@@ -89,10 +89,10 @@ export default function CapOptPlatform() {
   }
 
   const kpiData = [
-    { label: "Process Efficiency", value: 85, trend: "up" },
-    { label: "Risk Coverage", value: 92, trend: "up" },
-    { label: "Value Delivery", value: 78, trend: "down" },
-    { label: "Compliance Score", value: 96, trend: "up" },
+    { label: "Process Efficiency", value: 85, trend: "up", implemented: false },
+    { label: "Risk Coverage", value: 92, trend: "up", implemented: false },
+    { label: "Value Delivery", value: 78, trend: "down", implemented: false },
+    { label: "Compliance Score", value: 96, trend: "up", implemented: false },
   ]
 
   useEffect(() => {
@@ -351,6 +351,8 @@ export default function CapOptPlatform() {
                 <div className="bg-blue-600 h-2 rounded-full" style={{ width: '25%' }}></div>
               </div>
               <p className="text-xs text-blue-700 mt-1">25% Complete</p>
+              <p className="text-xs text-blue-600 mt-1">✓ Real data metrics enabled</p>
+              <p className="text-xs text-gray-500 mt-1">Mock data greyed out</p>
             </div>
             
             <div className="space-y-2">
@@ -470,10 +472,15 @@ export default function CapOptPlatform() {
                     {/* Overview Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                       {kpiData.map((kpi, index) => (
-                        <Card key={index}>
+                        <Card key={index} className={!kpi.implemented ? "opacity-50" : ""}>
                           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">{kpi.label}</CardTitle>
-                            <TrendingUp className={`h-4 w-4 ${kpi.trend === "up" ? "text-green-600" : "text-red-600"}`} />
+                            <div className="flex items-center gap-2">
+                              {!kpi.implemented && (
+                                <Badge variant="outline" className="text-xs">Mock Data</Badge>
+                              )}
+                              <TrendingUp className={`h-4 w-4 ${kpi.trend === "up" ? "text-green-600" : "text-red-600"}`} />
+                            </div>
                           </CardHeader>
                           <CardContent>
                             <div className="text-2xl font-bold">{kpi.value}%</div>
@@ -485,10 +492,64 @@ export default function CapOptPlatform() {
                       ))}
                     </div>
 
-                    {/* Maturity Scores */}
+                    {/* Real Database Metrics */}
                     <Card>
                       <CardHeader>
-                        <CardTitle>Maturity Assessment</CardTitle>
+                        <CardTitle className="flex items-center gap-2">
+                          Live Database Metrics
+                          <Badge variant="secondary" className="text-xs">✓ Real Data</Badge>
+                        </CardTitle>
+                        <CardDescription>Current metrics calculated from database</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-blue-600">{metrics.totalControls}</div>
+                            <div className="text-sm text-gray-500">Total Controls</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-green-600">{metrics.activeControls}</div>
+                            <div className="text-sm text-gray-500">Active Controls</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-purple-600">{metrics.totalProcesses}</div>
+                            <div className="text-sm text-gray-500">Total Processes</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-orange-600">{metrics.maturityScore}%</div>
+                            <div className="text-sm text-gray-500">Maturity Score</div>
+                          </div>
+                        </div>
+                        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-6">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-cyan-600">{metrics.activeProcesses}</div>
+                            <div className="text-sm text-gray-500">Active Processes</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-indigo-600">{metrics.totalAssets}</div>
+                            <div className="text-sm text-gray-500">Total Assets</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-teal-600">{metrics.operationalAssets}</div>
+                            <div className="text-sm text-gray-500">Operational Assets</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-emerald-600">
+                              {metrics.totalControls + metrics.totalProcesses + metrics.totalAssets}
+                            </div>
+                            <div className="text-sm text-gray-500">Total Items</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Maturity Scores */}
+                    <Card className="opacity-50">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          Maturity Assessment
+                          <Badge variant="outline" className="text-xs">Mock Data</Badge>
+                        </CardTitle>
                         <CardDescription>Current capability maturity across all layers</CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -576,9 +637,12 @@ export default function CapOptPlatform() {
                     </div>
 
                     {/* Recent Activity */}
-                    <Card>
+                    <Card className="opacity-50">
                       <CardHeader>
-                        <CardTitle>Recent Activity</CardTitle>
+                        <CardTitle className="flex items-center gap-2">
+                          Recent Activity
+                          <Badge variant="outline" className="text-xs">Mock Data</Badge>
+                        </CardTitle>
                         <CardDescription>Latest updates across the platform</CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -634,9 +698,12 @@ export default function CapOptPlatform() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <Card>
+                      <Card className="opacity-50">
                         <CardHeader>
-                          <CardTitle className="text-lg text-green-600">Effective Controls</CardTitle>
+                          <CardTitle className="text-lg text-green-600 flex items-center gap-2">
+                            Effective Controls
+                            <Badge variant="outline" className="text-xs">Mock Data</Badge>
+                          </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="text-3xl font-bold">24</div>
@@ -644,9 +711,12 @@ export default function CapOptPlatform() {
                         </CardContent>
                       </Card>
 
-                      <Card>
+                      <Card className="opacity-50">
                         <CardHeader>
-                          <CardTitle className="text-lg text-yellow-600">Needs Attention</CardTitle>
+                          <CardTitle className="text-lg text-yellow-600 flex items-center gap-2">
+                            Needs Attention
+                            <Badge variant="outline" className="text-xs">Mock Data</Badge>
+                          </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="text-3xl font-bold">3</div>
@@ -654,9 +724,12 @@ export default function CapOptPlatform() {
                         </CardContent>
                       </Card>
 
-                      <Card>
+                      <Card className="opacity-50">
                         <CardHeader>
-                          <CardTitle className="text-lg text-red-600">Critical Issues</CardTitle>
+                          <CardTitle className="text-lg text-red-600 flex items-center gap-2">
+                            Critical Issues
+                            <Badge variant="outline" className="text-xs">Mock Data</Badge>
+                          </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="text-3xl font-bold">1</div>
@@ -665,9 +738,12 @@ export default function CapOptPlatform() {
                       </Card>
                     </div>
 
-                    <Card>
+                    <Card className="opacity-50">
                       <CardHeader>
-                        <CardTitle>Control Status Overview</CardTitle>
+                        <CardTitle className="flex items-center gap-2">
+                          Control Status Overview
+                          <Badge variant="outline" className="text-xs">Mock Data</Badge>
+                        </CardTitle>
                         <CardDescription>Current status of all critical controls</CardDescription>
                       </CardHeader>
                       <CardContent>

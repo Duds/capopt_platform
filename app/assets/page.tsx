@@ -225,9 +225,10 @@ export default function AssetsPage() {
                 </div>
                 
                 <div className="flex items-end">
-                  <Button className="w-full">
+                  <Button className="w-full opacity-50" disabled>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Asset
+                    <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
                   </Button>
                 </div>
               </div>
@@ -236,6 +237,9 @@ export default function AssetsPage() {
 
           {/* Asset Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="col-span-full mb-2">
+              <Badge variant="secondary" className="text-xs">✓ Real Data</Badge>
+            </div>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Assets</CardTitle>

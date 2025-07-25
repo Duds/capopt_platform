@@ -202,9 +202,10 @@ export default function ControlsPage() {
                 </div>
                 
                 <div className="flex items-end">
-                  <Button className="w-full">
+                  <Button className="w-full opacity-50" disabled>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Control
+                    <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
                   </Button>
                 </div>
               </div>
@@ -214,8 +215,9 @@ export default function ControlsPage() {
           {/* Controls List */}
           <Card>
             <CardHeader>
-              <CardTitle>
+              <CardTitle className="flex items-center gap-2">
                 {filteredControls.length} control{filteredControls.length !== 1 ? 's' : ''} found
+                <Badge variant="secondary" className="text-xs">✓ Real Data</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
