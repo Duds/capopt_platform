@@ -1,3 +1,4 @@
+
 # Backend Development Standards
 
 ## Technology Stack
@@ -162,5 +163,5 @@ describe('UserService', () => {
 ---
 description: Backend development standards for Node.js/Express APIs, database design with Prisma, security practices, error handling, and testing requirements. Apply when working with server-side code, API endpoints, database schemas, or backend services.
 
-}
-```
+---
+description: Backend development standards for Node.js/Express APIs, database design with Prisma, security practices, error handling, and testing requirements. Apply when working with server-side code, API endpoints, database schemas, or backend services.

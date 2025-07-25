@@ -1,250 +1,551 @@
+---
+description: Apply when working with React components, UI interfaces, navigation patterns, implementation status indicators, strategic navigation flow components, page layouts, user experience patterns, accessibility features, responsive design, or any frontend-related code that involves user interface development, component composition, styling, or user interaction patterns.
+alwaysApply: false
+---
+
 # Frontend Development Standards
 
-## Technology Stack
-- **Framework:** Next.js 15+ with App Router
-- **Language:** TypeScript (strict mode)
-- **Styling:** Tailwind CSS
-- **UI Components:** Custom components based on shadcn/ui patterns
-- **State Management:** React hooks and context
-- **Forms:** React Hook Form with Zod validation
+## Overview
+**Purpose:** Ensure consistent, high-quality frontend development with proper implementation status communication and strategic navigation flow integration.
+
+## Core Principles
+
+### 1. **Implementation Status Transparency**
+- **Clear visual indicators** for implementation status
+- **Consistent disabled states** for non-functional components
+- **Honest communication** about feature capabilities
+- **Progress tracking** in prominent locations
+
+### 2. **Strategic Navigation Flow**
+- **Layer-to-layer navigation** between operational and strategic components
+- **Bidirectional flow** (operational→strategic, strategic→operational)
+- **Contextual navigation panels** showing strategic impact
+- **Alignment indicators** between process execution and strategic objectives
+
+### 3. **User Experience Excellence**
+- **Intuitive navigation** patterns
+- **Responsive design** across all devices
+- **Accessibility compliance** (WCAG 2.1 AA)
+- **Performance optimization** for fast interactions
+
+### 4. **Code Quality**
+- **TypeScript strict mode** for type safety
+- **Component composition** over inheritance
+- **Consistent naming conventions**
+- **Proper error handling** and loading states
 
 ## Component Standards
 
-### Component Structure
+### **Implementation Status Patterns**
+
+#### **Functional Components**
 ```typescript
-// Component template
-interface ComponentProps {
-  // Props interface at top
-}
-
-export function ComponentName({ prop1, prop2 }: ComponentProps) {
-  // Component logic
-  return (
-    // JSX with proper semantic HTML
-  );
-}
+// ✅ Fully implemented component
+<Card>
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      Feature Name
+      <Badge variant="secondary" className="text-xs">✓ Real Data</Badge>
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    {/* Real data content */}
+  </CardContent>
+</Card>
 ```
 
-### Styling Guidelines
-- **Always use Tailwind CSS** for styling
-- **Use semantic HTML** elements
-- **Follow accessibility guidelines** (WCAG 2.1 AA)
-- **Use CSS Grid and Flexbox** for layouts
-- **Implement responsive design** for all components
-- **Use design tokens** for consistent spacing, colors, and typography
-
-### Button Standards
-- **Primary buttons** must always have rainbow shadow effect
-- **Use `rounded-full`** for pill-shaped buttons (remove custom `btn-pill` class)
-- **Standard Tailwind classes** preferred over custom CSS
-- **Consistent hover and focus states**
-
-### Form Standards
-- **Use React Hook Form** for form management
-- **Zod schemas** for validation
-- **Proper error handling** and user feedback
-- **Accessible form labels** and descriptions
-- **Loading states** for form submissions
-
-## File Organization
-```
-app/
-  components/          # App-specific components
-  controls/           # Control-related pages
-  globals.css         # Global styles
-  layout.tsx          # Root layout
-  page.tsx            # Home page
-
-components/
-  ui/                 # Reusable UI components
-  controls/           # Control-related components
-  facility/           # Facility-related components
-  navigation/         # Navigation components
-```
-
-## Performance Guidelines
-- **Use Next.js Image component** for optimized images
-- **Implement proper loading states**
-- **Lazy load components** when appropriate
-- **Optimize bundle size** with dynamic imports
-- **Use React.memo** for expensive components
-
-## Accessibility Requirements
-- **Semantic HTML** structure
-- **ARIA labels** where needed
-- **Keyboard navigation** support
-- **Screen reader** compatibility
-- **Color contrast** compliance
-- **Focus management** for modals and dialogs
-
-## Testing Requirements
-- **Unit tests** for utility functions
-- **Component tests** for complex components
-- **Integration tests** for user workflows
-- **Accessibility tests** for compliance
-
-## Non-Functional Component Standards
-
-### Implementation Status Visualization
-**Purpose:** Clearly distinguish between implemented and non-implemented features to provide honest user feedback and development transparency.
-
-### Visual Indicators for Non-Functional Components
-
-#### **Disabled State Requirements**
-- **Opacity Reduction:** Use `opacity-50` class for non-functional components
-- **Visual Distinction:** Clear visual separation from functional components
-- **Consistent Styling:** Apply same disabled styling across all non-functional elements
-
-#### **Status Badges**
+#### **Non-Functional Components**
 ```typescript
-// For non-functional components
-<Badge variant="outline" className="text-xs">Mock Data</Badge>
-<Badge variant="outline" className="text-xs">Not Implemented</Badge>
-<Badge variant="outline" className="text-xs">Coming Soon</Badge>
-
-// For functional components
-<Badge variant="secondary" className="text-xs">✓ Real Data</Badge>
-<Badge variant="secondary" className="text-xs">✓ Implemented</Badge>
-```
-
-#### **Component Disabling Patterns**
-```typescript
-// Button disabling
-<Button disabled className="opacity-50">
-  Feature Name
-</Button>
-
-// Card disabling
+// ❌ Non-functional component
 <Card className="opacity-50">
   <CardHeader>
     <CardTitle className="flex items-center gap-2">
       Feature Name
-      <Badge variant="outline" className="text-xs">Mock Data</Badge>
+      <Badge variant="outline" className="text-xs">Not Implemented</Badge>
     </CardTitle>
   </CardHeader>
+  <CardContent>
+    {/* Mock data content */}
+  </CardContent>
 </Card>
-
-// Menu item disabling
-<DropdownMenuItem disabled>
-  <Icon className="mr-2 h-4 w-4" />
-  <span>Feature Name</span>
-</DropdownMenuItem>
 ```
 
-### Implementation Status Categories
+### **Strategic Navigation Flow Patterns**
 
-#### **✅ Fully Implemented**
-- **Database Integration:** Real data from API endpoints
-- **Full CRUD Operations:** Create, read, update, delete functionality
-- **User Interactions:** Complete user workflows
-- **Visual Indicator:** Full opacity, "✓ Real Data" badge
-
-#### **🚧 Partially Implemented**
-- **Backend Only:** API endpoints exist but no frontend interface
-- **Frontend Only:** UI exists but no backend integration
-- **Limited Functionality:** Basic features working, advanced features pending
-- **Visual Indicator:** Reduced opacity, "In Progress" badge
-
-#### **⏳ Not Implemented**
-- **Mock Data:** Hardcoded values or placeholder content
-- **No Backend:** No API endpoints or database integration
-- **No Frontend:** No user interface or interactions
-- **Visual Indicator:** Reduced opacity, "Mock Data" or "Not Implemented" badge
-
-### Dashboard Metrics Standards
-
-#### **Real Data Metrics**
+#### **Breadcrumb Navigation**
 ```typescript
-// Use real database calculations
-const realMetrics = {
-  totalControls: controlsData.length,
-  activeControls: controlsData.filter(c => c.status === 'ACTIVE').length,
-  maturityScore: calculateRealMaturityScore(data)
-}
+// Fully implemented navigation
+<Breadcrumb className="text-sm">
+  <BreadcrumbItem>Process Maps</BreadcrumbItem>
+  <BreadcrumbSeparator />
+  <BreadcrumbItem>Equipment Maintenance</BreadcrumbItem>
+  <BreadcrumbSeparator />
+  <BreadcrumbItem>Service Model</BreadcrumbItem>
+</Breadcrumb>
+
+// Disabled navigation for unimplemented layers
+<Breadcrumb className="text-sm opacity-50">
+  <BreadcrumbItem>Process Maps</BreadcrumbItem>
+  <BreadcrumbSeparator />
+  <BreadcrumbItem className="text-muted-foreground">Service Model</BreadcrumbItem>
+  <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
+</Breadcrumb>
 ```
 
-#### **Mock Data Identification**
+#### **Strategic Context Panel**
 ```typescript
-// Clearly mark mock data
-const mockKpiData = [
-  { 
-    label: "Process Efficiency", 
-    value: 85, 
-    trend: "up", 
-    implemented: false // Mark as non-functional
+// Active strategic navigation context
+<Card>
+  <CardHeader>
+    <CardTitle>Strategic Navigation Context</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="text-center">
+        <Button variant="outline" size="sm" className="w-full">
+          🔗 Service Model
+        </Button>
+        <p className="text-xs mt-1">85% Aligned</p>
+      </div>
+      <div className="text-center opacity-50">
+        <Button variant="outline" size="sm" className="w-full" disabled>
+          🔗 Value Chain
+        </Button>
+        <Badge variant="outline" className="mt-1 text-xs">Not Implemented</Badge>
+      </div>
+    </div>
+  </CardContent>
+</Card>
+```
+
+#### **Alignment Indicators**
+```typescript
+// Strategic alignment scoring
+<div className="flex items-center gap-2">
+  <div className="flex-1">
+    <div className="flex justify-between text-sm">
+      <span>Strategic Alignment</span>
+      <span>87%</span>
+    </div>
+    <Progress value={87} className="h-2" />
+  </div>
+  <Badge variant="secondary">High Alignment</Badge>
+</div>
+```
+
+## Navigation Flow Standards
+
+### **Layer Navigation Patterns**
+
+#### **Process Maps to Service Model**
+```typescript
+// Navigation button in process detail view
+<Button 
+  variant="outline" 
+  onClick={() => router.push(`/service-model/${process.serviceModelId}`)}
+  className="flex items-center gap-2"
+>
+  <ServiceIcon className="h-4 w-4" />
+  View Service Model
+  <Badge variant="secondary" className="text-xs">85% Aligned</Badge>
+</Button>
+```
+
+#### **Service Model to Value Chain**
+```typescript
+// Navigation button in service model view
+<Button 
+  variant="outline" 
+  onClick={() => router.push(`/value-chain/${serviceModel.valueChainId}`)}
+  className="flex items-center gap-2"
+>
+  <ValueChainIcon className="h-4 w-4" />
+  View Value Chain
+  <Badge variant="secondary" className="text-xs">92% Aligned</Badge>
+</Button>
+```
+
+#### **Value Chain to Operating Model**
+```typescript
+// Navigation button in value chain view
+<Button 
+  variant="outline" 
+  onClick={() => router.push(`/operating-model/${valueChain.operatingModelId}`)}
+  className="flex items-center gap-2"
+>
+  <OperatingModelIcon className="h-4 w-4" />
+  View Operating Model
+  <Badge variant="secondary" className="text-xs">78% Aligned</Badge>
+</Button>
+```
+
+#### **Operating Model to Business Canvas**
+```typescript
+// Navigation button in operating model view
+<Button 
+  variant="outline" 
+  onClick={() => router.push(`/business-canvas/${operatingModel.businessCanvasId}`)}
+  className="flex items-center gap-2"
+>
+  <BusinessCanvasIcon className="h-4 w-4" />
+  View Business Canvas
+  <Badge variant="secondary" className="text-xs">90% Aligned</Badge>
+</Button>
+```
+
+### **Disabled Navigation Patterns**
+
+#### **Unimplemented Layer Navigation**
+```typescript
+// Disabled navigation for unimplemented layers
+<Button 
+  variant="outline" 
+  disabled 
+  className="flex items-center gap-2 opacity-50"
+>
+  <ServiceIcon className="h-4 w-4" />
+  Service Model
+  <Badge variant="outline" className="text-xs">Coming Soon</Badge>
+</Button>
+```
+
+#### **Contextual Navigation Panel**
+```typescript
+// Strategic context panel with disabled layers
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+  {/* Implemented layer */}
+  <div className="text-center">
+    <Button variant="outline" size="sm" className="w-full">
+      🔗 Service Model
+    </Button>
+    <p className="text-xs mt-1">85% Aligned</p>
+  </div>
+  
+  {/* Unimplemented layer */}
+  <div className="text-center opacity-50">
+    <Button variant="outline" size="sm" className="w-full" disabled>
+      🔗 Value Chain
+    </Button>
+    <Badge variant="outline" className="mt-1 text-xs">Not Implemented</Badge>
+  </div>
+</div>
+```
+
+## Page Structure Standards
+
+### **Process Detail Page**
+```typescript
+// Process detail page with strategic navigation
+<div className="min-h-screen bg-gray-50">
+  <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    {/* Header with breadcrumbs */}
+    <div className="mb-8">
+      <Breadcrumb>
+        <BreadcrumbItem>Process Maps</BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>{process.name}</BreadcrumbItem>
+      </Breadcrumb>
+      <h1 className="text-3xl font-bold text-gray-900 mt-4">{process.name}</h1>
+    </div>
+    
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Main content */}
+      <div className="lg:col-span-2">
+        {/* Process details */}
+      </div>
+      
+      {/* Strategic navigation sidebar */}
+      <div className="space-y-6">
+        <StrategicContextPanel process={process} />
+        <AlignmentIndicators process={process} />
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+### **Service Model Page**
+```typescript
+// Service model page with navigation flow
+<div className="min-h-screen bg-gray-50">
+  <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    {/* Header with navigation */}
+    <div className="mb-8">
+      <Breadcrumb>
+        <BreadcrumbItem>Process Maps</BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>Equipment Maintenance</BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>Service Model</BreadcrumbItem>
+      </Breadcrumb>
+      <h1 className="text-3xl font-bold text-gray-900 mt-4">Service Model</h1>
+    </div>
+    
+    {/* Service blueprint content */}
+    <ServiceBlueprint serviceModel={serviceModel} />
+    
+    {/* Navigation footer */}
+    <div className="mt-8 flex justify-between">
+      <Button variant="outline" onClick={() => router.back()}>
+        ← Back to Process
+      </Button>
+      <Button variant="outline" onClick={() => router.push(`/value-chain/${serviceModel.valueChainId}`)}>
+        Value Chain →
+      </Button>
+    </div>
+  </div>
+</div>
+```
+
+## Component Composition Standards
+
+### **Strategic Navigation Components**
+
+#### **StrategicContextPanel**
+```typescript
+interface StrategicContextPanelProps {
+  process: Process
+  alignmentScores: {
+    serviceModel: number
+    valueChain: number
+    operatingModel: number
+    businessCanvas: number
   }
-]
+}
+
+const StrategicContextPanel: React.FC<StrategicContextPanelProps> = ({
+  process,
+  alignmentScores
+}) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Strategic Navigation Context</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <NavigationLayerButton
+            layer="serviceModel"
+            alignment={alignmentScores.serviceModel}
+            implemented={true}
+          />
+          <NavigationLayerButton
+            layer="valueChain"
+            alignment={alignmentScores.valueChain}
+            implemented={false}
+          />
+          {/* Additional layers */}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
 ```
 
-### Progress Tracking Requirements
-
-#### **Implementation Progress Indicator**
-- **Sidebar Progress Bar:** Show overall implementation percentage
-- **Feature Count:** Display implemented vs. total features
-- **Visual Progress:** Use progress bars and percentages
-- **Status Updates:** Real-time progress tracking
-
-#### **Progress Calculation**
+#### **AlignmentIndicators**
 ```typescript
-const progressMetrics = {
-  totalFeatures: 12,
-  implementedFeatures: 3,
-  progressPercentage: Math.round((implementedFeatures / totalFeatures) * 100),
-  phaseProgress: {
-    phase1: { completed: 4, total: 5, percentage: 80 },
-    phase2: { completed: 1, total: 4, percentage: 25 },
-    phase3: { completed: 0, total: 4, percentage: 0 }
+interface AlignmentIndicatorsProps {
+  process: Process
+  alignmentScore: number
+}
+
+const AlignmentIndicators: React.FC<AlignmentIndicatorsProps> = ({
+  process,
+  alignmentScore
+}) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Strategic Alignment</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <div className="flex justify-between text-sm">
+              <span>Overall Alignment</span>
+              <span>{alignmentScore}%</span>
+            </div>
+            <Progress value={alignmentScore} className="h-2" />
+          </div>
+          <Badge variant={alignmentScore > 80 ? "secondary" : "destructive"}>
+            {alignmentScore > 80 ? "High Alignment" : "Needs Attention"}
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+## Error Handling Standards
+
+### **Navigation Error Handling**
+```typescript
+// Handle navigation errors gracefully
+const handleNavigation = async (route: string) => {
+  try {
+    setIsNavigating(true)
+    await router.push(route)
+  } catch (error) {
+    console.error('Navigation error:', error)
+    toast({
+      title: "Navigation Error",
+      description: "Unable to navigate to the requested page. Please try again.",
+      variant: "destructive"
+    })
+  } finally {
+    setIsNavigating(false)
   }
 }
 ```
 
-### User Experience Guidelines
-
-#### **Transparency Requirements**
-- **Honest Communication:** Never hide implementation status
-- **Clear Expectations:** Users understand what's real vs. mock
-- **Progress Visibility:** Show development progress clearly
-- **Feature Roadmap:** Indicate when features will be implemented
-
-#### **Accessibility for Disabled Components**
-- **Screen Reader Support:** Proper ARIA labels for disabled state
-- **Keyboard Navigation:** Disabled components should be skipped
-- **Focus Management:** Clear focus indicators for functional elements
-- **Alternative Text:** Descriptive text for disabled features
-
-### Development Workflow
-
-#### **When Adding New Features**
-1. **Start with Mock Data:** Create UI with placeholder content
-2. **Mark as Non-Functional:** Apply disabled styling and badges
-3. **Implement Backend:** Add API endpoints and database integration
-4. **Connect Frontend:** Replace mock data with real API calls
-5. **Remove Disabled State:** Enable component and remove mock indicators
-
-#### **When Reviewing Components**
-1. **Check Implementation Status:** Verify if component is functional
-2. **Validate Data Sources:** Ensure real data vs. mock data
-3. **Test User Interactions:** Verify all interactions work
-4. **Update Progress Tracking:** Update implementation metrics
-
-### Code Quality Standards
-
-#### **Mock Data Management**
-- **Clear Identification:** All mock data must be clearly marked
-- **Consistent Naming:** Use `implemented: false` or similar flags
-- **Documentation:** Comment mock data with implementation plans
-- **Version Control:** Track mock data removal in commits
-
-#### **Component State Management**
+### **Loading States**
 ```typescript
-interface ComponentState {
-  isImplemented: boolean
-  hasRealData: boolean
-  mockDataFlag?: boolean
-  implementationNotes?: string
-}
+// Loading state for navigation
+<Button 
+  variant="outline" 
+  onClick={handleNavigation}
+  disabled={isNavigating}
+  className="flex items-center gap-2"
+>
+  {isNavigating ? (
+    <Loader2 className="h-4 w-4 animate-spin" />
+  ) : (
+    <ServiceIcon className="h-4 w-4" />
+  )}
+  {isNavigating ? "Navigating..." : "Service Model"}
+</Button>
+```
+
+## Accessibility Standards
+
+### **Navigation Accessibility**
+```typescript
+// Accessible navigation with proper ARIA labels
+<Button 
+  variant="outline"
+  onClick={handleNavigation}
+  aria-label={`Navigate to ${layerName} (${alignmentScore}% aligned)`}
+  aria-describedby={`${layerName}-description`}
+>
+  <Icon className="h-4 w-4 mr-2" />
+  {layerName}
+  <Badge variant="secondary" className="ml-2">{alignmentScore}%</Badge>
+</Button>
+<div id={`${layerName}-description`} className="sr-only">
+  This layer is {alignmentScore}% aligned with the current process
+</div>
+```
+
+### **Breadcrumb Accessibility**
+```typescript
+// Accessible breadcrumb navigation
+<nav aria-label="Breadcrumb">
+  <Breadcrumb>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/processes">Process Maps</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem aria-current="page">
+      {currentProcess.name}
+    </BreadcrumbItem>
+  </Breadcrumb>
+</nav>
+```
+
+## Performance Standards
+
+### **Navigation Performance**
+- **Preload critical navigation routes** for faster transitions
+- **Lazy load non-critical navigation components**
+- **Optimize bundle size** for navigation-related code
+- **Cache navigation state** to reduce API calls
+
+### **Component Optimization**
+```typescript
+// Optimize navigation components with React.memo
+const NavigationLayerButton = React.memo<NavigationLayerButtonProps>(({
+  layer,
+  alignment,
+  implemented
+}) => {
+  // Component implementation
+})
+
+// Use dynamic imports for navigation pages
+const ServiceModelPage = dynamic(() => import('./ServiceModelPage'), {
+  loading: () => <NavigationLoading />
+})
+```
+
+## Testing Standards
+
+### **Navigation Flow Testing**
+```typescript
+// Test navigation flow functionality
+describe('Strategic Navigation Flow', () => {
+  it('should navigate from process to service model', async () => {
+    render(<ProcessDetailPage />)
+    
+    const serviceModelButton = screen.getByRole('button', { name: /service model/i })
+    expect(serviceModelButton).toBeInTheDocument()
+    
+    await userEvent.click(serviceModelButton)
+    
+    expect(mockRouter.push).toHaveBeenCalledWith('/service-model/123')
+  })
+  
+  it('should show disabled state for unimplemented layers', () => {
+    render(<ProcessDetailPage />)
+    
+    const valueChainButton = screen.getByRole('button', { name: /value chain/i })
+    expect(valueChainButton).toBeDisabled()
+    expect(valueChainButton).toHaveClass('opacity-50')
+  })
+})
+```
+
+## Documentation Standards
+
+### **Navigation Flow Documentation**
+- **Wireframes and user journeys** for each navigation path
+- **Component API documentation** for navigation components
+- **Alignment scoring methodology** and metrics
+- **User training materials** for navigation features
+
+### **Code Documentation**
+```typescript
+/**
+ * Strategic Navigation Context Panel
+ * 
+ * Displays the strategic context for a process, showing alignment
+ * with higher-level strategic layers and providing navigation
+ * to those layers.
+ * 
+ * @param process - The current process being viewed
+ * @param alignmentScores - Alignment scores for each strategic layer
+ * @param onNavigate - Callback for navigation events
+ * 
+ * @example
+ * <StrategicContextPanel
+ *   process={currentProcess}
+ *   alignmentScores={{
+ *     serviceModel: 85,
+ *     valueChain: 92,
+ *     operatingModel: 78,
+ *     businessCanvas: 90
+ *   }}
+ *   onNavigate={handleNavigation}
+ * />
+ */
 ```
 
 ---
-description: Frontend development standards for React/Next.js components, styling with Tailwind CSS, accessibility requirements, performance guidelines, and non-functional component handling. Apply when working with frontend files, components, or UI-related code.
+
+**Next Steps**: Implement Service Model as the next layer in the strategic navigation flow, following these frontend standards for consistent user experience.
+
+
+
+**Next Steps**: Implement Service Model as the next layer in the strategic navigation flow, following these frontend standards for consistent user experience.
+
 

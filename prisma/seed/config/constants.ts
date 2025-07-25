@@ -1,0 +1,21 @@
+export const SEED_CONSTANTS = {
+  // User constants
+  DEFAULT_PASSWORD_HASH: '$2b$12$AFRDpiSEF5eSylOdT7WsHunO49KQo/sMpWgRkB.hIpEqgvr5st79K',
+  
+  // Process constants
+  DEFAULT_PROCESS_STATUS: 'ACTIVE',
+  DEFAULT_PROCESS_PRIORITY: 'MEDIUM',
+  
+  // Control constants
+  DEFAULT_CONTROL_STATUS: 'ACTIVE',
+  DEFAULT_RISK_LEVEL: 'MEDIUM',
+  
+  // Asset constants
+  DEFAULT_ASSET_STATUS: 'OPERATIONAL',
+  DEFAULT_MAINTENANCE_INTERVAL: 30, // days
+  
+  // Sample data limits
+  MAX_SAMPLE_PROCESSES: 10,
+  MAX_SAMPLE_CONTROLS: 20,
+  MAX_SAMPLE_ASSETS: 15,
+} as const 

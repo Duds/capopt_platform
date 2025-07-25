@@ -1,0 +1,428 @@
+---
+description: This rule provides standards for managing and seeding data in a Prisma project. It defines modular organization, data integrity, development workflow, performance, and configuration standards.
+---
+
+# Seed Management Standards
+
+## Overview
+**Purpose:** Ensure organized, maintainable, and scalable database seeding with proper separation of concerns and clear management strategies.
+
+## Core Principles
+
+### 1. **Modular Organization**
+- **Separate seed files** by domain/entity type
+- **Clear dependencies** between seed modules
+- **Reusable seed functions** for common patterns
+- **Environment-specific** seed configurations
+
+### 2. **Data Integrity**
+- **Consistent relationships** between seeded entities
+- **Proper foreign key** handling
+- **Data validation** before seeding
+- **Cleanup strategies** for development
+
+### 3. **Development Workflow**
+- **Quick development** seeding for rapid iteration
+- **Comprehensive seeding** for testing scenarios
+- **Production-safe** seed strategies
+- **Version control** for seed data
+
+### 4. **Performance & Scalability**
+- **Efficient seeding** for large datasets
+- **Incremental seeding** capabilities
+- **Selective seeding** for specific entities
+- **Memory management** for large seed operations
+
+## Seed File Structure
+
+### **Directory Organization**
+```
+prisma/
+├── seed/
+│   ├── index.ts                 # Main seed orchestrator
+│   ├── config/
+│   │   ├── environment.ts       # Environment-specific configs
+│   │   └── constants.ts         # Shared constants
+│   ├── users/
+│   │   ├── index.ts            # User seeding orchestrator
+│   │   ├── admin-users.ts      # Admin user creation
+│   │   ├── role-users.ts       # Role-specific users
+│   │   └── test-users.ts       # Test user scenarios
+│   ├── strategic/
+│   │   ├── index.ts            # Strategic layer seeding
+│   │   ├── business-canvas.ts  # Business canvas data
+│   │   ├── operating-model.ts  # Operating model data
+│   │   └── value-chain.ts      # Value chain data
+│   ├── operational/
+│   │   ├── index.ts            # Operational layer seeding
+│   │   ├── processes.ts        # Process data
+│   │   ├── playbooks.ts        # Playbook data
+│   │   └── maturity.ts         # Maturity assessment data
+│   ├── controls/
+│   │   ├── index.ts            # Control layer seeding
+│   │   ├── critical-controls.ts # Critical controls data
+│   │   ├── risk-categories.ts  # Risk categories
+│   │   └── bowtie-analysis.ts  # Bowtie analysis data
+│   ├── assets/
+│   │   ├── index.ts            # Asset layer seeding
+│   │   ├── equipment.ts        # Equipment data
+│   │   ├── facilities.ts       # Facility data
+│   │   └── monitoring.ts       # Asset monitoring data
+│   └── utils/
+│       ├── helpers.ts          # Common seeding utilities
+│       ├── validators.ts       # Data validation helpers
+│       └── cleanup.ts          # Cleanup utilities
+├── seed.ts                     # Legacy main seed (deprecated)
+└── schema.prisma
+```
+
+## Seed Module Standards
+
+### **Module Structure Template**
+```typescript
+// users/index.ts
+import { PrismaClient } from '@prisma/client'
+import { seedAdminUsers } from './admin-users'
+import { seedRoleUsers } from './role-users'
+import { seedTestUsers } from './test-users'
+
+export async function seedUsers(prisma: PrismaClient, options?: SeedOptions) {
+  console.log('👥 Seeding users...')
+  
+  try {
+    // Seed in dependency order
+    await seedAdminUsers(prisma, options)
+    await seedRoleUsers(prisma, options)
+    
+    if (options?.includeTestData) {
+      await seedTestUsers(prisma, options)
+    }
+    
+    console.log('✅ Users seeded successfully')
+  } catch (error) {
+    console.error('❌ Error seeding users:', error)
+    throw error
+  }
+}
+```
+
+### **Individual Seed File Template**
+```typescript
+// users/admin-users.ts
+import { PrismaClient } from '@prisma/client'
+import { SeedOptions } from '../config/types'
+
+export async function seedAdminUsers(prisma: PrismaClient, options?: SeedOptions) {
+  const adminUsers = [
+    {
+      email: 'admin@capopt.com',
+      name: 'System Administrator',
+      role: 'ADMIN' as const,
+    },
+    {
+      email: 'superadmin@capopt.com',
+      name: 'Super Administrator',
+      role: 'SUPERADMIN' as const,
+    }
+  ]
+
+  for (const userData of adminUsers) {
+    await prisma.user.upsert({
+      where: { email: userData.email },
+      update: {},
+      create: {
+        ...userData,
+        password: options?.defaultPassword || '$2b$12$AFRDpiSEF5eSylOdT7WsHunO49KQo/sMpWgRkB.hIpEqgvr5st79K',
+      },
+    })
+  }
+}
+```
+
+## Configuration Standards
+
+### **Environment Configuration**
+```typescript
+// config/environment.ts
+export interface SeedOptions {
+  environment: 'development' | 'testing' | 'staging'
+  includeTestData: boolean
+  includeSampleData: boolean
+  defaultPassword: string
+  cleanupBeforeSeed: boolean
+  seedSpecificModules?: string[]
+}
+
+export const getSeedConfig = (): SeedOptions => {
+  const env = process.env.NODE_ENV || 'development'
+  
+  return {
+    environment: env as 'development' | 'testing' | 'staging',
+    includeTestData: env === 'development' || env === 'testing',
+    includeSampleData: env === 'development',
+    defaultPassword: process.env.SEED_DEFAULT_PASSWORD || 'admin123',
+    cleanupBeforeSeed: env === 'testing',
+    seedSpecificModules: process.env.SEED_MODULES?.split(',') || undefined,
+  }
+}
+```
+
+### **Constants Management**
+```typescript
+// config/constants.ts
+export const SEED_CONSTANTS = {
+  // User constants
+  DEFAULT_PASSWORD_HASH: '$2b$12$AFRDpiSEF5eSylOdT7WsHunO49KQo/sMpWgRkB.hIpEqgvr5st79K',
+  
+  // Process constants
+  DEFAULT_PROCESS_STATUS: 'ACTIVE',
+  DEFAULT_PROCESS_PRIORITY: 'MEDIUM',
+  
+  // Control constants
+  DEFAULT_CONTROL_STATUS: 'ACTIVE',
+  DEFAULT_RISK_LEVEL: 'MEDIUM',
+  
+  // Asset constants
+  DEFAULT_ASSET_STATUS: 'OPERATIONAL',
+  DEFAULT_MAINTENANCE_INTERVAL: 30, // days
+} as const
+```
+
+## Seeding Strategies
+
+### **Development Seeding**
+```typescript
+// Quick development seeding
+export async function seedDevelopment(prisma: PrismaClient) {
+  const config = getSeedConfig()
+  
+  console.log('🚀 Starting development seed...')
+  
+  // Essential data only
+  await seedUsers(prisma, { ...config, includeTestData: false })
+  await seedControls(prisma, { ...config, includeSampleData: true })
+  await seedProcesses(prisma, { ...config, includeSampleData: true })
+  
+  console.log('✅ Development seed complete')
+}
+```
+
+### **Testing Seeding**
+```typescript
+// Comprehensive testing seeding
+export async function seedTesting(prisma: PrismaClient) {
+  const config = getSeedConfig()
+  
+  console.log('🧪 Starting testing seed...')
+  
+  // Clean database first
+  if (config.cleanupBeforeSeed) {
+    await cleanupDatabase(prisma)
+  }
+  
+  // All data including test scenarios
+  await seedUsers(prisma, { ...config, includeTestData: true })
+  await seedControls(prisma, { ...config, includeSampleData: true })
+  await seedProcesses(prisma, { ...config, includeSampleData: true })
+  await seedAssets(prisma, { ...config, includeSampleData: true })
+  await seedStrategic(prisma, { ...config, includeSampleData: true })
+  
+  console.log('✅ Testing seed complete')
+}
+```
+
+### **Selective Seeding**
+```typescript
+// Seed specific modules
+export async function seedSpecific(prisma: PrismaClient, modules: string[]) {
+  console.log(`🎯 Seeding specific modules: ${modules.join(', ')}`)
+  
+  const seedFunctions: Record<string, (prisma: PrismaClient) => Promise<void>> = {
+    users: () => seedUsers(prisma),
+    controls: () => seedControls(prisma),
+    processes: () => seedProcesses(prisma),
+    assets: () => seedAssets(prisma),
+    strategic: () => seedStrategic(prisma),
+  }
+  
+  for (const module of modules) {
+    if (seedFunctions[module]) {
+      await seedFunctions[module](prisma)
+    } else {
+      console.warn(`⚠️ Unknown seed module: ${module}`)
+    }
+  }
+}
+```
+
+## Utility Functions
+
+### **Common Helpers**
+```typescript
+// utils/helpers.ts
+import { PrismaClient } from '@prisma/client'
+
+export async function createOrUpdate<T>(
+  prisma: PrismaClient,
+  model: any,
+  where: any,
+  data: any
+): Promise<T> {
+  return await prisma[model].upsert({
+    where,
+    update: data,
+    create: data,
+  })
+}
+
+export async function createManyIfNotExists<T>(
+  prisma: PrismaClient,
+  model: any,
+  data: any[],
+  uniqueField: string
+): Promise<T[]> {
+  const results: T[] = []
+  
+  for (const item of data) {
+    const existing = await prisma[model].findUnique({
+      where: { [uniqueField]: item[uniqueField] }
+    })
+    
+    if (!existing) {
+      const created = await prisma[model].create({ data: item })
+      results.push(created)
+    } else {
+      results.push(existing)
+    }
+  }
+  
+  return results
+}
+```
+
+### **Data Validation**
+```typescript
+// utils/validators.ts
+import { z } from 'zod'
+
+export const UserSeedSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1),
+  role: z.enum(['ADMIN', 'SUPERADMIN', 'MANAGER', 'AUDITOR', 'USER']),
+  password: z.string().min(1),
+})
+
+export function validateSeedData<T>(schema: z.ZodSchema<T>, data: unknown): T {
+  return schema.parse(data)
+}
+```
+
+### **Cleanup Utilities**
+```typescript
+// utils/cleanup.ts
+import { PrismaClient } from '@prisma/client'
+
+export async function cleanupDatabase(prisma: PrismaClient) {
+  console.log('🧹 Cleaning up database...')
+  
+  // Delete in reverse dependency order
+  await prisma.processStep.deleteMany()
+  await prisma.process.deleteMany()
+  await prisma.control.deleteMany()
+  await prisma.asset.deleteMany()
+  await prisma.user.deleteMany()
+  // Add other entities as needed
+  
+  console.log('✅ Database cleaned')
+}
+```
+
+## Package.json Scripts
+
+### **Seed Scripts**
+```json
+{
+  "scripts": {
+    "seed": "tsx prisma/seed/index.ts",
+    "seed:dev": "NODE_ENV=development tsx prisma/seed/index.ts",
+    "seed:test": "NODE_ENV=testing tsx prisma/seed/index.ts",
+    "seed:users": "tsx prisma/seed/index.ts --modules=users",
+    "seed:controls": "tsx prisma/seed/index.ts --modules=controls",
+    "seed:processes": "tsx prisma/seed/index.ts --modules=processes",
+    "seed:clean": "tsx prisma/seed/utils/cleanup.ts",
+    "db:reset": "prisma migrate reset --force && npm run seed:test"
+  }
+}
+```
+
+## Migration Strategy
+
+### **Legacy Seed Migration**
+1. **Create new modular structure**
+2. **Move existing seed logic** to appropriate modules
+3. **Update package.json scripts**
+4. **Test all seeding scenarios**
+5. **Deprecate old seed.ts** with warning
+6. **Remove old seed.ts** after confirmation
+
+### **Backward Compatibility**
+```typescript
+// seed.ts (legacy - deprecated)
+import { PrismaClient } from '@prisma/client'
+import { seedTesting } from './seed/index'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  console.warn('⚠️ Using legacy seed.ts - consider migrating to modular seeding')
+  await seedTesting(prisma)
+}
+
+main()
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
+```
+
+## Best Practices
+
+### **Performance Optimization**
+- **Batch operations** for large datasets
+- **Transaction wrapping** for related data
+- **Index consideration** during seeding
+- **Memory management** for large operations
+
+### **Data Quality**
+- **Realistic sample data** for development
+- **Comprehensive test scenarios** for testing
+- **Data validation** before seeding
+- **Relationship integrity** maintenance
+
+### **Maintenance**
+- **Regular review** of seed data
+- **Version control** for seed changes
+- **Documentation** of seed scenarios
+- **Testing** of seed operations
+
+---
+
+**Next Steps**: Implement the modular seed structure, migrate existing seed data, and establish the new seeding workflow.
+
+globs:
+alwaysApply: false
+---
+
+
+globs:
+alwaysApply: false
+---
+
+alwaysApply: false
+---
+
+alwaysApply: false
+---

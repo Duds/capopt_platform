@@ -7,8 +7,15 @@
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
-    "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "npx prisma migrate reset && npm run db:seed"
+    "db:seed": "tsx prisma/seed/index.ts",
+    "db:seed:dev": "NODE_ENV=development tsx prisma/seed/index.ts",
+    "db:seed:test": "NODE_ENV=testing tsx prisma/seed/index.ts",
+    "db:seed:enterprise": "tsx prisma/seed/index.ts --modules=enterprise",
+    "db:seed:users": "tsx prisma/seed/index.ts --modules=users",
+    "db:seed:controls": "tsx prisma/seed/index.ts --modules=controls",
+    "db:seed:operational": "tsx prisma/seed/index.ts --modules=operational",
+    "db:clean": "tsx prisma/seed/utils/cleanup.ts",
+    "db:reset": "npx prisma migrate reset --force && npm run db:seed:test"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -70,7 +77,7 @@
     "zod": "^3.24.1"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed/index.ts"
   },
   "devDependencies": {
     "@types/node": "^22",

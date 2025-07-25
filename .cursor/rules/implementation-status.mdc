@@ -1,3 +1,4 @@
+
 # Implementation Status & Progress Tracking Standards
 
 ## Overview
@@ -23,6 +24,12 @@
 - **Accessible disabled states** for screen readers
 - **Helpful messaging** about implementation status
 
+### 4. **Strategic Navigation Flow**
+- **Layer-to-layer traceability** between operational and strategic components
+- **Bidirectional navigation** (operational→strategic, strategic→operational)
+- **Contextual navigation panels** showing strategic impact
+- **Alignment indicators** between process execution and strategic objectives
+
 ## Implementation Status Categories
 
 ### ✅ **Fully Implemented**
@@ -32,18 +39,21 @@
 - Full user workflow functionality
 - API endpoints working
 - Frontend interface complete
+- **Strategic navigation integration** (if applicable)
 
 **Visual Indicators:**
 - Full opacity (100%)
 - "✓ Real Data" or "✓ Implemented" badge
 - No disabled states
 - Interactive functionality
+- **Navigation breadcrumbs** and contextual panels
 
 **Examples:**
 - User authentication system
 - Business model canvas
 - Critical controls management
 - Live database metrics
+- **Process-to-strategy navigation** (when complete)
 
 ### 🚧 **Partially Implemented**
 **Criteria:**
@@ -51,16 +61,19 @@
 - Frontend UI exists but no backend integration
 - Basic functionality working, advanced features pending
 - Database schema defined but not fully utilized
+- **Navigation flow partially connected**
 
 **Visual Indicators:**
 - Slight opacity reduction (75%)
 - "In Progress" or "Partial" badge
 - Limited functionality
 - Clear indication of what works vs. what doesn't
+- **Partial navigation breadcrumbs**
 
 **Examples:**
 - Process management (backend done, frontend pending)
 - Asset management (schema done, interface pending)
+- **Service Model** (UI ready, backend pending)
 
 ### ⏳ **Not Implemented**
 **Criteria:**
@@ -68,18 +81,119 @@
 - No backend API endpoints
 - No database integration
 - Placeholder UI only
+- **No navigation flow integration**
 
 **Visual Indicators:**
 - Significant opacity reduction (50%)
 - "Mock Data" or "Not Implemented" badge
 - Disabled interactions
 - Clear indication of placeholder status
+- **Disabled navigation links**
 
 **Examples:**
 - Search functionality
 - Notification system
 - Theme management
 - Advanced analytics
+- **Value Chain navigation**
+- **Operating Model navigation**
+
+## Strategic Navigation Flow Standards
+
+### **Navigation Flow Implementation Status**
+
+#### **Layer 1: Process Maps** ✅ Fully Implemented
+- **Status**: 80% complete
+- **Navigation**: Process detail views with strategic context panels
+- **Integration**: Links to Service Model (when implemented)
+- **Visual Indicators**: "✓ Real Data" badge, full navigation breadcrumbs
+
+#### **Layer 2: Service Model** 🚧 Partially Implemented
+- **Status**: 0% complete (Next priority)
+- **Navigation**: Service blueprint interface with process links
+- **Integration**: Connects Process Maps to Value Chain
+- **Visual Indicators**: "In Progress" badge, partial navigation
+
+#### **Layer 3: Value Chain** ⏳ Not Implemented
+- **Status**: 0% complete
+- **Navigation**: Value flow visualization with optimization opportunities
+- **Integration**: Connects Service Model to Operating Model
+- **Visual Indicators**: "Not Implemented" badge, disabled navigation
+
+#### **Layer 4: Operating Model** ⏳ Not Implemented
+- **Status**: 0% complete
+- **Navigation**: Operating principles and capability model
+- **Integration**: Connects Value Chain to Business Canvas
+- **Visual Indicators**: "Not Implemented" badge, disabled navigation
+
+#### **Layer 5: Business Canvas** ✅ Fully Implemented
+- **Status**: 100% complete
+- **Navigation**: Strategic business model with operational impact
+- **Integration**: Links to Operating Model (when implemented)
+- **Visual Indicators**: "✓ Real Data" badge, full navigation breadcrumbs
+
+### **Navigation Flow Visual Standards**
+
+#### **Breadcrumb Navigation**
+```typescript
+// Fully implemented navigation
+<Breadcrumb className="text-sm">
+  <BreadcrumbItem>Process Maps</BreadcrumbItem>
+  <BreadcrumbSeparator />
+  <BreadcrumbItem>Equipment Maintenance</BreadcrumbItem>
+  <BreadcrumbSeparator />
+  <BreadcrumbItem>Service Model</BreadcrumbItem>
+</Breadcrumb>
+
+// Disabled navigation for unimplemented layers
+<Breadcrumb className="text-sm opacity-50">
+  <BreadcrumbItem>Process Maps</BreadcrumbItem>
+  <BreadcrumbSeparator />
+  <BreadcrumbItem className="text-muted-foreground">Service Model</BreadcrumbItem>
+  <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
+</Breadcrumb>
+```
+
+#### **Strategic Context Panel**
+```typescript
+// Active strategic navigation context
+<Card>
+  <CardHeader>
+    <CardTitle>Strategic Navigation Context</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="text-center">
+        <Button variant="outline" size="sm" className="w-full">
+          🔗 Service Model
+        </Button>
+        <p className="text-xs mt-1">85% Aligned</p>
+      </div>
+      <div className="text-center opacity-50">
+        <Button variant="outline" size="sm" className="w-full" disabled>
+          🔗 Value Chain
+        </Button>
+        <Badge variant="outline" className="mt-1 text-xs">Not Implemented</Badge>
+      </div>
+    </div>
+  </CardContent>
+</Card>
+```
+
+#### **Alignment Indicators**
+```typescript
+// Strategic alignment scoring
+<div className="flex items-center gap-2">
+  <div className="flex-1">
+    <div className="flex justify-between text-sm">
+      <span>Strategic Alignment</span>
+      <span>87%</span>
+    </div>
+    <Progress value={87} className="h-2" />
+  </div>
+  <Badge variant="secondary">High Alignment</Badge>
+</div>
+```
 
 ## Visual Implementation Standards
 
@@ -99,252 +213,75 @@
   <CardHeader>
     <CardTitle className="flex items-center gap-2">
       Feature Name
-      <Badge variant="outline" className="text-xs">Mock Data</Badge>
+      <Badge variant="outline" className="text-xs">Not Implemented</Badge>
     </CardTitle>
   </CardHeader>
-  <CardContent>
-    {/* Content */}
-  </CardContent>
 </Card>
 ```
 
-#### **Menu Items**
+#### **Navigation Links**
 ```typescript
-<DropdownMenuItem disabled>
+// Disabled navigation for unimplemented strategic layers
+<Button variant="ghost" disabled className="opacity-50">
   <Icon className="mr-2 h-4 w-4" />
-  <span>Feature Name</span>
-</DropdownMenuItem>
-```
-
-#### **Navigation Items**
-```typescript
-<Button
-  variant={activeLayer === "feature" ? "default" : "ghost"}
-  className="w-full justify-start"
-  onClick={() => setActiveLayer("feature")}
-  disabled
->
-  <Icon className="h-4 w-4 mr-2" />
-  Feature Name
+  Service Model
+  <Badge variant="outline" className="ml-2 text-xs">Coming Soon</Badge>
 </Button>
-```
-
-### **Status Badge Standards**
-
-#### **Badge Types**
-```typescript
-// Non-functional components
-<Badge variant="outline" className="text-xs">Mock Data</Badge>
-<Badge variant="outline" className="text-xs">Not Implemented</Badge>
-<Badge variant="outline" className="text-xs">Coming Soon</Badge>
-
-// Functional components
-<Badge variant="secondary" className="text-xs">✓ Real Data</Badge>
-<Badge variant="secondary" className="text-xs">✓ Implemented</Badge>
-<Badge variant="secondary" className="text-xs">✓ Working</Badge>
-```
-
-## Dashboard Metrics Standards
-
-### **Real Data Requirements**
-```typescript
-// ✅ Good - Real database calculations
-const realMetrics = {
-  totalControls: controlsData.length,
-  activeControls: controlsData.filter(c => c.status === 'ACTIVE').length,
-  maturityScore: calculateRealMaturityScore(data)
-}
-
-// ❌ Bad - Hardcoded mock data
-const mockMetrics = {
-  totalControls: 24, // Hardcoded
-  activeControls: 20, // Hardcoded
-  maturityScore: 85 // Hardcoded
-}
-```
-
-### **Mock Data Identification**
-```typescript
-// ✅ Good - Clearly marked mock data
-const kpiData = [
-  { 
-    label: "Process Efficiency", 
-    value: 85, 
-    trend: "up", 
-    implemented: false // Clear flag
-  }
-]
-
-// ❌ Bad - Unclear mock data
-const kpiData = [
-  { 
-    label: "Process Efficiency", 
-    value: 85, 
-    trend: "up" // No indication of mock status
-  }
-]
-```
-
-## Progress Tracking Standards
-
-### **Progress Indicator Requirements**
-- **Sidebar Progress Bar:** Overall implementation percentage
-- **Feature Count:** Implemented vs. total features
-- **Phase Progress:** Progress within current development phase
-- **Real-time Updates:** Progress updates with implementation
-
-### **Progress Calculation**
-```typescript
-const progressMetrics = {
-  totalFeatures: 12,
-  implementedFeatures: 3,
-  progressPercentage: Math.round((implementedFeatures / totalFeatures) * 100),
-  phaseProgress: {
-    phase1: { completed: 4, total: 5, percentage: 80 },
-    phase2: { completed: 1, total: 4, percentage: 25 },
-    phase3: { completed: 0, total: 4, percentage: 0 }
-  }
-}
-```
-
-### **Progress Display**
-```typescript
-<div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-  <div className="flex items-center justify-between mb-2">
-    <span className="text-sm font-medium text-blue-900">Implementation Progress</span>
-    <Badge variant="secondary" className="text-xs">{implementedFeatures}/{totalFeatures}</Badge>
-  </div>
-  <div className="w-full bg-blue-200 rounded-full h-2">
-    <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
-  </div>
-  <p className="text-xs text-blue-700 mt-1">{progressPercentage}% Complete</p>
-  <p className="text-xs text-blue-600 mt-1">✓ Real data metrics enabled</p>
-  <p className="text-xs text-gray-500 mt-1">Mock data greyed out</p>
-</div>
 ```
 
 ## Development Workflow
 
-### **When Adding New Features**
-1. **Create UI with Mock Data:** Start with placeholder content
-2. **Apply Disabled Styling:** Use opacity reduction and badges
-3. **Implement Backend:** Add API endpoints and database integration
-4. **Connect Frontend:** Replace mock data with real API calls
-5. **Remove Disabled State:** Enable component and remove mock indicators
-6. **Update Progress Tracking:** Increment implementation metrics
+### **When Implementing New Features**
+1. **Check current phase** - Ensure feature aligns with phase goals
+2. **Validate against backlog** - Confirm feature is in current phase
+3. **Consider dependencies** - Implement prerequisites first
+4. **Focus on core value** - Prioritise features that demonstrate platform value
+5. **Maintain quality** - Don't sacrifice code quality for speed
+6. **Mark implementation status** - Clearly indicate functional vs. non-functional components
+7. **Update progress tracking** - Keep implementation metrics current
+8. **Integrate navigation flow** - Connect to strategic layers when applicable
 
-### **When Reviewing Components**
-1. **Check Implementation Status:** Verify if component is functional
-2. **Validate Data Sources:** Ensure real data vs. mock data
-3. **Test User Interactions:** Verify all interactions work
-4. **Update Progress Tracking:** Update implementation metrics
-5. **Document Status Changes:** Update documentation and changelog
-
-### **Code Review Checklist**
-- [ ] Component implementation status is clear
-- [ ] Mock data is properly marked
-- [ ] Visual indicators are consistent
-- [ ] Progress tracking is updated
-- [ ] Accessibility requirements met
-- [ ] Documentation reflects current status
-
-## Accessibility Requirements
-
-### **Screen Reader Support**
-```typescript
-// Disabled components should be properly labeled
-<Button 
-  disabled 
-  className="opacity-50"
-  aria-label="Feature not yet implemented"
->
-  Feature Name
-</Button>
-```
-
-### **Keyboard Navigation**
-- **Skip Disabled Components:** Disabled components should be skipped in tab order
-- **Focus Management:** Clear focus indicators for functional elements
-- **Alternative Text:** Descriptive text for disabled features
-
-### **ARIA Labels**
-```typescript
-// For disabled components
-aria-label="Feature not yet implemented"
-aria-describedby="feature-status-description"
-
-// For progress indicators
-aria-label={`Implementation progress: ${progressPercentage}% complete`}
-aria-valuenow={progressPercentage}
-aria-valuemin={0}
-aria-valuemax={100}
-```
-
-## Documentation Requirements
-
-### **Implementation Status Documentation**
-- **Feature Status Matrix:** Document all features and their implementation status
-- **Progress Tracking:** Regular updates to implementation metrics
-- **Changelog Updates:** Track when features move from mock to real data
-- **User Documentation:** Clear user guides about feature capabilities
-
-### **Code Documentation**
-```typescript
-/**
- * Process Efficiency KPI Card
- * 
- * @status MOCK_DATA - Currently using hardcoded values
- * @implementation_plan - Replace with real process efficiency calculations
- * @target_phase - Phase 2 (MVP)
- * @dependencies - Process management system completion
- */
-const ProcessEfficiencyCard = () => {
-  // Mock data - will be replaced with real calculations
-  const mockData = {
-    efficiency: 85,
-    trend: "up",
-    implemented: false
-  }
-  
-  return (
-    <Card className="opacity-50">
-      {/* Component implementation */}
-    </Card>
-  )
-}
-```
-
-## Quality Assurance
-
-### **Implementation Status Validation**
-- **Automated Checks:** Verify mock data flags are present
-- **Visual Testing:** Ensure disabled states are visually clear
-- **Accessibility Testing:** Validate disabled component accessibility
-- **Progress Accuracy:** Verify progress calculations are correct
-
-### **User Testing**
-- **Clarity Testing:** Users understand what's real vs. mock
-- **Expectation Management:** Users have realistic expectations
-- **Progress Perception:** Users understand development progress
-- **Feature Discovery:** Users can identify functional features
+### **When Making Technical Decisions**
+1. **Phase-appropriate complexity** - Don't over-engineer for current phase
+2. **Future-proofing** - Consider how decisions impact future phases
+3. **Scalability** - Ensure architecture supports future growth
+4. **Maintainability** - Write code that can be enhanced in future phases
+5. **Navigation integration** - Plan for strategic layer connections
 
 ## Success Metrics
 
-### **Transparency Metrics**
-- **100% Feature Status Visibility:** All features clearly marked
-- **0% Hidden Mock Data:** No undisclosed placeholder content
-- **Clear Progress Communication:** Users understand development status
-- **Honest User Feedback:** No misleading feature capabilities
+### **Implementation Status Metrics**
+- **Feature completion rate** by phase
+- **User satisfaction** with transparency
+- **Development velocity** improvements
+- **Bug reduction** through clear status communication
 
-### **Development Metrics**
-- **Accurate Progress Tracking:** Real-time implementation status
-- **Consistent Visual Indicators:** Standardized disabled states
-- **Complete Documentation:** All status changes documented
-- **Quality Implementation:** No rushed features without proper status marking
+### **Navigation Flow Metrics**
+- **Traceability coverage** - % of processes linked to strategic elements
+- **Alignment scores** - Strategic-operational alignment percentages
+- **User adoption** - % of users using navigation flow weekly
+- **Navigation effectiveness** - Time to find strategic context
+
+## Documentation Requirements
+
+### **Implementation Status Updates**
+- **Weekly progress reviews** and status updates
+- **Feature completion documentation** with screenshots
+- **User feedback collection** on transparency
+- **Navigation flow testing** and validation
+
+### **Strategic Navigation Documentation**
+- **Navigation flow wireframes** and user journeys
+- **Layer integration specifications** and APIs
+- **Alignment scoring methodology** and metrics
+- **User training materials** for navigation features
 
 ---
 description: Standards for implementation status visualization, progress tracking, and transparent communication of feature capabilities. Apply when working with UI components, dashboard metrics, or any feature that may have mock data or incomplete implementation.
-description:
+globs:
+alwaysApply: false
+---
+
 globs:
 alwaysApply: false
 ---

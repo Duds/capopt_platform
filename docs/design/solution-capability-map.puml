@@ -1,70 +1,154 @@
-@startwbs
-* CapOpt Platform Solution Capability Map
-** Strategic Layer
-*** Business Model Canvas
-*** Strategy Mapping
-*** Value Proposition Design
-*** Market Analysis
-*** Partnership Management
-** Value & Service Layer
-*** Value Chain Mapping
-*** Service Model Design
-*** Experience Model Framework
-*** Capability Mapping
-*** Value Stream Analysis
-*** Bottleneck Identification
-*** Optimisation Opportunities
-** Operational Layer
-*** Process Mapping & Documentation
-*** Playbook Management
-*** Procedure & Best Practice Repository
-*** Training Material Management
-*** Maturity Assessment & Benchmarking
-*** Improvement Roadmaps
-*** KPI & Metrics Tracking
-** Control & Risk Layer
-*** Critical Control Management
-*** Risk Assessment & Bowtie Analysis
-*** Control Effectiveness Evaluation
-*** Compliance Monitoring
-*** Incident Reporting & Response
-*** Asset Management & Protection
-*** Assurance & Audit Trails
-** Integration & Analytics Layer
-*** Cross-Layer Integration Engine
-*** Data Warehouse & ETL
-*** Analytics & BI Dashboards
-*** Predictive Analytics & AI/ML
-*** Reporting System
-**** Executive Dashboards
-**** Operational Reports
-**** Risk Reports
-**** Compliance Reports
-**** Maturity Reports
-**** Custom Report Builder
-**** Board Reporting
-**** Regulatory Reporting
-**** Export & Distribution
-*** Traceability & Data Lineage
-** Platform Capabilities
-*** Role-Based Access Control (RBAC)
-**** User Management
-**** Role Definition & Assignment
-**** Permission Management
-**** Multi-Factor Authentication
-**** Single Sign-On (SSO)
-**** Session Management
-**** Access Auditing
-*** Security & Compliance
-**** Data Encryption
-**** Audit Logging
-**** Privacy Controls
-**** Data Retention
-** External Integration
-*** ERP Integration (SAP, Oracle, Dynamics)
-*** MES Integration (Siemens, Rockwell, GE)
-*** Condition Monitoring Integration (OSIsoft PI, Emerson)
-*** SCADA/PLM/CRM Integration
-*** API & Webhook Framework
-*** Middleware & Data Mapping
-@endwbs 
+@startuml CapOpt Platform Solution Capability Map
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+
+title CapOpt Platform - Solution Capability Map
+
+package "Enterprise Information System" {
+  [Enterprise Management] as EM
+  [Multi-Facility Support] as MFS
+  [Operational Streams] as OS
+  [Organizational Hierarchy] as OH
+  [Address Management] as AM
+}
+
+package "Strategic Layer" {
+  [Business Model Canvas] as BMC
+  [Operating Model Canvas] as OMC
+  [Value Chain Management] as VCM
+  [Service Model] as SM
+  [Experience Model] as EM2
+  [Capability Model] as CM
+}
+
+package "Value & Service Layer" {
+  [Value Proposition] as VP
+  [Customer Segments] as CS
+  [Revenue Streams] as RS
+  [Partnerships] as P
+  [Resources] as R
+  [Activities] as A
+  [Cost Structures] as CS2
+  [Channels] as C
+}
+
+package "Operational Layer" {
+  [Process Management] as PM
+  [Process Maps] as PM2
+  [Playbooks] as PB
+  [Procedures] as PR
+  [Training Materials] as TM
+  [Best Practices] as BP
+  [Improvements] as I
+}
+
+package "Control & Risk Layer" {
+  [Critical Controls] as CC
+  [Risk Categories] as RC
+  [Control Types] as CT
+  [Control Effectiveness] as CE
+  [Bowtie Analysis] as BA
+  [Threats] as T
+  [Consequences] as CON
+  [Barriers] as BAR
+}
+
+package "Asset Management" {
+  [Asset Tracking] as AT
+  [Asset Risks] as AR
+  [Asset Protection] as AP
+  [Asset Monitoring] as AM2
+  [Asset Optimization] as AO
+}
+
+package "Maturity & Improvement" {
+  [Maturity Assessments] as MA
+  [Capability Scores] as CS3
+  [Improvement Roadmaps] as IR
+  [Benchmarks] as B
+  [Progress Tracking] as PT
+}
+
+package "User Management & Security" {
+  [Authentication] as AUTH
+  [Authorization] as AUTH2
+  [Role-Based Access Control] as RBAC
+  [User Management] as UM
+  [Audit Logging] as AL
+}
+
+' Enterprise Information System Relationships
+EM --> MFS : supports
+EM --> OS : manages
+EM --> OH : contains
+EM --> AM : includes
+
+' Strategic Layer Relationships
+BMC --> OMC : informs
+OMC --> VCM : defines
+VCM --> SM : enables
+SM --> EM2 : supports
+EM2 --> CM : measures
+
+' Value & Service Layer Relationships
+VP --> CS : targets
+VP --> RS : generates
+RS --> P : requires
+P --> R : provides
+R --> A : enables
+A --> CS2 : incurs
+CS2 --> C : delivers
+
+' Operational Layer Relationships
+PM --> PM2 : creates
+PM2 --> PB : documents
+PB --> PR : contains
+PR --> TM : requires
+TM --> BP : shares
+BP --> I : enables
+
+' Control & Risk Layer Relationships
+CC --> RC : categorizes
+CC --> CT : types
+CC --> CE : measures
+CC --> BA : analyzes
+BA --> T : identifies
+BA --> CON : assesses
+BA --> BAR : implements
+
+' Asset Management Relationships
+AT --> AR : tracks
+AR --> AP : requires
+AP --> AM2 : monitors
+AM2 --> AO : optimizes
+
+' Maturity & Improvement Relationships
+MA --> CS3 : scores
+CS3 --> IR : plans
+IR --> B : benchmarks
+B --> PT : tracks
+
+' Cross-Layer Relationships
+EM --> BMC : informs
+EM --> PM : executes
+EM --> CC : controls
+EM --> AT : owns
+EM --> MA : assesses
+
+OS --> PM : processes
+OS --> CC : controls
+OS --> AT : uses
+
+OH --> UM : manages
+OH --> RBAC : secures
+
+' User Management & Security Relationships
+AUTH --> AUTH2 : enables
+AUTH2 --> RBAC : implements
+RBAC --> UM : controls
+UM --> AL : logs
+
+@enduml 

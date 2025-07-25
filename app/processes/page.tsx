@@ -1,13 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Workflow, Plus, Search, Filter } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { Workflow, Plus, Search, Filter, Edit, Eye, Trash2 } from 'lucide-react'
 import { processesApi, formatDate, getStatusColor, getPriorityColor } from '@/lib/api'
 
 interface Process {
@@ -29,7 +33,16 @@ interface Process {
   }>
 }
 
+interface ProcessFormData {
+  name: string
+  description: string
+  status: string
+  priority: string
+  version: string
+}
+
 export default function ProcessesPage() {
+  const router = useRouter()
   const { user, isLoading: authLoading } = useAuth()
   const [processes, setProcesses] = useState<Process[]>([])
   const [filteredProcesses, setFilteredProcesses] = useState<Process[]>([])
@@ -38,6 +51,15 @@ export default function ProcessesPage() {
   const [priorityFilter, setPriorityFilter] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
+  const [formData, setFormData] = useState<ProcessFormData>({
+    name: '',
+    description: '',
+    status: 'DRAFT',
+    priority: 'MEDIUM',
+    version: '1.0'
+  })
 
   useEffect(() => {
     if (user && !authLoading) {
@@ -92,6 +114,50 @@ export default function ProcessesPage() {
     setFilteredProcesses(filtered)
   }
 
+  const handleCreateProcess = async () => {
+    try {
+      setIsCreating(true)
+      setError(null)
+      
+      const newProcess = await processesApi.create(formData)
+      setProcesses(prev => [...prev, newProcess])
+      setIsCreateDialogOpen(false)
+      setFormData({
+        name: '',
+        description: '',
+        status: 'DRAFT',
+        priority: 'MEDIUM',
+        version: '1.0'
+      })
+    } catch (error: any) {
+      console.error('Error creating process:', error)
+      setError(error.message)
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
+  const handleViewProcess = (process: Process) => {
+    router.push(`/processes/${process.id}`)
+  }
+
+  const handleEditProcess = (process: Process) => {
+    // TODO: Implement process editing
+    console.log('Edit process:', process)
+  }
+
+  const handleDeleteProcess = async (processId: string) => {
+    if (!confirm('Are you sure you want to delete this process?')) return
+    
+    try {
+      await processesApi.delete(processId)
+      setProcesses(prev => prev.filter(p => p.id !== processId))
+    } catch (error: any) {
+      console.error('Error deleting process:', error)
+      setError(error.message)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -107,8 +173,7 @@ export default function ProcessesPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Workflow className="h-8 w-8 text-red-600 mx-auto mb-4" />
-          <p className="text-red-600 mb-4">{error}</p>
+          <p className="text-red-600 mb-4">Error: {error}</p>
           <Button onClick={fetchProcesses}>Retry</Button>
         </div>
       </div>
@@ -117,33 +182,18 @@ export default function ProcessesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Workflow className="h-8 w-8 text-blue-600 mr-3" />
-              <h1 className="text-xl font-bold text-gray-900">Process Management</h1>
-            </div>
-          </div>
+      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Process Management</h1>
+          <p className="mt-2 text-gray-600">Manage and document your operational processes</p>
         </div>
-      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
-          {/* Page Header */}
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900">Processes</h2>
-            <p className="text-gray-600">Manage operational processes and workflows</p>
-          </div>
-
-          {/* Filters */}
+          {/* Filters and Actions */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Filter className="h-5 w-5 mr-2" />
-                Filters
-              </CardTitle>
+              <CardTitle>Filters & Actions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -151,15 +201,11 @@ export default function ProcessesPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Search
                   </label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      placeholder="Search processes..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
+                  <Input
+                    placeholder="Search processes..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
                 
                 <div>
@@ -175,7 +221,7 @@ export default function ProcessesPage() {
                       <SelectItem value="ACTIVE">Active</SelectItem>
                       <SelectItem value="DRAFT">Draft</SelectItem>
                       <SelectItem value="INACTIVE">Inactive</SelectItem>
-                      <SelectItem value="ARCHIVED">Archived</SelectItem>
+                      <SelectItem value="UNDER_REVIEW">Under Review</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -199,11 +245,101 @@ export default function ProcessesPage() {
                 </div>
                 
                 <div className="flex items-end">
-                  <Button className="w-full opacity-50" disabled>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Process
-                    <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
-                  </Button>
+                  <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Process
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Create New Process</DialogTitle>
+                        <DialogDescription>
+                          Create a new operational process with basic information.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="name" className="text-right">
+                            Name
+                          </Label>
+                          <Input
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                            className="col-span-3"
+                            placeholder="Enter process name"
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="description" className="text-right">
+                            Description
+                          </Label>
+                          <Textarea
+                            id="description"
+                            value={formData.description}
+                            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                            className="col-span-3"
+                            placeholder="Enter process description"
+                            rows={3}
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="status" className="text-right">
+                            Status
+                          </Label>
+                          <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
+                            <SelectTrigger className="col-span-3">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="DRAFT">Draft</SelectItem>
+                              <SelectItem value="ACTIVE">Active</SelectItem>
+                              <SelectItem value="INACTIVE">Inactive</SelectItem>
+                              <SelectItem value="UNDER_REVIEW">Under Review</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="priority" className="text-right">
+                            Priority
+                          </Label>
+                          <Select value={formData.priority} onValueChange={(value) => setFormData(prev => ({ ...prev, priority: value }))}>
+                            <SelectTrigger className="col-span-3">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="LOW">Low</SelectItem>
+                              <SelectItem value="MEDIUM">Medium</SelectItem>
+                              <SelectItem value="HIGH">High</SelectItem>
+                              <SelectItem value="CRITICAL">Critical</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="version" className="text-right">
+                            Version
+                          </Label>
+                          <Input
+                            id="version"
+                            value={formData.version}
+                            onChange={(e) => setFormData(prev => ({ ...prev, version: e.target.value }))}
+                            className="col-span-3"
+                            placeholder="1.0"
+                          />
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button onClick={handleCreateProcess} disabled={isCreating || !formData.name.trim()}>
+                          {isCreating ? 'Creating...' : 'Create Process'}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             </CardContent>
@@ -313,6 +449,36 @@ export default function ProcessesPage() {
                           <span>Controls: {process.controls?.length || 0}</span>
                           <span>Created: {formatDate(process.createdAt)}</span>
                         </div>
+                        
+                        <div className="flex items-center justify-between pt-2 border-t">
+                          <div className="flex items-center space-x-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleViewProcess(process)}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              View
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleEditProcess(process)}
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                          </div>
+                          
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleDeleteProcess(process.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -322,7 +488,7 @@ export default function ProcessesPage() {
                   <div className="col-span-full text-center py-8">
                     <Workflow className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500 mb-4">No processes found</p>
-                    <Button>
+                    <Button onClick={() => setIsCreateDialogOpen(true)}>
                       <Plus className="h-4 w-4 mr-2" />
                       Create First Process
                     </Button>

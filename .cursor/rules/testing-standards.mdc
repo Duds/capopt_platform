@@ -1,3 +1,8 @@
+---
+description: Testing standards and requirements including unit, integration, and E2E testing strategies, testing tools, coverage requirements, and best practices. Apply when working with test files, implementing testing, or reviewing test coverage.
+
+---
+
 # Testing Standards and Requirements
 
 ## Testing Philosophy
@@ -255,8 +260,6 @@ module.exports = {
 };
 ```
 
----
-description: Testing standards and requirements including unit, integration, and E2E testing strategies, testing tools, coverage requirements, and best practices. Apply when working with test files, implementing testing, or reviewing test coverage.
 
 
 ```

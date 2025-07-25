@@ -1,6 +1,7 @@
 ---
-alwaysApply: true
+description: Phase-based prioritisation for development and navigation flow.
 ---
+
 # Phase-Based Development Prioritisation
 
 ## Current Development Phase: Phase 1 - Functional PoC
@@ -25,6 +26,12 @@ alwaysApply: true
    - Basic report generation
    - Data visualisation
 
+4. **Strategic Navigation Flow Foundation (Core)**
+   - Process Maps to Service Model navigation
+   - Strategic context panels in process views
+   - Basic alignment indicators
+   - Navigation breadcrumbs and flow structure
+
 ## Development Guidelines by Phase
 
 ### Phase 1 Guidelines
@@ -36,6 +43,7 @@ alwaysApply: true
 - **Focus on backend APIs** and data flow
 - **Visualize implementation status** - clearly mark non-functional components
 - **Maintain transparency** - show real vs. mock data to users
+- **Establish navigation flow foundation** - connect operational to strategic layers
 
 ### Phase 2 Guidelines (MVP - 8-12 weeks)
 - **Implement RBAC** and security features
@@ -44,6 +52,8 @@ alwaysApply: true
 - **Implement Azure deployment** pipeline
 - **Add comprehensive testing** coverage
 - **Focus on customer-ready features**
+- **Complete strategic navigation flow** - Service Model, Value Chain, Operating Model
+- **Implement alignment scoring** and traceability metrics
 
 ### Phase 3 Guidelines (Extended Rollout - 6-12 months)
 - **Advanced analytics** and AI/ML features
@@ -51,6 +61,7 @@ alwaysApply: true
 - **Advanced reporting** and dashboards
 - **Performance optimization** and scaling
 - **Advanced security** features
+- **Advanced navigation features** - AI-powered recommendations, automated alignment
 
 ## Feature Implementation Priority
 
@@ -60,6 +71,7 @@ alwaysApply: true
 - Core business logic
 - Simple user interface
 - Basic authentication
+- **Strategic navigation foundation** - Process Maps to Service Model
 
 ### Medium Priority (Phase 2)
 - Enhanced UI components
@@ -67,6 +79,8 @@ alwaysApply: true
 - Real-time features
 - Comprehensive testing
 - Azure deployment
+- **Complete navigation flow** - Value Chain and Operating Model
+- **Alignment scoring system**
 
 ### Low Priority (Phase 3)
 - Advanced integrations
@@ -74,6 +88,39 @@ alwaysApply: true
 - Advanced analytics
 - Performance optimization
 - Advanced security features
+- **Advanced navigation intelligence**
+
+## Strategic Navigation Flow Priority
+
+### **Layer 1: Process Maps** ✅ Complete (Phase 1)
+- **Status**: 80% complete
+- **Priority**: High - Core operational functionality
+- **Dependencies**: None
+- **Success Criteria**: Full CRUD operations, process detail views
+
+### **Layer 2: Service Model** 🚧 Next Priority (Phase 1)
+- **Status**: 0% complete
+- **Priority**: High - Connects operational to strategic
+- **Dependencies**: Process Maps completion
+- **Success Criteria**: Service blueprint interface, process linking
+
+### **Layer 3: Value Chain** ⏳ Phase 2
+- **Status**: 0% complete
+- **Priority**: Medium - Strategic value flow
+- **Dependencies**: Service Model completion
+- **Success Criteria**: Value flow visualization, optimization opportunities
+
+### **Layer 4: Operating Model** ⏳ Phase 2
+- **Status**: 0% complete
+- **Priority**: Medium - Strategic operational design
+- **Dependencies**: Value Chain completion
+- **Success Criteria**: Operating principles, capability model
+
+### **Layer 5: Business Canvas** ✅ Complete (Phase 1)
+- **Status**: 100% complete
+- **Priority**: High - Strategic foundation
+- **Dependencies**: None
+- **Success Criteria**: Full business model canvas functionality
 
 ## Decision Making Framework
 
@@ -85,12 +132,14 @@ alwaysApply: true
 5. **Maintain quality** - Don't sacrifice code quality for speed
 6. **Mark implementation status** - Clearly indicate functional vs. non-functional components
 7. **Update progress tracking** - Keep implementation metrics current
+8. **Plan navigation integration** - Consider strategic layer connections
 
 ### When Making Technical Decisions
 1. **Phase-appropriate complexity** - Don't over-engineer for current phase
 2. **Future-proofing** - Consider how decisions impact future phases
 3. **Scalability** - Ensure architecture supports future growth
 4. **Maintainability** - Write code that can be enhanced in future phases
+5. **Navigation architecture** - Design for strategic layer integration
 
 ## Success Metrics by Phase
 
@@ -100,6 +149,7 @@ alwaysApply: true
 - Fundamental workflows operational
 - Database properly plumbed
 - Basic UI functional
+- **Process Maps to Service Model navigation working**
 
 ### Phase 2 Success Metrics
 - Customer-ready product
@@ -107,11 +157,63 @@ alwaysApply: true
 - Azure deployment successful
 - Core features fully functional
 - Comprehensive testing coverage
+- **Complete strategic navigation flow operational**
 
 ### Phase 3 Success Metrics
 - Full feature set implemented
 - Advanced integrations working
 - Performance optimized
 - Scalable architecture
+- Enterprise-ready platform
+- **Advanced navigation intelligence features**
+
+## Navigation Flow Development Timeline
+
+### **Week 6 (Current)**
+- Complete Process Maps (remaining 20%)
+- Start Service Model implementation
+- Add navigation breadcrumbs to existing components
+
+### **Week 7-8**
+- Complete Service Model (100%)
+- Implement Value Chain foundation
+- Add strategic context panels to process views
+
+### **Week 9-10**
+- Complete Value Chain (100%)
+- Implement Operating Model
+- Add alignment scoring system
+
+### **Week 11-12**
+- Complete Operating Model (100%)
+- Integrate full navigation flow
+- Add advanced navigation features
+
+## Quality Standards
+
+### **Navigation Flow Quality**
+- **Consistent navigation patterns** across all layers
+- **Clear visual indicators** for implementation status
+- **Smooth user experience** between layers
+- **Accurate alignment scoring** and metrics
+- **Comprehensive error handling** for navigation failures
+
+### **Implementation Standards**
+- **Phase-appropriate features** - don't over-engineer
+- **Clear status communication** - honest about capabilities
+- **Consistent visual design** - unified user experience
+- **Performance optimization** - fast navigation between layers
+- **Accessibility compliance** - WCAG 2.1 AA standards
+
+
+- Enterprise-ready platform
+
+
+- Enterprise-ready platform
+
+
+- Enterprise-ready platform
+
+
 - Enterprise-ready platform
 

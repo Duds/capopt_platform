@@ -5,6 +5,114 @@ The CapOpt platform is a comprehensive operational capability optimisation syste
 
 ---
 
+## 0. Enterprise Information System
+
+### 0.1 Enterprise Management Module
+**Purpose**: Multi-facility enterprise management with organizational hierarchy
+
+**Key Entities:**
+- Enterprise
+- EnterpriseAddress
+- Facility
+- BusinessUnit
+- Department
+
+**ERD:**
+```mermaid
+erDiagram
+    Enterprise {
+        string id
+        string name
+        string legalName
+        string abn
+        string acn
+        string industry
+        string sector
+    }
+    EnterpriseAddress {
+        string id
+        enum type
+        string street
+        string suburb
+        string city
+        string state
+        string postcode
+        string country
+    }
+    Facility {
+        string id
+        string name
+        string code
+        enum type
+        enum status
+        string location
+        string capacity
+    }
+    BusinessUnit {
+        string id
+        string name
+        string code
+        enum type
+        enum status
+        string manager
+        decimal budget
+    }
+    Department {
+        string id
+        string name
+        string code
+        enum type
+        enum status
+        string manager
+        int employeeCount
+    }
+    Enterprise ||--o{ EnterpriseAddress : has
+    Enterprise ||--o{ Facility : operates
+    Enterprise ||--o{ BusinessUnit : contains
+    Facility ||--o{ BusinessUnit : hosts
+    BusinessUnit ||--o{ Department : manages
+    Enterprise ||--o{ User : employs
+    Enterprise ||--o{ Process : executes
+    Enterprise ||--o{ Asset : owns
+```
+
+### 0.2 Operational Streams
+**Purpose**: Multi-stream operational management for complex mining operations
+
+**Supported Streams:**
+- **Copper Stream**: Flotation, smelting, refining processes
+- **Uranium Stream**: Leaching, solvent extraction, precipitation
+- **Gold Stream**: Recovery from copper, refining processes
+- **Silver Stream**: Recovery from copper, refining processes
+
+**Test Data Foundation:**
+- **Enterprise**: Cracked Mountain Pty Ltd (CMP)
+- **Facility**: Hercules Levee (HL001) - Based on Olympic Dam Mine
+- **Location**: Roxby Downs, South Australia
+- **Capacity**: 200,000 tonnes copper, 4,000 tonnes uranium, 80,000 oz gold, 800,000 oz silver annually
+
+### 0.3 Organizational Hierarchy
+**Purpose**: Comprehensive organizational structure management
+
+**Business Units (12):**
+- Mining Operations (MINING)
+- Mineral Processing (PROCESSING)
+- Metallurgy (METALLURGY)
+- Maintenance (MAINTENANCE)
+- Engineering (ENGINEERING)
+- Safety & Health (SAFETY)
+- Environmental (ENVIRONMENTAL)
+- Finance (FINANCE)
+- Human Resources (HR)
+- Information Technology (IT)
+- Logistics (LOGISTICS)
+- Quality Assurance (QA)
+
+**Departments (20+):**
+Each business unit contains multiple departments with realistic staffing levels and management structures.
+
+---
+
 ## 1. Strategic Layer
 
 ### 1.1 Business Canvas Module
@@ -305,60 +413,295 @@ erDiagram
     Playbook ||--o{ Improvement : tracks
 ```
 
-### 3.3 Maturity Assessment Engine
-**Purpose**: Capability maturity evaluation and improvement tracking
+---
 
-**Key Entities:**
-- MaturityAssessment
-- CapabilityScore
-- ImprovementRoadmap
-- Benchmark
-- Progress
+## 4. Strategic Navigation Flow System
+
+### 4.1 Navigation Flow Architecture
+**Purpose**: Enable bidirectional navigation between operational and strategic layers, providing traceability and alignment visibility
+
+**Key Components:**
+- NavigationFlow
+- StrategicContext
+- AlignmentScore
+- NavigationBreadcrumb
+- ContextualPanel
 
 **ERD:**
 ```mermaid
 erDiagram
-    MaturityAssessment {
+    NavigationFlow {
         string id
-        string name
+        string sourceLayer
+        string targetLayer
+        string sourceEntityId
+        string targetEntityId
+        number alignmentScore
+        string navigationType
     }
-    CapabilityScore {
+    StrategicContext {
         string id
-        string score
+        string entityId
+        string entityType
+        string contextData
+        number strategicAlignment
     }
-    ImprovementRoadmap {
+    AlignmentScore {
         string id
-        string description
+        string sourceEntityId
+        string targetEntityId
+        number score
+        string metricType
+        date calculatedAt
     }
-    Benchmark {
+    NavigationBreadcrumb {
         string id
-        string metric
+        string sessionId
+        string breadcrumbPath
+        string currentLocation
+        date createdAt
     }
-    Progress {
+    ContextualPanel {
         string id
-        string status
+        string entityId
+        string panelType
+        string contentData
+        boolean isActive
     }
-    MaturityAssessment ||--o{ CapabilityScore : scores
-    MaturityAssessment ||--o{ ImprovementRoadmap : plans
-    MaturityAssessment ||--o{ Benchmark : benchmarks
-    MaturityAssessment ||--o{ Progress : tracks
+    NavigationFlow ||--o{ StrategicContext : provides
+    NavigationFlow ||--o{ AlignmentScore : calculates
+    NavigationFlow ||--o{ NavigationBreadcrumb : tracks
+    NavigationFlow ||--o{ ContextualPanel : displays
 ```
+
+### 4.2 Navigation Flow Patterns
+
+#### **Operational to Strategic Flow**
+```
+Process Maps → Service Model → Value Chain → Operating Model → Business Canvas
+```
+
+**Implementation:**
+- **Process Maps**: Starting point with process detail views
+- **Service Model**: Service blueprint with process linking
+- **Value Chain**: Value flow visualization with optimization opportunities
+- **Operating Model**: Operating principles and capability model
+- **Business Canvas**: Strategic business model with operational impact
+
+#### **Strategic to Operational Flow**
+```
+Business Canvas → Operating Model → Value Chain → Service Model → Process Maps
+```
+
+**Implementation:**
+- **Business Canvas**: Strategic objectives and business model
+- **Operating Model**: Operational strategy and design principles
+- **Value Chain**: Value creation and flow management
+- **Service Model**: Service delivery and customer experience
+- **Process Maps**: Operational execution and process management
+
+### 4.3 Navigation Flow Components
+
+#### **Strategic Context Panel**
+**Purpose**: Display strategic context for operational processes
+
+**Features:**
+- **Alignment Indicators**: Show strategic alignment percentages
+- **Navigation Buttons**: Quick access to strategic layers
+- **Context Information**: Relevant strategic context for current entity
+- **Status Indicators**: Implementation status of navigation targets
+
+**Implementation:**
+```typescript
+interface StrategicContextPanel {
+  entityId: string
+  entityType: 'process' | 'service' | 'valueChain' | 'operatingModel'
+  alignmentScores: {
+    serviceModel: number
+    valueChain: number
+    operatingModel: number
+    businessCanvas: number
+  }
+  navigationTargets: {
+    serviceModel: { id: string, implemented: boolean }
+    valueChain: { id: string, implemented: boolean }
+    operatingModel: { id: string, implemented: boolean }
+    businessCanvas: { id: string, implemented: boolean }
+  }
+}
+```
+
+#### **Navigation Breadcrumbs**
+**Purpose**: Provide clear navigation path through strategic layers
+
+**Features:**
+- **Layer Indicators**: Show current position in strategic hierarchy
+- **Quick Navigation**: Click to navigate to any layer
+- **Status Indicators**: Show implementation status of each layer
+- **Context Preservation**: Maintain context when navigating
+
+**Implementation:**
+```typescript
+interface NavigationBreadcrumb {
+  path: Array<{
+    layer: string
+    entityId: string
+    entityName: string
+    implemented: boolean
+  }>
+  currentLayer: string
+  currentEntityId: string
+}
+```
+
+#### **Alignment Scoring System**
+**Purpose**: Calculate and display strategic alignment between layers
+
+**Metrics:**
+- **Process-Service Alignment**: How well processes deliver services
+- **Service-Value Alignment**: How well services create value
+- **Value-Operating Alignment**: How well value aligns with operating principles
+- **Operating-Strategic Alignment**: How well operations align with strategy
+
+**Implementation:**
+```typescript
+interface AlignmentScore {
+  sourceEntityId: string
+  targetEntityId: string
+  score: number // 0-100
+  metrics: {
+    processEfficiency: number
+    strategicRelevance: number
+    riskAlignment: number
+    valueCreation: number
+  }
+  lastCalculated: Date
+}
+```
+
+### 4.4 Navigation Flow API Design
+
+#### **Navigation Flow Endpoints**
+```typescript
+// Get strategic context for an entity
+GET /api/navigation/context/{entityType}/{entityId}
+
+// Navigate between layers
+POST /api/navigation/flow
+{
+  sourceLayer: string
+  targetLayer: string
+  sourceEntityId: string
+  targetEntityId: string
+}
+
+// Get alignment scores
+GET /api/navigation/alignment/{sourceEntityId}/{targetEntityId}
+
+// Update navigation breadcrumb
+POST /api/navigation/breadcrumb
+{
+  sessionId: string
+  path: NavigationPath[]
+}
+```
+
+#### **Strategic Context API**
+```typescript
+// Get strategic context for a process
+GET /api/processes/{processId}/strategic-context
+
+// Get linked strategic entities
+GET /api/processes/{processId}/strategic-links
+
+// Calculate alignment scores
+POST /api/processes/{processId}/calculate-alignment
+```
+
+### 4.5 Navigation Flow User Experience
+
+#### **Process Detail View Integration**
+- **Strategic Context Panel**: Sidebar showing strategic alignment
+- **Navigation Buttons**: Quick access to Service Model, Value Chain, etc.
+- **Alignment Indicators**: Visual progress bars showing alignment scores
+- **Breadcrumb Navigation**: Clear path through strategic layers
+
+#### **Service Model View Integration**
+- **Process Links**: Show linked processes that deliver the service
+- **Value Chain Navigation**: Connect to value creation flow
+- **Service Blueprint**: Visual service delivery process
+- **Quality Metrics**: Service performance indicators
+
+#### **Value Chain View Integration**
+- **Service Links**: Show services that contribute to value creation
+- **Operating Model Navigation**: Connect to operational strategy
+- **Value Flow Visualization**: Visual value creation process
+- **Optimization Opportunities**: Identify improvement areas
+
+#### **Operating Model View Integration**
+- **Value Chain Links**: Show value chains that align with operating principles
+- **Business Canvas Navigation**: Connect to strategic business model
+- **Capability Model**: Show organizational capabilities
+- **Operating Principles**: Strategic operational guidelines
+
+#### **Business Canvas View Integration**
+- **Operating Model Links**: Show operating models that support business strategy
+- **Strategic Impact Summary**: Show operational impact on strategy
+- **Business Model Sections**: Complete business model canvas
+- **Strategic Metrics**: Business performance indicators
+
+### 4.6 Navigation Flow Implementation Status
+
+#### **Phase 1 Implementation (Current)**
+- ✅ **Process Maps**: 80% complete with navigation foundation
+- ✅ **Business Canvas**: 100% complete
+- 🚧 **Service Model**: 0% complete (Next priority)
+- ⏳ **Value Chain**: 0% complete
+- ⏳ **Operating Model**: 0% complete
+
+#### **Phase 2 Implementation (Weeks 7-8)**
+- **Service Model**: Complete implementation with process linking
+- **Value Chain**: Foundation implementation with service linking
+- **Navigation Integration**: Complete breadcrumb and contextual panels
+
+#### **Phase 3 Implementation (Weeks 9-10)**
+- **Value Chain**: Complete implementation with optimization features
+- **Operating Model**: Complete implementation with capability model
+- **Alignment Scoring**: Complete alignment calculation system
+
+### 4.7 Navigation Flow Success Metrics
+
+#### **User Experience Metrics**
+- **Navigation Effectiveness**: Time to find strategic context
+- **User Adoption**: Percentage of users using navigation flow weekly
+- **Task Completion**: Success rate of strategic navigation tasks
+- **User Satisfaction**: User feedback on navigation experience
+
+#### **Business Impact Metrics**
+- **Strategic Alignment**: Improvement in strategic-operational alignment
+- **Decision Quality**: Faster strategic decision making
+- **Process Optimization**: Better process-strategy alignment
+- **Risk Management**: Improved risk-strategy alignment
+
+#### **Technical Metrics**
+- **Navigation Performance**: Page load times for navigation
+- **Alignment Accuracy**: Accuracy of alignment calculations
+- **System Reliability**: Navigation system uptime
+- **Data Consistency**: Consistency of navigation data
 
 ---
 
-## 4. Control & Risk Layer
+## 5. Control & Risk Layer
 
-### 4.1 Critical Control Management System
-**Purpose**: Risk controls and compliance management
+### 5.1 Critical Control Management
+**Purpose**: Identify, monitor, and assure critical controls
 
 **Key Entities:**
 - CriticalControl
-- RiskCategory
 - ControlType
 - ControlEffectiveness
-- ComplianceStatus
-- LinkedProcess
-- LinkedAsset
+- RiskCategory
+- ControlProcess
 
 **ERD:**
 ```mermaid
@@ -367,1034 +710,218 @@ erDiagram
         string id
         string name
         string description
-    }
-    RiskCategory {
-        string id
-        string name
+        string priority
+        string status
     }
     ControlType {
         string id
         string name
+        string category
     }
     ControlEffectiveness {
         string id
-        string rating
-    }
-    ComplianceStatus {
-        string id
-        string status
-    }
-    LinkedProcess {
-        string id
-        string name
-    }
-    LinkedAsset {
-        string id
-        string name
-    }
-    CriticalControl ||--o{ RiskCategory : categorised_by
-    CriticalControl ||--o{ ControlType : typed_as
-    CriticalControl ||--o{ ControlEffectiveness : measured_by
-    CriticalControl ||--o{ ComplianceStatus : compliance
-    CriticalControl ||--o{ LinkedProcess : protects
-    CriticalControl ||--o{ LinkedAsset : protects
-```
-
-### 4.2 Asset Management System
-**Purpose**: Critical asset identification and protection
-
-**Key Entities:**
-- Asset
-- AssetRisk
-- AssetProtection
-- AssetMonitor
-- AssetOptimisation
-
-**ERD:**
-```mermaid
-erDiagram
-    Asset {
-        string id
-        string name
-    }
-    AssetRisk {
-        string id
-        string description
-    }
-    AssetProtection {
-        string id
-        string measure
-    }
-    AssetMonitor {
-        string id
-        string status
-    }
-    AssetOptimisation {
-        string id
-        string opportunity
-    }
-    Asset ||--o{ AssetRisk : risks
-    Asset ||--o{ AssetProtection : protected_by
-    Asset ||--o{ AssetMonitor : monitored_by
-    Asset ||--o{ AssetOptimisation : optimised_by
-```
-
----
-
-## 5. Integration & Analytics Layer
-
-### 5.1 Cross-Layer Integration Engine
-**Purpose**: Connect all layers for comprehensive analysis
-
-**Key Entities:**
-- StrategicOperationalMap
-- ProcessControlLink
-- ValueChainProcessMap
-- AssetProcessRelation
-- Traceability
-
-**ERD:**
-```mermaid
-erDiagram
-    StrategicOperationalMap {
-        string id
-    }
-    ProcessControlLink {
-        string id
-    }
-    ValueChainProcessMap {
-        string id
-    }
-    AssetProcessRelation {
-        string id
-    }
-    Traceability {
-        string id
-    }
-    StrategicOperationalMap ||--o{ ProcessControlLink : links
-    ValueChainProcessMap ||--o{ AssetProcessRelation : maps
-    Traceability ||--o{ StrategicOperationalMap : traces
-    Traceability ||--o{ ValueChainProcessMap : traces
-```
-
-### 5.2 Analytics Engine & Reporting System
-**Purpose**: Data analysis, insights, and reporting
-
-**Key Entities:**
-- AnalyticsJob
-- Report
-- Dashboard
-- KPI
-- Trend
-- Prediction
-
-**ERD:**
-```mermaid
-erDiagram
-    AnalyticsJob {
-        string id
-        string type
-    }
-    Report {
-        string id
-        string title
-    }
-    Dashboard {
-        string id
-        string name
-    }
-    KPI {
-        string id
-        string metric
-    }
-    Trend {
-        string id
-        string description
-    }
-    Prediction {
-        string id
-        string outcome
-    }
-    AnalyticsJob ||--o{ Report : generates
-    AnalyticsJob ||--o{ Dashboard : updates
-    AnalyticsJob ||--o{ KPI : calculates
-    AnalyticsJob ||--o{ Trend : analyses
-    AnalyticsJob ||--o{ Prediction : predicts
-```
-
----
-
-## 6. Technical Architecture
-
-### Frontend Architecture
-**Technology Stack**:
-- React 18+ with TypeScript
-- Next.js 15+ for SSR and routing
-- Tailwind CSS for styling
-- Shadcn/ui for component library
-- React Query for state management
-- React Hook Form for form handling
-
-**Key Components**:
-- Responsive design system
-- Accessibility compliance (WCAG 2.1)
-- Progressive Web App capabilities
-- Offline functionality
-- Real-time updates
-
-### Backend Architecture
-**Technology Stack**:
-- Node.js with TypeScript
-- Express.js or Fastify for API
-- PostgreSQL for primary database
-- Redis for caching and sessions
-- Prisma for ORM
-- JWT for authentication
-
-**API Design**:
-- RESTful API with GraphQL option
-- OpenAPI/Swagger documentation
-- Rate limiting and security
-- API versioning
-- Comprehensive error handling
-
-### Data Architecture
-**Database Design**:
-- Normalized relational schema
-- Audit trails for all changes
-- Soft deletes for data retention
-- Optimized indexes for performance
-- Data archiving strategy
-
-**Data Models**:
-- Entity-relationship diagrams
-- Data dictionaries
-- Data quality rules
-- Data governance policies
-- Data lineage tracking
-
-### Security Architecture
-**Authentication & Authorization**:
-- Multi-factor authentication
-- Role-based access control (RBAC)
-- Attribute-based access control (ABAC)
-- Single sign-on (SSO) integration
-- Session management
-
-**Data Protection**:
-- Encryption at rest and in transit
-- Data masking for sensitive information
-- Audit logging for compliance
-- Data backup and recovery
-- Privacy by design principles
-
-## Deployment Architecture
-
-### Infrastructure
-**Cloud Platform**: AWS, Azure, or GCP
-**Containerization**: Docker with Kubernetes
-**CI/CD**: GitHub Actions or GitLab CI
-**Monitoring**: Prometheus, Grafana, ELK Stack
-**Logging**: Centralized logging with correlation IDs
-
-### Scalability
-**Horizontal Scaling**: Auto-scaling groups
-**Load Balancing**: Application load balancers
-**Caching**: Multi-layer caching strategy
-**Database**: Read replicas and connection pooling
-**CDN**: Content delivery network for static assets
-
-### High Availability
-**Multi-AZ Deployment**: Across availability zones
-**Backup Strategy**: Automated backups with point-in-time recovery
-**Disaster Recovery**: RTO/RPO objectives defined
-**Health Checks**: Comprehensive health monitoring
-**Circuit Breakers**: Fault tolerance patterns
-
-## Integration Architecture
-
-### External Systems Integration
-**ERP Systems**: SAP, Oracle, Microsoft Dynamics
-**MES Systems**: Manufacturing execution systems
-**SCADA Systems**: Supervisory control and data acquisition
-**PLM Systems**: Product lifecycle management
-**CRM Systems**: Customer relationship management
-
-### API Integration
-**REST APIs**: Standard HTTP APIs
-**GraphQL**: Flexible data querying
-**Webhooks**: Real-time event notifications
-**Message Queues**: Asynchronous processing
-**Event Streaming**: Real-time data pipelines
-
-## Performance Architecture
-
-### Performance Optimization
-**Frontend**: Code splitting, lazy loading, image optimization
-**Backend**: Database query optimization, caching strategies
-**Network**: CDN, compression, HTTP/2
-**Database**: Indexing, query optimization, connection pooling
-**Monitoring**: Performance metrics and alerting
-
-### Scalability Patterns
-**Microservices**: Service decomposition
-**Event-Driven**: Asynchronous processing
-**CQRS**: Command Query Responsibility Segregation
-**Event Sourcing**: Audit trail and state reconstruction
-**Saga Pattern**: Distributed transaction management
-
-## Monitoring & Observability
-
-### Application Monitoring
-**Metrics**: Custom business metrics
-**Logging**: Structured logging with correlation IDs
-**Tracing**: Distributed tracing with OpenTelemetry
-**Alerting**: Proactive alerting with escalation
-**Dashboards**: Real-time operational dashboards
-
-### Business Intelligence
-**Data Warehouse**: Centralized data repository
-**ETL Processes**: Data extraction, transformation, loading
-**Reporting**: Automated report generation
-**Analytics**: Advanced analytics and machine learning
-**Visualization**: Interactive dashboards and charts
-
-## Compliance & Governance
-
-### Regulatory Compliance
-**Data Protection**: GDPR, CCPA compliance
-**Industry Standards**: ISO 27001, SOC 2
-**Audit Requirements**: Comprehensive audit trails
-**Data Retention**: Automated data lifecycle management
-**Privacy Controls**: Data minimization and purpose limitation
-
-### Governance Framework
-**Change Management**: Controlled deployment processes
-**Access Management**: Regular access reviews
-**Data Governance**: Data quality and lineage
-**Risk Management**: Continuous risk assessment
-**Compliance Monitoring**: Automated compliance checking
-
-## Future Considerations
-
-### Technology Evolution
-**AI/ML Integration**: Predictive analytics and automation
-**Blockchain**: Immutable audit trails
-**IoT Integration**: Real-time sensor data
-**Edge Computing**: Local processing capabilities
-**Quantum Computing**: Future-proofing considerations
-
-### Scalability Planning
-**Global Expansion**: Multi-region deployment
-**User Growth**: Performance under load
-**Feature Expansion**: Modular architecture
-**Integration Growth**: API ecosystem
-**Data Growth**: Storage and processing optimization
-
-This architecture provides a solid foundation for the CapOpt platform, ensuring scalability, maintainability, and alignment with business objectives while maintaining security and compliance requirements. 
-
-## Entity Relationship Diagram (ERD)
-
-```mermaid
-erDiagram
-    BusinessCanvas {
-        string id
-        string name
-    }
-    OperatingModel {
-        string id
-        string name
-    }
-    ValueChain {
-        string id
-        string name
-    }
-    Process {
-        string id
-        string name
-        string description
-    }
-    CriticalControl {
-        string id
-        string name
-        string description
-    }
-    Asset {
-        string id
-        string name
+        string controlId
+        number effectiveness
+        date assessedAt
     }
     RiskCategory {
         string id
         string name
+        string description
     }
-    ControlType {
+    ControlProcess {
         string id
-        string name
+        string controlId
+        string processId
+        string relationship
     }
-    ControlEffectiveness {
-        string id
-        string rating
-    }
-    ComplianceStatus {
-        string id
-        string status
-    }
-    // Relationships
-    BusinessCanvas ||--o{ ValueChain : contains
-    ValueChain ||--o{ Process : includes
-    Process ||--o{ CriticalControl : has
-    CriticalControl ||--o{ RiskCategory : categorised_by
-    CriticalControl ||--o{ ControlType : typed_as
-    CriticalControl ||--o{ ControlEffectiveness : measured_by
-    CriticalControl ||--o{ ComplianceStatus : compliance
-    CriticalControl ||--o{ Asset : protects
-    Asset ||--o{ Process : used_in
-    OperatingModel ||--o{ ValueChain : defines
-``` 
-
-## Detailed Systems Architecture
-
-```mermaid
-graph TD
-  subgraph Frontend
-    FE[React/Next.js UI]
-    PWA[Progressive Web App]
-    ACC[Accessibility Layer]
-  end
-  subgraph Backend
-    API[Node.js API (Express/Fastify)]
-    AUTH[Auth Service (JWT, SSO, RBAC)]
-    ORM[Prisma ORM]
-    CACHE[Redis Cache]
-    WORKER[Background Workers]
-  end
-  subgraph Database
-    PG[(PostgreSQL)]
-  end
-  subgraph Integration
-    ERP[ERP Integration]
-    MES[MES Integration]
-    SCADA[SCADA Integration]
-    PLM[PLM Integration]
-    CRM[CRM Integration]
-    EXTAPI[External APIs]
-  end
-  subgraph Analytics
-    DW[Data Warehouse]
-    ETL[ETL Pipeline]
-    BI[BI & Dashboards]
-    ML[AI/ML Engine]
-  end
-  subgraph Security
-    SEC[Security Layer]
-    AUDIT[Audit Logging]
-    ENCRYPT[Encryption]
-  end
-  subgraph Deployment
-    DOCKER[Docker/Kubernetes]
-    CI[CI/CD Pipeline]
-    MON[Monitoring (Prometheus/Grafana)]
-    LOG[Centralised Logging (ELK)]
-  end
-
-  FE -->|REST/GraphQL| API
-  FE -->|WebSockets| API
-  PWA --> FE
-  ACC --> FE
-  API --> ORM
-  API --> AUTH
-  API --> CACHE
-  API --> WORKER
-  ORM --> PG
-  AUTH --> PG
-  CACHE --> PG
-  WORKER --> PG
-  API -->|Integrates| ERP
-  API --> MES
-  API --> SCADA
-  API --> PLM
-  API --> CRM
-  API --> EXTAPI
-  API --> DW
-  DW --> ETL
-  ETL --> BI
-  BI --> ML
-  API --> SEC
-  SEC --> AUDIT
-  SEC --> ENCRYPT
-  API --> DOCKER
-  API --> CI
-  API --> MON
-  API --> LOG
+    CriticalControl ||--o{ ControlType : has
+    CriticalControl ||--o{ ControlEffectiveness : measures
+    CriticalControl ||--o{ RiskCategory : addresses
+    CriticalControl ||--o{ ControlProcess : links
 ```
 
-### Component Descriptions
+### 5.2 Bowtie Analysis System
+**Purpose**: Risk analysis and control mapping
 
-- **Frontend**: React/Next.js UI, PWA features, accessibility compliance
-- **Backend**: Node.js API, authentication/authorisation, ORM, caching, background workers
-- **Database**: PostgreSQL for transactional data
-- **Integration**: Connectors for ERP, MES, SCADA, PLM, CRM, and external APIs
-- **Analytics**: Data warehouse, ETL, BI dashboards, AI/ML engine
-- **Security**: Security layer, audit logging, encryption
-- **Deployment**: Docker/Kubernetes, CI/CD, monitoring, centralised logging
+**Key Entities:**
+- BowtieAnalysis
+- Threat
+- TopEvent
+- Consequence
+- PreventiveControl
+- MitigativeControl
 
-All components are designed for scalability, security, and compliance with high-risk industry requirements. 
-
-## Key Workflow Sequence Diagrams
-
-### 1. Risk Assessment and Critical Control Assurance
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant FE as Frontend (UI)
-    participant API as Backend (API)
-    participant DB as Database
-    participant AN as Analytics Engine
-
-    User->>FE: Initiate Risk Assessment
-    FE->>API: Submit risk data and context
-    API->>DB: Store risk assessment data
-    API->>AN: Request risk analysis and control recommendations
-    AN-->>API: Return risk analysis, control effectiveness, recommendations
-    API->>DB: Store analysis results
-    API->>FE: Return assessment results and recommendations
-    FE->>User: Display risk assessment, control status, recommendations
-    User->>FE: Approve/adjust controls
-    FE->>API: Submit control updates
-    API->>DB: Update control records
-    API->>FE: Confirm update
-    FE->>User: Show confirmation
-```
-
-### 2. Incident Reporting and Response
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant FE as Frontend (UI)
-    participant API as Backend (API)
-    participant DB as Database
-    participant AN as Analytics Engine
-    participant NOTIF as Notification Service
-
-    User->>FE: Report incident
-    FE->>API: Submit incident details
-    API->>DB: Store incident record
-    API->>AN: Trigger incident analysis (severity, impact, related controls)
-    AN-->>API: Return analysis and recommended actions
-    API->>DB: Update incident with analysis
-    API->>NOTIF: Notify responsible parties
-    NOTIF-->>User: Send confirmation/alerts
-    API->>FE: Return incident status and next steps
-    FE->>User: Display incident response workflow
-    User->>FE: Acknowledge/close incident
-    FE->>API: Update incident status
-    API->>DB: Mark incident as closed
-    API->>FE: Confirm closure
-    FE->>User: Show closure confirmation
-``` 
-
-### 3. Compliance Audit Workflow
-
-```mermaid
-sequenceDiagram
-    participant Auditor
-    participant FE as Frontend (UI)
-    participant API as Backend (API)
-    participant DB as Database
-    participant AN as Analytics Engine
-
-    Auditor->>FE: Initiate compliance audit
-    FE->>API: Request audit checklist and requirements
-    API->>DB: Fetch audit templates and compliance data
-    DB-->>API: Return audit data
-    API->>FE: Provide audit checklist
-    FE->>Auditor: Display checklist and requirements
-    Auditor->>FE: Submit audit findings and evidence
-    FE->>API: Send findings and evidence
-    API->>DB: Store audit results
-    API->>AN: Analyse compliance gaps and risks
-    AN-->>API: Return gap analysis and recommendations
-    API->>DB: Update audit record with analysis
-    API->>FE: Return audit summary and recommendations
-    FE->>Auditor: Display audit results and next steps
-```
-
-### 4. Asset Risk Assessment and Protection
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant FE as Frontend (UI)
-    participant API as Backend (API)
-    participant DB as Database
-    participant AN as Analytics Engine
-
-    User->>FE: Select asset for risk assessment
-    FE->>API: Request asset details and risk profile
-    API->>DB: Fetch asset data and historical incidents
-    DB-->>API: Return asset and incident data
-    API->>AN: Analyse asset risk and recommend controls
-    AN-->>API: Return risk score and control recommendations
-    API->>FE: Provide risk assessment and recommendations
-    FE->>User: Display asset risk, controls, and actions
-    User->>FE: Approve/add protection measures
-    FE->>API: Submit protection updates
-    API->>DB: Update asset protection records
-    API->>FE: Confirm update
-    FE->>User: Show confirmation
-``` 
-
-### 5. User Onboarding and Role Assignment
-
-```mermaid
-sequenceDiagram
-    participant Admin
-    participant FE as Frontend (UI)
-    participant API as Backend (API)
-    participant DB as Database
-    participant AUTH as Auth Service
-    participant NOTIF as Notification Service
-
-    Admin->>FE: Invite new user
-    FE->>API: Send invitation details
-    API->>AUTH: Create user account and assign temporary credentials
-    AUTH->>DB: Store user record
-    API->>NOTIF: Send invitation email to user
-    NOTIF-->>User: Receive onboarding email
-    User->>FE: Accept invitation and set password
-    FE->>API: Submit new credentials
-    API->>AUTH: Update user credentials
-    API->>DB: Update user status
-    Admin->>FE: Assign roles and permissions
-    FE->>API: Update user roles
-    API->>DB: Store role assignments
-    API->>FE: Confirm onboarding completion
-    FE->>Admin: Show confirmation
-```
-
-### 6. Maturity Assessment and Improvement Roadmap
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant FE as Frontend (UI)
-    participant API as Backend (API)
-    participant DB as Database
-    participant AN as Analytics Engine
-
-    User->>FE: Start maturity assessment
-    FE->>API: Request assessment questions
-    API->>DB: Fetch assessment framework
-    DB-->>API: Return questions and criteria
-    API->>FE: Provide assessment to user
-    FE->>User: Display assessment form
-    User->>FE: Submit responses
-    FE->>API: Send responses
-    API->>DB: Store responses
-    API->>AN: Analyse maturity and generate roadmap
-    AN-->>API: Return maturity score and improvement plan
-    API->>DB: Store results
-    API->>FE: Return assessment results and roadmap
-    FE->>User: Display maturity score and improvement roadmap
-```
-
-## Error Handling and Exception Workflows
-
-### Principles
-- All errors are logged with context and correlation IDs for traceability.
-- User-facing errors are clear, actionable, and never expose sensitive details.
-- System errors trigger alerts and, where appropriate, automated recovery or escalation.
-- Critical errors (e.g., control failures, data loss) follow strict escalation and notification protocols.
-- All error flows are tested, monitored, and reviewed regularly.
-
-### Common Error Types
-- **Validation Errors:** Invalid user input, missing required fields
-- **Authentication/Authorisation Errors:** Invalid credentials, insufficient permissions
-- **System Errors:** Database or service outages, timeouts
-- **Integration Errors:** Failed connections to external systems (ERP, MES, etc.)
-- **Business Logic Errors:** Violations of business rules, control failures
-- **Critical Incidents:** Loss of control effectiveness, unmitigated risks
-
-### 1. API Error Handling and User Feedback
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant FE as Frontend (UI)
-    participant API as Backend (API)
-    participant LOG as Logging Service
-
-    User->>FE: Submit form/request
-    FE->>API: Send API request
-    API-->>API: Validate input and permissions
-    alt Validation or Auth Error
-        API->>FE: Return error response (code, message)
-        API->>LOG: Log error with context
-        FE->>User: Display user-friendly error message
-    else System/Integration Error
-        API->>LOG: Log error with stack trace
-        API->>FE: Return generic error response
-        FE->>User: Display fallback error message
-    end
-    User->>FE: Retry or correct input
-```
-
-### 2. Critical Control Failure Escalation
-
-```mermaid
-sequenceDiagram
-    participant Monitor as Control Monitor
-    participant API as Backend (API)
-    participant LOG as Logging Service
-    participant NOTIF as Notification Service
-    participant FE as Frontend (UI)
-    participant User
-    participant Manager
-
-    Monitor->>API: Detect control failure event
-    API->>LOG: Log critical event with details
-    API->>NOTIF: Trigger escalation notification
-    NOTIF-->>User: Notify responsible user(s)
-    NOTIF-->>Manager: Notify manager/escalation contact
-    API->>FE: Update dashboard/status
-    FE->>User: Display critical control failure alert
-    User->>FE: Acknowledge/assign response
-    FE->>API: Record acknowledgement/action
-    API->>LOG: Log response action
-``` 
-
-## User Persona Journey Diagrams
-
-**Legend:**
-- ⚠️ Pain Point
-- ⭐ Opportunity
-
-### 1. Strategic Planner Journey
-
-```mermaid
-journey
-    title Strategic Planner: From Strategy to Execution
-    section Login & Orientation
-      Login to platform: 5: User
-      Review dashboard: 4: User ⚠️ (Information overload)
-    section Strategic Planning
-      Access Business Canvas: 5: User
-      Map value propositions: 4: User ⭐ (Strategic clarity)
-      Define strategic objectives: 4: User
-    section Alignment & Analysis
-      Link strategy to operating model: 3: User ⚠️ (Alignment complexity)
-      Review risk controls: 3: User ⭐ (Integrated risk view)
-      Analyse strategic risks: 2: User ⚠️ (Uncertain risk data)
-    section Execution & Monitoring
-      Assign initiatives: 4: User
-      Monitor progress: 3: User ⭐ (Real-time tracking)
-      Review reports: 4: User
-```
-
-### 2. Operations Manager Journey
-
-```mermaid
-journey
-    title Operations Manager: Process Optimisation & Control
-    section Start of Day
-      Login to platform: 5: User
-      Review operational dashboard: 4: User ⚠️ (Alert fatigue)
-    section Process Management
-      Access process maps: 4: User
-      Identify bottlenecks: 3: User ⭐ (Bottleneck detection)
-      Review critical controls: 3: User ⚠️ (Control gaps)
-      Assign tasks to team: 4: User ⭐ (Task automation)
-    section Incident Handling
-      Respond to incident alert: 2: User ⚠️ (Incident stress)
-      Review incident details: 2: User
-      Implement corrective actions: 3: User ⭐ (Guided response)
-    section Continuous Improvement
-      Track KPIs: 4: User
-      Review improvement roadmap: 4: User ⭐ (Continuous improvement)
-      Share feedback: 5: User
-```
-
-### 3. Risk Manager Journey
-
-```mermaid
-journey
-    title Risk Manager: Assurance & Compliance
-    section Daily Routine
-      Login to platform: 5: User
-      Review risk dashboard: 4: User ⚠️ (Risk overload)
-    section Risk Assessment
-      Conduct risk assessment: 3: User ⭐ (Automated scoring)
-      Review control effectiveness: 3: User ⚠️ (Data gaps)
-      Update risk register: 3: User
-    section Audit & Compliance
-      Initiate compliance audit: 2: User
-      Review audit findings: 2: User ⚠️ (Audit backlog)
-      Escalate critical issues: 1: User ⭐ (Escalation workflow)
-    section Reporting
-      Generate compliance reports: 4: User
-      Present to management: 4: User ⭐ (Board-ready reports)
-      Plan risk mitigation: 3: User
-``` 
-
-### 4. Analyst Journey
-
-```mermaid
-journey
-    title Analyst: Insights & Reporting
-    section Start of Day
-      Login to platform: 5: User
-      Review analytics dashboard: 4: User
-    section Data Exploration
-      Access data warehouse: 3: User
-      Query operational data: 3: User ⚠️ (Data complexity)
-      Visualise trends: 4: User ⭐ (Advanced visualisation)
-    section Insights Generation
-      Run predictive analytics: 3: User ⭐ (AI/ML tools)
-      Identify anomalies: 2: User ⚠️ (Data quality)
-      Generate reports: 4: User
-    section Collaboration
-      Share insights with team: 4: User ⭐ (Collaboration tools)
-      Receive feedback: 3: User
-```
-
-**Workflow/Feature Links:**
-| Journey Step                | Platform Workflow/Feature           |
-|----------------------------|-------------------------------------|
-| Review analytics dashboard  | Analytics Engine, KPI Dashboards    |
-| Access data warehouse       | Data Warehouse, ETL Pipeline        |
-| Query operational data      | BI Tools, Data Query Interface      |
-| Visualise trends            | BI Dashboards, Charting Tools       |
-| Run predictive analytics    | AI/ML Engine                        |
-| Identify anomalies          | Data Quality & Monitoring           |
-| Generate reports            | Reporting System                    |
-| Share insights with team    | Collaboration/Sharing Tools         |
-| Receive feedback            | Comments, Notifications             |
-
-### 5. Executive Journey
-
-```mermaid
-journey
-    title Executive: Oversight & Decision-Making
-    section Daily Overview
-      Login to platform: 5: User
-      Review executive dashboard: 4: User
-    section Strategic Review
-      Assess risk posture: 3: User ⭐ (Risk heatmaps)
-      Review compliance status: 3: User ⚠️ (Regulatory complexity)
-      Monitor key initiatives: 4: User
-    section Decision-Making
-      Approve strategic actions: 3: User
-      Request additional analysis: 2: User ⚠️ (Information gaps)
-      Communicate decisions: 4: User ⭐ (Integrated comms)
-    section Stakeholder Engagement
-      Share reports with board: 4: User ⭐ (Board reporting)
-      Respond to queries: 3: User
-```
-
-**Workflow/Feature Links:**
-| Journey Step                | Platform Workflow/Feature           |
-|----------------------------|-------------------------------------|
-| Review executive dashboard  | Executive Dashboard, KPI Reporting  |
-| Assess risk posture         | Risk Dashboard, Heatmaps            |
-| Review compliance status    | Compliance Monitoring, Audit Trails |
-| Monitor key initiatives     | Initiative Tracker, Progress Reports|
-| Approve strategic actions   | Approval Workflow                   |
-| Request additional analysis | Analytics Engine, BI Tools          |
-| Communicate decisions       | Integrated Communication Tools      |
-| Share reports with board    | Board Reporting, Export Tools       |
-| Respond to queries          | Notifications, Messaging            |
-``` 
-
----
-
-## Cross-Layer Relationship Diagrams
-
-### 1. ValueChain, Process, and Playbook Linkage
+**ERD:**
 ```mermaid
 erDiagram
-    ValueChain {
+    BowtieAnalysis {
         string id
         string name
+        string description
     }
-    Process {
+    Threat {
         string id
         string name
+        string description
     }
-    Playbook {
+    TopEvent {
         string id
         string name
+        string description
     }
-    ValueChain ||--o{ Process : includes
-    Process ||--o{ Playbook : guided_by
-```
-
-### 2. CriticalControl, Process, and Asset Linkage
-```mermaid
-erDiagram
-    CriticalControl {
+    Consequence {
         string id
         string name
+        string severity
     }
-    Process {
+    PreventiveControl {
         string id
         string name
+        string effectiveness
     }
-    Asset {
+    MitigativeControl {
         string id
         string name
+        string effectiveness
     }
-    CriticalControl ||--o{ Process : protects
-    CriticalControl ||--o{ Asset : protects
-    Process ||--o{ Asset : uses
+    BowtieAnalysis ||--o{ Threat : identifies
+    BowtieAnalysis ||--o{ TopEvent : focuses
+    BowtieAnalysis ||--o{ Consequence : maps
+    BowtieAnalysis ||--o{ PreventiveControl : uses
+    BowtieAnalysis ||--o{ MitigativeControl : uses
 ```
 
 ---
 
-## Example Data Dictionaries
+## 6. Integration Architecture
 
-### BusinessCanvas
-| Attribute         | Type    | Description                                 |
-|------------------|---------|---------------------------------------------|
-| id               | string  | Unique identifier for the business canvas   |
-| name             | string  | Name of the business canvas                 |
-| valueProposition | string  | Reference to value proposition entity       |
-| customerSegments | array   | List of customer segment references         |
-| revenueStreams   | array   | List of revenue stream references           |
-| keyPartnerships  | array   | List of partnership references              |
-| keyResources     | array   | List of resource references                 |
-| keyActivities    | array   | List of activity references                 |
-| costStructure    | string  | Reference to cost structure entity          |
-| channels         | array   | List of channel references                  |
+### 6.1 Layer Integration Patterns
 
-### ValueChain
-| Attribute         | Type    | Description                                 |
-|------------------|---------|---------------------------------------------|
-| id               | string  | Unique identifier for the value chain       |
-| name             | string  | Name of the value chain                     |
-| steps            | array   | List of value step references               |
-| flows            | array   | List of value flow references               |
-| metrics          | array   | List of value metric references             |
-| bottlenecks      | array   | List of bottleneck references               |
-| optimisationOpportunities | array | List of optimisation opportunity references |
+#### **Strategic Navigation Integration**
+- **Bidirectional Flow**: Enable navigation between all layers
+- **Context Preservation**: Maintain context when navigating between layers
+- **Alignment Tracking**: Track strategic alignment across layers
+- **Impact Traceability**: Trace operational impact on strategic objectives
 
-### Process
-| Attribute         | Type    | Description                                 |
-|------------------|---------|---------------------------------------------|
-| id               | string  | Unique identifier for the process           |
-| name             | string  | Name of the process                         |
-| description      | string  | Description of the process                  |
-| steps            | array   | List of process step references             |
-| inputs           | array   | List of process input references            |
-| outputs          | array   | List of process output references           |
-| metrics          | array   | List of process metric references           |
-| risks            | array   | List of process risk references             |
-| controls         | array   | List of process control references          |
+#### **Control Integration**
+- **Cross-Layer Controls**: Apply controls across all layers
+- **Risk Alignment**: Align risk management with strategic objectives
+- **Compliance Tracking**: Track compliance across all layers
+- **Assurance Integration**: Integrate assurance activities across layers
 
-### CriticalControl
-| Attribute         | Type    | Description                                 |
-|------------------|---------|---------------------------------------------|
-| id               | string  | Unique identifier for the critical control  |
-| name             | string  | Name of the critical control                |
-| description      | string  | Description of the control                  |
-| riskCategory     | string  | Reference to risk category entity           |
-| controlType      | string  | Reference to control type entity            |
-| effectiveness    | string  | Reference to control effectiveness entity   |
-| complianceStatus | string  | Reference to compliance status entity       |
-| linkedProcesses  | array   | List of linked process references           |
-| linkedAssets     | array   | List of linked asset references             |
+### 6.2 API Integration Patterns
 
-### ServiceModel
-| Attribute         | Type    | Description                                 |
-|------------------|---------|---------------------------------------------|
-| id               | string  | Unique identifier for the service model     |
-| name             | string  | Name of the service model                   |
-| blueprints       | array   | List of service blueprint references        |
-| touchpoints      | array   | List of touchpoint references               |
-| qualityMetrics   | array   | List of quality metric references           |
-| improvements     | array   | List of service improvement references      |
-| customerJourneys | array   | List of customer journey references         |
+#### **RESTful API Design**
+- **Consistent Endpoints**: Standardized API patterns across all modules
+- **Resource-Based URLs**: Clear resource identification in URLs
+- **HTTP Status Codes**: Proper status code usage for responses
+- **Error Handling**: Consistent error response formats
 
-### Playbook
-| Attribute         | Type    | Description                                 |
-|------------------|---------|---------------------------------------------|
-| id               | string  | Unique identifier for the playbook          |
-| name             | string  | Name of the playbook                        |
-| procedures       | array   | List of procedure references                |
-| trainingMaterials| array   | List of training material references        |
-| bestPractices    | array   | List of best practice references            |
-| improvements     | array   | List of improvement references              |
+#### **GraphQL Integration**
+- **Flexible Queries**: Allow clients to request specific data
+- **Real-time Updates**: Subscription-based real-time updates
+- **Schema Evolution**: Backward-compatible schema changes
+- **Performance Optimization**: Efficient data fetching
 
-### Asset
-| Attribute         | Type    | Description                                 |
-|------------------|---------|---------------------------------------------|
-| id               | string  | Unique identifier for the asset             |
-| name             | string  | Name of the asset                           |
-| risks            | array   | List of asset risk references               |
-| protections      | array   | List of asset protection references         |
-| monitors         | array   | List of asset monitor references            |
-| optimisations    | array   | List of asset optimisation references       |
+### 6.3 Data Integration Patterns
 
-### AnalyticsJob
-| Attribute         | Type    | Description                                 |
-|------------------|---------|---------------------------------------------|
-| id               | string  | Unique identifier for the analytics job     |
-| type             | string  | Type of analytics job (e.g., KPI, trend)    |
-| targetEntity     | string  | Reference to the entity being analysed      |
-| parameters       | object  | Parameters for the analytics job            |
-| status           | string  | Status of the analytics job                 |
-| results          | object  | Results of the analytics job                |
+#### **Event-Driven Architecture**
+- **Domain Events**: Capture business events across all layers
+- **Event Sourcing**: Maintain event history for audit and replay
+- **CQRS Pattern**: Separate read and write operations
+- **Event Streaming**: Real-time event processing
 
-### Report
-| Attribute         | Type    | Description                                 |
-|------------------|---------|---------------------------------------------|
-| id               | string  | Unique identifier for the report            |
-| title            | string  | Title of the report                         |
-| type             | string  | Type of report (e.g., operational, risk)    |
-| generatedBy      | string  | Reference to the analytics job              |
-| relatedEntities  | array   | List of related entity references           |
-| createdAt        | date    | Date/time the report was generated          |
-``` 
+#### **Data Consistency**
+- **Eventual Consistency**: Accept eventual consistency for better performance
+- **Saga Pattern**: Handle distributed transactions across layers
+- **Compensation Logic**: Handle rollback scenarios
+- **Data Validation**: Ensure data integrity across layers
 
 ---
 
-## Expanded Cross-Layer Relationship Diagrams
+## 7. Security Architecture
 
-### 3. Analytics, Reporting, and Integration Linkage
-```mermaid
-erDiagram
-    Process {
-        string id
-        string name
-    }
-    ValueChain {
-        string id
-        string name
-    }
-    Asset {
-        string id
-        string name
-    }
-    AnalyticsJob {
-        string id
-        string type
-    }
-    Report {
-        string id
-        string title
-    }
-    Process ||--o{ AnalyticsJob : analysed_by
-    ValueChain ||--o{ AnalyticsJob : analysed_by
-    Asset ||--o{ AnalyticsJob : analysed_by
-    AnalyticsJob ||--o{ Report : generates
-    Report ||--o{ Process : reports_on
-    Report ||--o{ ValueChain : reports_on
-    Report ||--o{ Asset : reports_on
-```
+### 7.1 Authentication & Authorization
+- **JWT Tokens**: Secure token-based authentication
+- **Role-Based Access Control**: Granular permission management
+- **Multi-Factor Authentication**: Enhanced security for sensitive operations
+- **Session Management**: Secure session handling
 
-**Example Usage Scenario:**
-- An AnalyticsJob is created to analyse a specific Process (e.g., "Ore Refinement"). The job runs a KPI analysis and generates a Report (e.g., "Monthly Refinement Efficiency"). The Report references both the Process and the ValueChain it belongs to, and may also include Asset performance data.
+### 7.2 Data Protection
+- **Encryption at Rest**: Encrypt sensitive data in storage
+- **Encryption in Transit**: Secure data transmission
+- **Data Classification**: Classify data by sensitivity level
+- **Access Logging**: Comprehensive access audit trails
 
-- Another AnalyticsJob targets an Asset (e.g., "Conveyor Belt 3"), running a trend analysis on downtime. The resulting Report links to the Asset and any related Processes.
-``` 
+### 7.3 Compliance & Governance
+- **Regulatory Compliance**: Meet industry-specific regulations
+- **Audit Trails**: Complete audit trail for all operations
+- **Data Retention**: Implement data retention policies
+- **Privacy Protection**: Protect user privacy and data
+
+---
+
+## 8. Performance & Scalability
+
+### 8.1 Performance Optimization
+- **Caching Strategy**: Implement multi-level caching
+- **Database Optimization**: Optimize database queries and indexing
+- **CDN Integration**: Use CDN for static content delivery
+- **Load Balancing**: Distribute load across multiple servers
+
+### 8.2 Scalability Patterns
+- **Horizontal Scaling**: Scale by adding more servers
+- **Vertical Scaling**: Scale by increasing server resources
+- **Microservices Architecture**: Decompose into microservices
+- **Container Orchestration**: Use Kubernetes for container management
+
+### 8.3 Monitoring & Observability
+- **Application Monitoring**: Monitor application performance
+- **Infrastructure Monitoring**: Monitor infrastructure health
+- **Log Aggregation**: Centralized log management
+- **Alerting**: Proactive alerting for issues
+
+---
+
+## 9. Deployment Architecture
+
+### 9.1 Cloud Infrastructure
+- **Azure Cloud Services**: Leverage Azure cloud capabilities
+- **Container Deployment**: Deploy using Docker containers
+- **Kubernetes Orchestration**: Use Kubernetes for container orchestration
+- **Auto-scaling**: Implement automatic scaling based on demand
+
+### 9.2 CI/CD Pipeline
+- **Automated Testing**: Comprehensive automated testing
+- **Continuous Integration**: Automated build and test process
+- **Continuous Deployment**: Automated deployment to production
+- **Environment Management**: Manage multiple deployment environments
+
+### 9.3 Disaster Recovery
+- **Backup Strategy**: Regular automated backups
+- **Recovery Procedures**: Documented recovery procedures
+- **High Availability**: Implement high availability patterns
+- **Business Continuity**: Ensure business continuity during outages
+
+---
+
+## 10. Future Enhancements
+
+### 10.1 AI/ML Integration
+- **Predictive Analytics**: Predict operational issues and opportunities
+- **Automated Optimization**: Automatically optimize processes and controls
+- **Intelligent Recommendations**: Provide intelligent recommendations
+- **Natural Language Processing**: Enable natural language interactions
+
+### 10.2 Advanced Analytics
+- **Real-time Analytics**: Real-time operational analytics
+- **Advanced Reporting**: Advanced reporting and visualization
+- **Data Mining**: Discover patterns and insights in data
+- **Business Intelligence**: Comprehensive business intelligence capabilities
+
+### 10.3 External Integrations
+- **ERP Integration**: Integrate with enterprise resource planning systems
+- **MES Integration**: Integrate with manufacturing execution systems
+- **IoT Integration**: Integrate with Internet of Things devices
+- **Third-party APIs**: Integrate with third-party services and APIs 

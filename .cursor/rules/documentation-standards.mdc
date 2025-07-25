@@ -1,3 +1,9 @@
+---
+description: Documentation as Code standards, Markdown formatting guidelines, documentation workflow, and templates for creating and maintaining project documentation. Apply when working with documentation files, README files, or creating technical documentation.
+
+alwaysApply: false
+---
+
 # Documentation as Code Standards
 
 ## Core Principles
@@ -180,9 +186,3 @@ Common error responses and their meanings.
 ## Examples
 Usage examples with sample requests and responses.
 ```
-
----
-description: Documentation as Code standards, Markdown formatting guidelines, documentation workflow, and templates for creating and maintaining project documentation. Apply when working with documentation files, README files, or creating technical documentation.
-
-alwaysApply: false
----

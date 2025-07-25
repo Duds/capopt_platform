@@ -25,7 +25,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Enterprise relationships
+  enterpriseId String?
+  departmentId String?
+
   // Relationships
+  enterprise   Enterprise? @relation("EnterpriseUsers", fields: [enterpriseId], references: [id])
+  department   Department? @relation("DepartmentUsers", fields: [departmentId], references: [id])
   createdProcesses    Process[]    @relation("ProcessCreator")
   createdControls     CriticalControl[] @relation("ControlCreator")
   createdAssets       Asset[]      @relation("AssetCreator")
@@ -49,6 +55,202 @@ enum UserRole {
   EXTERNAL_AUDITOR
   MAINTENANCE
   DOCUMENTATION_SPECIALIST
+}
+
+// ============================================================================
+// ENTERPRISE INFORMATION
+// ============================================================================
+
+model Enterprise {
+  id          String   @id @default(cuid())
+  name        String
+  legalName   String
+  abn         String   @unique // Australian Business Number
+  acn         String?  @unique // Australian Company Number
+  description String?
+  industry    String
+  sector      String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  addresses   EnterpriseAddress[]
+  facilities  Facility[]
+  businessUnits BusinessUnit[]
+  users       User[]     @relation("EnterpriseUsers")
+  processes   Process[]
+  assets      Asset[]
+
+  @@map("enterprises")
+}
+
+model EnterpriseAddress {
+  id           String    @id @default(cuid())
+  enterpriseId String
+  type         AddressType
+  street       String
+  suburb       String
+  city         String
+  state        String
+  postcode     String
+  country      String    @default("Australia")
+  isPrimary    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relationships
+  enterprise   Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+
+  @@map("enterprise_addresses")
+}
+
+model Facility {
+  id           String    @id @default(cuid())
+  enterpriseId String
+  name         String
+  code         String    @unique // Facility code (e.g., HL001)
+  description  String?
+  type         FacilityType
+  status       FacilityStatus @default(ACTIVE)
+  location     String?   // Geographic location
+  coordinates  String?   // GPS coordinates
+  capacity     String?   // Production capacity
+  startDate    DateTime? // Operational start date
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relationships
+  enterprise   Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  businessUnits BusinessUnit[]
+  assets       Asset[]
+  processes    Process[]
+
+  @@map("facilities")
+}
+
+model BusinessUnit {
+  id           String    @id @default(cuid())
+  enterpriseId String
+  facilityId   String?
+  name         String
+  code         String    @unique // Business unit code (e.g., MINING, PROCESSING)
+  description  String?
+  type         BusinessUnitType
+  status       BusinessUnitStatus @default(ACTIVE)
+  manager      String?   // Business unit manager name
+  budget       Decimal?  // Annual budget
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relationships
+  enterprise   Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  facility     Facility?  @relation(fields: [facilityId], references: [id])
+  departments  Department[]
+  assets       Asset[]
+  processes    Process[]
+
+  @@map("business_units")
+}
+
+model Department {
+  id            String    @id @default(cuid())
+  businessUnitId String
+  name          String
+  code          String    @unique // Department code (e.g., MINING_OP, PROCESSING_MAINT)
+  description   String?
+  type          DepartmentType
+  status        DepartmentStatus @default(ACTIVE)
+  manager       String?   // Department manager name
+  employeeCount Int?      // Number of employees
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relationships
+  businessUnit  BusinessUnit @relation(fields: [businessUnitId], references: [id], onDelete: Cascade)
+  users         User[]     @relation("DepartmentUsers")
+  assets        Asset[]
+  processes     Process[]
+
+  @@map("departments")
+}
+
+// Enums for Enterprise Information
+enum AddressType {
+  REGISTERED_OFFICE
+  OPERATIONAL_OFFICE
+  WAREHOUSE
+  SITE_OFFICE
+  MAILING_ADDRESS
+}
+
+enum FacilityType {
+  MINE
+  PROCESSING_PLANT
+  REFINERY
+  SMELTER
+  WAREHOUSE
+  OFFICE
+  LABORATORY
+  WORKSHOP
+  POWER_STATION
+  WATER_TREATMENT
+  WASTE_MANAGEMENT
+}
+
+enum FacilityStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+  DECOMMISSIONED
+  PLANNED
+}
+
+enum BusinessUnitType {
+  MINING
+  PROCESSING
+  MAINTENANCE
+  ENGINEERING
+  SAFETY
+  ENVIRONMENTAL
+  FINANCE
+  HUMAN_RESOURCES
+  IT
+  LOGISTICS
+  QUALITY_ASSURANCE
+  RESEARCH_DEVELOPMENT
+}
+
+enum BusinessUnitStatus {
+  ACTIVE
+  INACTIVE
+  PLANNED
+  DECOMMISSIONED
+}
+
+enum DepartmentType {
+  OPERATIONS
+  MAINTENANCE
+  ENGINEERING
+  SAFETY
+  ENVIRONMENTAL
+  FINANCE
+  HUMAN_RESOURCES
+  IT
+  LOGISTICS
+  QUALITY_ASSURANCE
+  RESEARCH_DEVELOPMENT
+  ADMINISTRATION
+}
+
+enum DepartmentStatus {
+  ACTIVE
+  INACTIVE
+  PLANNED
+  DECOMMISSIONED
 }
 
 // ============================================================================
@@ -311,11 +513,22 @@ model Process {
   status      ProcessStatus @default(DRAFT)
   priority    Priority @default(MEDIUM)
   createdById String
+  
+  // Enterprise relationships
+  enterpriseId String?
+  facilityId   String?
+  businessUnitId String?
+  departmentId String?
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relationships
   createdBy       User           @relation("ProcessCreator", fields: [createdById], references: [id])
+  enterprise      Enterprise?    @relation(fields: [enterpriseId], references: [id])
+  facility        Facility?      @relation(fields: [facilityId], references: [id])
+  businessUnit    BusinessUnit?  @relation(fields: [businessUnitId], references: [id])
+  department      Department?    @relation(fields: [departmentId], references: [id])
   steps           ProcessStep[]
   inputs          ProcessInput[]
   outputs         ProcessOutput[]
@@ -724,11 +937,22 @@ model Asset {
   status      AssetStatus @default(OPERATIONAL)
   criticality AssetCriticality @default(MEDIUM)
   createdById String
+  
+  // Enterprise relationships
+  enterpriseId String?
+  facilityId   String?
+  businessUnitId String?
+  departmentId String?
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relationships
   createdBy       User          @relation("AssetCreator", fields: [createdById], references: [id])
+  enterprise      Enterprise?   @relation(fields: [enterpriseId], references: [id])
+  facility        Facility?     @relation(fields: [facilityId], references: [id])
+  businessUnit    BusinessUnit? @relation(fields: [businessUnitId], references: [id])
+  department      Department?   @relation(fields: [departmentId], references: [id])
   controls        AssetControl[]
   risks           AssetRisk[]
   protections     AssetProtection[]
