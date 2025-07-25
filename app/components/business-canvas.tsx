@@ -21,225 +21,21 @@ import {
   Trash2,
   Download,
   Share,
-  Users,
-  Handshake,
-  Activity,
-  Package,
-  Heart,
-  Radio,
-  DollarSign,
-  TrendingDown,
   Save,
   Eye,
   Copy,
 } from "lucide-react"
 import { CanvasVisualization } from "@/components/business-canvas/canvas-visualization"
-
-interface CanvasItem {
-  id: string
-  title: string
-  description: string
-  priority: "high" | "medium" | "low"
-}
-
-interface BusinessModel {
-  keyPartners: CanvasItem[]
-  keyActivities: CanvasItem[]
-  keyResources: CanvasItem[]
-  valuePropositions: CanvasItem[]
-  customerRelationships: CanvasItem[]
-  channels: CanvasItem[]
-  customerSegments: CanvasItem[]
-  costStructure: CanvasItem[]
-  revenueStreams: CanvasItem[]
-}
+import { BusinessModel, CanvasItem } from "@/components/business-canvas/types"
+import { defaultBusinessModel, canvasSections } from "@/components/business-canvas/utils"
+import { CanvasSection } from "@/components/business-canvas/canvas-section"
 
 export function BusinessCanvas() {
-  const [businessModel, setBusinessModel] = useState<BusinessModel>({
-    keyPartners: [
-      {
-        id: "1",
-        title: "Technology Vendors",
-        description: "Cloud infrastructure and software providers",
-        priority: "high",
-      },
-      {
-        id: "2",
-        title: "Strategic Consultants",
-        description: "Industry expertise and implementation partners",
-        priority: "medium",
-      },
-    ],
-    keyActivities: [
-      {
-        id: "1",
-        title: "Platform Development",
-        description: "Continuous development and enhancement of the CapOpt platform",
-        priority: "high",
-      },
-      {
-        id: "2",
-        title: "Customer Success",
-        description: "Onboarding, training, and ongoing support",
-        priority: "high",
-      },
-    ],
-    keyResources: [
-      { id: "1", title: "Development Team", description: "Skilled engineers and product managers", priority: "high" },
-      {
-        id: "2",
-        title: "Intellectual Property",
-        description: "Proprietary algorithms and methodologies",
-        priority: "high",
-      },
-    ],
-    valuePropositions: [
-      {
-        id: "1",
-        title: "End-to-End Optimization",
-        description: "Complete visibility from strategy to execution",
-        priority: "high",
-      },
-      {
-        id: "2",
-        title: "Risk Management",
-        description: "Comprehensive risk assessment and control management",
-        priority: "high",
-      },
-    ],
-    customerRelationships: [
-      {
-        id: "1",
-        title: "Strategic Partnership",
-        description: "Long-term collaborative relationships",
-        priority: "high",
-      },
-      {
-        id: "2",
-        title: "Consultative Support",
-        description: "Ongoing advisory and support services",
-        priority: "medium",
-      },
-    ],
-    channels: [
-      {
-        id: "1",
-        title: "Direct Sales",
-        description: "Direct enterprise sales and implementation",
-        priority: "high",
-      },
-      {
-        id: "2",
-        title: "Partner Network",
-        description: "Strategic partner distribution channels",
-        priority: "medium",
-      },
-    ],
-    customerSegments: [
-      {
-        id: "1",
-        title: "Mining Companies",
-        description: "Large-scale mining operations",
-        priority: "high",
-      },
-      {
-        id: "2",
-        title: "Petrochemical Companies",
-        description: "Oil and gas processing facilities",
-        priority: "high",
-      },
-    ],
-    costStructure: [
-      {
-        id: "1",
-        title: "Development Costs",
-        description: "Software development and maintenance",
-        priority: "high",
-      },
-      {
-        id: "2",
-        title: "Sales and Marketing",
-        description: "Customer acquisition and retention",
-        priority: "medium",
-      },
-    ],
-    revenueStreams: [
-      {
-        id: "1",
-        title: "Subscription Licenses",
-        description: "Annual platform subscription fees",
-        priority: "high",
-      },
-      {
-        id: "2",
-        title: "Implementation Services",
-        description: "Professional services and consulting",
-        priority: "medium",
-      },
-    ],
-  })
-
+  const [businessModel, setBusinessModel] = useState<BusinessModel>(defaultBusinessModel)
   const [viewMode, setViewMode] = useState<'list' | 'canvas'>('canvas')
   const [isEditing, setIsEditing] = useState(false)
   const [editingItem, setEditingItem] = useState<{ section: keyof BusinessModel; item: CanvasItem } | null>(null)
   const [newItem, setNewItem] = useState<{ section: keyof BusinessModel } | null>(null)
-
-  const sectionConfig = {
-    keyPartners: {
-      title: "Key Partners",
-      icon: Handshake,
-      color: "bg-blue-50 border-blue-200",
-      description: "Who are our key partners and suppliers?",
-    },
-    keyActivities: {
-      title: "Key Activities",
-      icon: Activity,
-      color: "bg-green-50 border-green-200",
-      description: "What key activities does our value proposition require?",
-    },
-    keyResources: {
-      title: "Key Resources",
-      icon: Package,
-      color: "bg-purple-50 border-purple-200",
-      description: "What key resources does our value proposition require?",
-    },
-    valuePropositions: {
-      title: "Value Propositions",
-      icon: Heart,
-      color: "bg-red-50 border-red-200",
-      description: "What value do we deliver to customers?",
-    },
-    customerRelationships: {
-      title: "Customer Relationships",
-      icon: Users,
-      color: "bg-orange-50 border-orange-200",
-      description: "What type of relationship does each customer segment expect?",
-    },
-    channels: {
-      title: "Channels",
-      icon: Radio,
-      color: "bg-yellow-50 border-yellow-200",
-      description: "Through which channels do we reach our customers?",
-    },
-    customerSegments: {
-      title: "Customer Segments",
-      icon: Users,
-      color: "bg-indigo-50 border-indigo-200",
-      description: "For whom are we creating value?",
-    },
-    costStructure: {
-      title: "Cost Structure",
-      icon: TrendingDown,
-      color: "bg-gray-50 border-gray-200",
-      description: "What are the most important costs in our business model?",
-    },
-    revenueStreams: {
-      title: "Revenue Streams",
-      icon: DollarSign,
-      color: "bg-emerald-50 border-emerald-200",
-      description: "For what value are customers willing to pay?",
-    },
-  }
 
   const addItem = (section: keyof BusinessModel, item: Omit<CanvasItem, "id">) => {
     const newId = Date.now().toString()
@@ -263,81 +59,24 @@ export function BusinessCanvas() {
     }))
   }
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800"
-      case "medium":
-        return "bg-yellow-100 text-yellow-800"
-      case "low":
-        return "bg-green-100 text-green-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
+  const handleAddItem = (sectionKey: keyof BusinessModel) => {
+    setNewItem({ section: sectionKey })
   }
 
-  const renderCanvasSection = (sectionKey: keyof BusinessModel) => {
-    const section = sectionConfig[sectionKey]
-    const items = businessModel[sectionKey]
-    const Icon = section.icon
+  const handleEditItem = (item: CanvasItem) => {
+    // Find the section this item belongs to
+    const section = Object.keys(businessModel).find(key => 
+      businessModel[key as keyof BusinessModel].some(i => i.id === item.id)
+    ) as keyof BusinessModel
+    setEditingItem({ section, item })
+  }
 
-    return (
-      <Card key={sectionKey} className={`${section.color} min-h-[350px] h-full`}>
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center text-xl">
-            <Icon className="h-6 w-6 mr-3" />
-            {section.title}
-          </CardTitle>
-          <CardDescription className="text-sm leading-relaxed">{section.description}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 flex-1">
-          {items.map((item) => (
-            <div key={item.id} className="bg-white p-4 rounded-lg border shadow-sm">
-              <div className="flex items-start justify-between mb-3">
-                <h4 className="font-medium text-base leading-tight">{item.title}</h4>
-                <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
-                  <Badge variant="secondary" className={getPriorityColor(item.priority)}>
-                    {item.priority}
-                  </Badge>
-                  {viewMode === "edit" && (
-                    <div className="flex space-x-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                        onClick={() => setEditingItem({ section: sectionKey, item })}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                        onClick={() => deleteItem(sectionKey, item.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 leading-relaxed">{item.description}</p>
-            </div>
-          ))}
-
-          {viewMode === "edit" && (
-            <Button
-variant="outline"
-              className="w-full border-2 border-dashed border-gray-300 hover:border-gray-400 bg-transparent py-3"
-              onClick={() => setNewItem({ section: sectionKey })}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add {section.title.slice(0, -1)}
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-    )
+  const handleDeleteItem = (itemId: string) => {
+    // Find the section this item belongs to
+    const section = Object.keys(businessModel).find(key => 
+      businessModel[key as keyof BusinessModel].some(i => i.id === itemId)
+    ) as keyof BusinessModel
+    deleteItem(section, itemId)
   }
 
   return (
@@ -375,13 +114,15 @@ variant="outline"
             <Edit className="h-4 w-4 mr-2" />
             {isEditing ? 'View Mode' : 'Edit Mode'}
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="opacity-50" disabled>
             <Download className="h-4 w-4 mr-2" />
             Export
+            <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="opacity-50" disabled>
             <Share className="h-4 w-4 mr-2" />
             Share
+            <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
           </Button>
         </div>
       </div>
@@ -406,32 +147,27 @@ variant="outline"
             </div>
             <div className="flex items-center space-x-3">
               <Button
-                variant={viewMode === "edit" ? "default" : "outline"}
-                onClick={() => setViewMode("edit")}
+                variant={isEditing ? "default" : "outline"}
+                onClick={() => setIsEditing(!isEditing)}
                 className="px-6"
               >
                 <Edit className="h-4 w-4 mr-2" />
-                Edit
+                {isEditing ? 'View Mode' : 'Edit Mode'}
               </Button>
-              <Button
-                variant={viewMode === "present" ? "default" : "outline"}
-                onClick={() => setViewMode("present")}
-                className="px-6"
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                Present
-              </Button>
-              <Button variant="outline" className="px-6 bg-transparent">
+              <Button variant="outline" className="px-6 bg-transparent opacity-50" disabled>
                 <Save className="h-4 w-4 mr-2" />
                 Save
+                <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
               </Button>
-              <Button variant="outline" className="px-6 bg-transparent">
+              <Button variant="outline" className="px-6 bg-transparent opacity-50" disabled>
                 <Share className="h-4 w-4 mr-2" />
                 Share
+                <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
               </Button>
-              <Button variant="outline" className="px-6 bg-transparent">
+              <Button variant="outline" className="px-6 bg-transparent opacity-50" disabled>
                 <Download className="h-4 w-4 mr-2" />
                 Export
+                <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
               </Button>
             </div>
           </div>
@@ -439,19 +175,100 @@ variant="outline"
           {/* Canvas Grid */}
           <div className="grid grid-cols-5 gap-6 min-h-[800px]">
             {/* Row 1 - Top sections */}
-            <div className="col-span-1 row-span-2">{renderCanvasSection("keyPartners")}</div>
-            <div className="col-span-1">{renderCanvasSection("keyActivities")}</div>
-            <div className="col-span-1 row-span-2">{renderCanvasSection("valuePropositions")}</div>
-            <div className="col-span-1">{renderCanvasSection("customerRelationships")}</div>
-            <div className="col-span-1 row-span-2">{renderCanvasSection("customerSegments")}</div>
+            <div className="col-span-1 row-span-2">
+              <CanvasSection
+                section={canvasSections[0]} // keyPartners
+                items={businessModel.keyPartners}
+                isEditing={isEditing}
+                onAddItem={handleAddItem}
+                onEditItem={handleEditItem}
+                onDeleteItem={handleDeleteItem}
+              />
+            </div>
+            <div className="col-span-1">
+              <CanvasSection
+                section={canvasSections[1]} // keyActivities
+                items={businessModel.keyActivities}
+                isEditing={isEditing}
+                onAddItem={handleAddItem}
+                onEditItem={handleEditItem}
+                onDeleteItem={handleDeleteItem}
+              />
+            </div>
+            <div className="col-span-1 row-span-2">
+              <CanvasSection
+                section={canvasSections[3]} // valuePropositions
+                items={businessModel.valuePropositions}
+                isEditing={isEditing}
+                onAddItem={handleAddItem}
+                onEditItem={handleEditItem}
+                onDeleteItem={handleDeleteItem}
+              />
+            </div>
+            <div className="col-span-1">
+              <CanvasSection
+                section={canvasSections[4]} // customerRelationships
+                items={businessModel.customerRelationships}
+                isEditing={isEditing}
+                onAddItem={handleAddItem}
+                onEditItem={handleEditItem}
+                onDeleteItem={handleDeleteItem}
+              />
+            </div>
+            <div className="col-span-1 row-span-2">
+              <CanvasSection
+                section={canvasSections[6]} // customerSegments
+                items={businessModel.customerSegments}
+                isEditing={isEditing}
+                onAddItem={handleAddItem}
+                onEditItem={handleEditItem}
+                onDeleteItem={handleDeleteItem}
+              />
+            </div>
 
             {/* Row 2 - Middle sections */}
-            <div className="col-span-1">{renderCanvasSection("keyResources")}</div>
-            <div className="col-span-1">{renderCanvasSection("channels")}</div>
+            <div className="col-span-1">
+              <CanvasSection
+                section={canvasSections[2]} // keyResources
+                items={businessModel.keyResources}
+                isEditing={isEditing}
+                onAddItem={handleAddItem}
+                onEditItem={handleEditItem}
+                onDeleteItem={handleDeleteItem}
+              />
+            </div>
+            <div className="col-span-1">
+              <CanvasSection
+                section={canvasSections[5]} // channels
+                items={businessModel.channels}
+                isEditing={isEditing}
+                onAddItem={handleAddItem}
+                onEditItem={handleEditItem}
+                onDeleteItem={handleDeleteItem}
+              />
+            </div>
 
             {/* Row 3 - Bottom sections */}
-            <div className="col-span-2">{renderCanvasSection("costStructure")}</div>
-            <div className="col-span-3">{renderCanvasSection("revenueStreams")}</div>
+            <div className="col-span-2">
+              <CanvasSection
+                section={canvasSections[7]} // costStructure
+                items={businessModel.costStructure}
+                isEditing={isEditing}
+                onAddItem={handleAddItem}
+                onEditItem={handleEditItem}
+                onDeleteItem={handleDeleteItem}
+              />
+            </div>
+            <div className="col-span-3">
+              <CanvasSection
+                section={canvasSections[8]} // revenueStreams
+                items={businessModel.revenueStreams}
+                isEditing={isEditing}
+                onAddItem={handleAddItem}
+                onEditItem={handleEditItem}
+                onDeleteItem={handleDeleteItem}
+              />
+            </div>
           </div>
 
           {/* Templates and Examples */}
@@ -462,41 +279,44 @@ variant="outline"
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer hover:shadow-md transition-shadow opacity-50">
                   <CardHeader>
                     <CardTitle className="text-lg">SaaS Platform</CardTitle>
                     <CardDescription>Template for software-as-a-service businesses</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button variant="outline" size="sm" className="bg-transparent">
+                    <Button variant="outline" size="sm" className="bg-transparent" disabled>
                       <Copy className="h-4 w-4 mr-2" />
                       Use Template
+                      <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
                     </Button>
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer hover:shadow-md transition-shadow opacity-50">
                   <CardHeader>
                     <CardTitle className="text-lg">Consulting Services</CardTitle>
                     <CardDescription>Template for professional services firms</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button variant="outline" size="sm" className="bg-transparent">
+                    <Button variant="outline" size="sm" className="bg-transparent" disabled>
                       <Copy className="h-4 w-4 mr-2" />
                       Use Template
+                      <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
                     </Button>
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer hover:shadow-md transition-shadow opacity-50">
                   <CardHeader>
                     <CardTitle className="text-lg">E-commerce</CardTitle>
                     <CardDescription>Template for online retail businesses</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button variant="outline" size="sm" className="bg-transparent">
+                    <Button variant="outline" size="sm" className="bg-transparent" disabled>
                       <Copy className="h-4 w-4 mr-2" />
                       Use Template
+                      <Badge variant="outline" className="ml-2 text-xs">Not Implemented</Badge>
                     </Button>
                   </CardContent>
                 </Card>
@@ -595,6 +415,7 @@ variant="outline"
                   title: formData.get("title") as string,
                   description: formData.get("description") as string,
                   priority: formData.get("priority") as "high" | "medium" | "low",
+                  isImplemented: false
                 })
                 setNewItem(null)
               }
