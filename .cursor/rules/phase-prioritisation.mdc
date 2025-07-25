@@ -34,6 +34,8 @@ alwaysApply: true
 - **Prioritise database schema** and data relationships
 - **Implement basic authentication** (no RBAC yet)
 - **Focus on backend APIs** and data flow
+- **Visualize implementation status** - clearly mark non-functional components
+- **Maintain transparency** - show real vs. mock data to users
 
 ### Phase 2 Guidelines (MVP - 8-12 weeks)
 - **Implement RBAC** and security features
@@ -81,6 +83,8 @@ alwaysApply: true
 3. **Consider dependencies** - Implement prerequisites first
 4. **Focus on core value** - Prioritise features that demonstrate platform value
 5. **Maintain quality** - Don't sacrifice code quality for speed
+6. **Mark implementation status** - Clearly indicate functional vs. non-functional components
+7. **Update progress tracking** - Keep implementation metrics current
 
 ### When Making Technical Decisions
 1. **Phase-appropriate complexity** - Don't over-engineer for current phase

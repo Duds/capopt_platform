@@ -83,9 +83,168 @@ components/
 - **Integration tests** for user workflows
 - **Accessibility tests** for compliance
 
+## Non-Functional Component Standards
+
+### Implementation Status Visualization
+**Purpose:** Clearly distinguish between implemented and non-implemented features to provide honest user feedback and development transparency.
+
+### Visual Indicators for Non-Functional Components
+
+#### **Disabled State Requirements**
+- **Opacity Reduction:** Use `opacity-50` class for non-functional components
+- **Visual Distinction:** Clear visual separation from functional components
+- **Consistent Styling:** Apply same disabled styling across all non-functional elements
+
+#### **Status Badges**
+```typescript
+// For non-functional components
+<Badge variant="outline" className="text-xs">Mock Data</Badge>
+<Badge variant="outline" className="text-xs">Not Implemented</Badge>
+<Badge variant="outline" className="text-xs">Coming Soon</Badge>
+
+// For functional components
+<Badge variant="secondary" className="text-xs">✓ Real Data</Badge>
+<Badge variant="secondary" className="text-xs">✓ Implemented</Badge>
+```
+
+#### **Component Disabling Patterns**
+```typescript
+// Button disabling
+<Button disabled className="opacity-50">
+  Feature Name
+</Button>
+
+// Card disabling
+<Card className="opacity-50">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      Feature Name
+      <Badge variant="outline" className="text-xs">Mock Data</Badge>
+    </CardTitle>
+  </CardHeader>
+</Card>
+
+// Menu item disabling
+<DropdownMenuItem disabled>
+  <Icon className="mr-2 h-4 w-4" />
+  <span>Feature Name</span>
+</DropdownMenuItem>
+```
+
+### Implementation Status Categories
+
+#### **✅ Fully Implemented**
+- **Database Integration:** Real data from API endpoints
+- **Full CRUD Operations:** Create, read, update, delete functionality
+- **User Interactions:** Complete user workflows
+- **Visual Indicator:** Full opacity, "✓ Real Data" badge
+
+#### **🚧 Partially Implemented**
+- **Backend Only:** API endpoints exist but no frontend interface
+- **Frontend Only:** UI exists but no backend integration
+- **Limited Functionality:** Basic features working, advanced features pending
+- **Visual Indicator:** Reduced opacity, "In Progress" badge
+
+#### **⏳ Not Implemented**
+- **Mock Data:** Hardcoded values or placeholder content
+- **No Backend:** No API endpoints or database integration
+- **No Frontend:** No user interface or interactions
+- **Visual Indicator:** Reduced opacity, "Mock Data" or "Not Implemented" badge
+
+### Dashboard Metrics Standards
+
+#### **Real Data Metrics**
+```typescript
+// Use real database calculations
+const realMetrics = {
+  totalControls: controlsData.length,
+  activeControls: controlsData.filter(c => c.status === 'ACTIVE').length,
+  maturityScore: calculateRealMaturityScore(data)
+}
+```
+
+#### **Mock Data Identification**
+```typescript
+// Clearly mark mock data
+const mockKpiData = [
+  { 
+    label: "Process Efficiency", 
+    value: 85, 
+    trend: "up", 
+    implemented: false // Mark as non-functional
+  }
+]
+```
+
+### Progress Tracking Requirements
+
+#### **Implementation Progress Indicator**
+- **Sidebar Progress Bar:** Show overall implementation percentage
+- **Feature Count:** Display implemented vs. total features
+- **Visual Progress:** Use progress bars and percentages
+- **Status Updates:** Real-time progress tracking
+
+#### **Progress Calculation**
+```typescript
+const progressMetrics = {
+  totalFeatures: 12,
+  implementedFeatures: 3,
+  progressPercentage: Math.round((implementedFeatures / totalFeatures) * 100),
+  phaseProgress: {
+    phase1: { completed: 4, total: 5, percentage: 80 },
+    phase2: { completed: 1, total: 4, percentage: 25 },
+    phase3: { completed: 0, total: 4, percentage: 0 }
+  }
+}
+```
+
+### User Experience Guidelines
+
+#### **Transparency Requirements**
+- **Honest Communication:** Never hide implementation status
+- **Clear Expectations:** Users understand what's real vs. mock
+- **Progress Visibility:** Show development progress clearly
+- **Feature Roadmap:** Indicate when features will be implemented
+
+#### **Accessibility for Disabled Components**
+- **Screen Reader Support:** Proper ARIA labels for disabled state
+- **Keyboard Navigation:** Disabled components should be skipped
+- **Focus Management:** Clear focus indicators for functional elements
+- **Alternative Text:** Descriptive text for disabled features
+
+### Development Workflow
+
+#### **When Adding New Features**
+1. **Start with Mock Data:** Create UI with placeholder content
+2. **Mark as Non-Functional:** Apply disabled styling and badges
+3. **Implement Backend:** Add API endpoints and database integration
+4. **Connect Frontend:** Replace mock data with real API calls
+5. **Remove Disabled State:** Enable component and remove mock indicators
+
+#### **When Reviewing Components**
+1. **Check Implementation Status:** Verify if component is functional
+2. **Validate Data Sources:** Ensure real data vs. mock data
+3. **Test User Interactions:** Verify all interactions work
+4. **Update Progress Tracking:** Update implementation metrics
+
+### Code Quality Standards
+
+#### **Mock Data Management**
+- **Clear Identification:** All mock data must be clearly marked
+- **Consistent Naming:** Use `implemented: false` or similar flags
+- **Documentation:** Comment mock data with implementation plans
+- **Version Control:** Track mock data removal in commits
+
+#### **Component State Management**
+```typescript
+interface ComponentState {
+  isImplemented: boolean
+  hasRealData: boolean
+  mockDataFlag?: boolean
+  implementationNotes?: string
+}
+```
+
 ---
-description: Frontend development standards for React/Next.js components, styling with Tailwind CSS, accessibility requirements, and performance guidelines. Apply when working with frontend files, components, or UI-related code.
-
-
-- **Accessibility tests** for compliance
+description: Frontend development standards for React/Next.js components, styling with Tailwind CSS, accessibility requirements, performance guidelines, and non-functional component handling. Apply when working with frontend files, components, or UI-related code.
 
