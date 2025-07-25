@@ -33,6 +33,7 @@ import {
   Eye,
   Copy,
 } from "lucide-react"
+import { CanvasVisualization } from "@/components/business-canvas/canvas-visualization"
 
 interface CanvasItem {
   id: string
@@ -101,66 +102,87 @@ export function BusinessCanvas() {
       },
       {
         id: "2",
-        title: "Risk Integration",
-        description: "Built-in risk management across all layers",
+        title: "Risk Management",
+        description: "Comprehensive risk assessment and control management",
         priority: "high",
       },
     ],
     customerRelationships: [
       {
         id: "1",
-        title: "Dedicated Support",
-        description: "Personal account management for enterprise clients",
+        title: "Strategic Partnership",
+        description: "Long-term collaborative relationships",
         priority: "high",
       },
       {
         id: "2",
-        title: "Community Platform",
-        description: "User community for best practices sharing",
+        title: "Consultative Support",
+        description: "Ongoing advisory and support services",
         priority: "medium",
       },
     ],
     channels: [
-      { id: "1", title: "Direct Sales", description: "Enterprise sales team for large accounts", priority: "high" },
-      { id: "2", title: "Partner Network", description: "Implementation partners and resellers", priority: "medium" },
-    ],
-    customerSegments: [
       {
         id: "1",
-        title: "Large Enterprises",
-        description: "Fortune 500 companies with complex operations",
+        title: "Direct Sales",
+        description: "Direct enterprise sales and implementation",
         priority: "high",
       },
       {
         id: "2",
-        title: "Mid-Market",
-        description: "Growing companies seeking operational excellence",
+        title: "Partner Network",
+        description: "Strategic partner distribution channels",
         priority: "medium",
+      },
+    ],
+    customerSegments: [
+      {
+        id: "1",
+        title: "Mining Companies",
+        description: "Large-scale mining operations",
+        priority: "high",
+      },
+      {
+        id: "2",
+        title: "Petrochemical Companies",
+        description: "Oil and gas processing facilities",
+        priority: "high",
       },
     ],
     costStructure: [
       {
         id: "1",
         title: "Development Costs",
-        description: "Engineering and product development expenses",
+        description: "Software development and maintenance",
         priority: "high",
       },
-      { id: "2", title: "Infrastructure", description: "Cloud hosting and security infrastructure", priority: "high" },
-    ],
-    revenueStreams: [
-      { id: "1", title: "SaaS Subscriptions", description: "Monthly/annual platform subscriptions", priority: "high" },
       {
         id: "2",
-        title: "Professional Services",
-        description: "Implementation and consulting services",
+        title: "Sales and Marketing",
+        description: "Customer acquisition and retention",
+        priority: "medium",
+      },
+    ],
+    revenueStreams: [
+      {
+        id: "1",
+        title: "Subscription Licenses",
+        description: "Annual platform subscription fees",
+        priority: "high",
+      },
+      {
+        id: "2",
+        title: "Implementation Services",
+        description: "Professional services and consulting",
         priority: "medium",
       },
     ],
   })
 
+  const [viewMode, setViewMode] = useState<'list' | 'canvas'>('canvas')
+  const [isEditing, setIsEditing] = useState(false)
   const [editingItem, setEditingItem] = useState<{ section: keyof BusinessModel; item: CanvasItem } | null>(null)
   const [newItem, setNewItem] = useState<{ section: keyof BusinessModel } | null>(null)
-  const [viewMode, setViewMode] = useState<"edit" | "present">("edit")
 
   const sectionConfig = {
     keyPartners: {
@@ -319,112 +341,170 @@ variant="outline"
   }
 
   return (
-    <div className="space-y-8 max-w-[1600px] mx-auto">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-4xl font-bold mb-2">Business Model Canvas</h2>
-          <p className="text-gray-600 text-lg">Define and visualize your business model across 9 key components</p>
+          <h2 className="text-2xl font-bold">Business Model Canvas</h2>
+          <p className="text-muted-foreground">
+            Design and visualize your business model strategy
+          </p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-2">
           <Button
-            variant={viewMode === "edit" ? "default" : "outline"}
-            onClick={() => setViewMode("edit")}
-            className="px-6"
-          >
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-          <Button
-            variant={viewMode === "present" ? "default" : "outline"}
-            onClick={() => setViewMode("present")}
-            className="px-6"
+            variant={viewMode === 'list' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('list')}
           >
             <Eye className="h-4 w-4 mr-2" />
-            Present
+            List View
           </Button>
-          <Button variant="outline" className="px-6 bg-transparent">
-            <Save className="h-4 w-4 mr-2" />
-            Save
+          <Button
+            variant={viewMode === 'canvas' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('canvas')}
+          >
+            <Copy className="h-4 w-4 mr-2" />
+            Canvas View
           </Button>
-          <Button variant="outline" className="px-6 bg-transparent">
-            <Share className="h-4 w-4 mr-2" />
-            Share
+          <Button
+            variant={isEditing ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setIsEditing(!isEditing)}
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            {isEditing ? 'View Mode' : 'Edit Mode'}
           </Button>
-          <Button variant="outline" className="px-6 bg-transparent">
+          <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
+          <Button variant="outline" size="sm">
+            <Share className="h-4 w-4 mr-2" />
+            Share
+          </Button>
         </div>
       </div>
 
-      {/* Canvas Grid */}
-      <div className="grid grid-cols-5 gap-6 min-h-[800px]">
-        {/* Row 1 - Top sections */}
-        <div className="col-span-1 row-span-2">{renderCanvasSection("keyPartners")}</div>
-        <div className="col-span-1">{renderCanvasSection("keyActivities")}</div>
-        <div className="col-span-1 row-span-2">{renderCanvasSection("valuePropositions")}</div>
-        <div className="col-span-1">{renderCanvasSection("customerRelationships")}</div>
-        <div className="col-span-1 row-span-2">{renderCanvasSection("customerSegments")}</div>
+      {/* Canvas Visualization */}
+      {viewMode === 'canvas' && (
+        <CanvasVisualization
+          businessModel={businessModel}
+          onUpdate={setBusinessModel}
+          isEditing={isEditing}
+        />
+      )}
 
-        {/* Row 2 - Middle sections */}
-        <div className="col-span-1">{renderCanvasSection("keyResources")}</div>
-        <div className="col-span-1">{renderCanvasSection("channels")}</div>
-
-        {/* Row 3 - Bottom sections */}
-        <div className="col-span-2">{renderCanvasSection("costStructure")}</div>
-        <div className="col-span-3">{renderCanvasSection("revenueStreams")}</div>
-      </div>
-
-      {/* Templates and Examples */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Templates & Examples</CardTitle>
-          <CardDescription>Get started quickly with pre-built templates</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-lg">SaaS Platform</CardTitle>
-                <CardDescription>Template for software-as-a-service businesses</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" size="sm" className="bg-transparent">
-                  <Copy className="h-4 w-4 mr-2" />
-                  Use Template
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-lg">Consulting Services</CardTitle>
-                <CardDescription>Template for professional services firms</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" size="sm" className="bg-transparent">
-                  <Copy className="h-4 w-4 mr-2" />
-                  Use Template
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-lg">E-commerce</CardTitle>
-                <CardDescription>Template for online retail businesses</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" size="sm" className="bg-transparent">
-                  <Copy className="h-4 w-4 mr-2" />
-                  Use Template
-                </Button>
-              </CardContent>
-            </Card>
+      {/* List View */}
+      {viewMode === 'list' && (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-4xl font-bold mb-2">Business Model Canvas</h2>
+              <p className="text-gray-600 text-lg">Define and visualize your business model across 9 key components</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant={viewMode === "edit" ? "default" : "outline"}
+                onClick={() => setViewMode("edit")}
+                className="px-6"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+              <Button
+                variant={viewMode === "present" ? "default" : "outline"}
+                onClick={() => setViewMode("present")}
+                className="px-6"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Present
+              </Button>
+              <Button variant="outline" className="px-6 bg-transparent">
+                <Save className="h-4 w-4 mr-2" />
+                Save
+              </Button>
+              <Button variant="outline" className="px-6 bg-transparent">
+                <Share className="h-4 w-4 mr-2" />
+                Share
+              </Button>
+              <Button variant="outline" className="px-6 bg-transparent">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Canvas Grid */}
+          <div className="grid grid-cols-5 gap-6 min-h-[800px]">
+            {/* Row 1 - Top sections */}
+            <div className="col-span-1 row-span-2">{renderCanvasSection("keyPartners")}</div>
+            <div className="col-span-1">{renderCanvasSection("keyActivities")}</div>
+            <div className="col-span-1 row-span-2">{renderCanvasSection("valuePropositions")}</div>
+            <div className="col-span-1">{renderCanvasSection("customerRelationships")}</div>
+            <div className="col-span-1 row-span-2">{renderCanvasSection("customerSegments")}</div>
+
+            {/* Row 2 - Middle sections */}
+            <div className="col-span-1">{renderCanvasSection("keyResources")}</div>
+            <div className="col-span-1">{renderCanvasSection("channels")}</div>
+
+            {/* Row 3 - Bottom sections */}
+            <div className="col-span-2">{renderCanvasSection("costStructure")}</div>
+            <div className="col-span-3">{renderCanvasSection("revenueStreams")}</div>
+          </div>
+
+          {/* Templates and Examples */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Templates & Examples</CardTitle>
+              <CardDescription>Get started quickly with pre-built templates</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="text-lg">SaaS Platform</CardTitle>
+                    <CardDescription>Template for software-as-a-service businesses</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" size="sm" className="bg-transparent">
+                      <Copy className="h-4 w-4 mr-2" />
+                      Use Template
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Consulting Services</CardTitle>
+                    <CardDescription>Template for professional services firms</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" size="sm" className="bg-transparent">
+                      <Copy className="h-4 w-4 mr-2" />
+                      Use Template
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="text-lg">E-commerce</CardTitle>
+                    <CardDescription>Template for online retail businesses</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" size="sm" className="bg-transparent">
+                      <Copy className="h-4 w-4 mr-2" />
+                      Use Template
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Edit Item Dialog */}
       <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>

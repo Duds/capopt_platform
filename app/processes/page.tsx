@@ -16,6 +16,7 @@ import { processesApi, formatDate, getStatusColor, getPriorityColor } from '@/li
 import { EnterpriseContext } from '@/components/navigation/enterprise-context'
 import { StrategicContext } from '@/components/navigation/strategic-context'
 import { StrategicNavigationFlow } from '@/components/navigation/strategic-navigation-flow'
+import { ProcessMapViewer } from '@/components/processes/process-map-viewer'
 
 interface Process {
   id: string
@@ -54,6 +55,7 @@ export default function ProcessesPage() {
   const [priorityFilter, setPriorityFilter] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedProcess, setSelectedProcess] = useState<string | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [formData, setFormData] = useState<ProcessFormData>({
@@ -465,10 +467,10 @@ export default function ProcessesPage() {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              onClick={() => handleViewProcess(process)}
+                              onClick={() => setSelectedProcess(process.id)}
                             >
                               <Eye className="h-4 w-4 mr-1" />
-                              View
+                              View Map
                             </Button>
                             <Button 
                               variant="outline" 
@@ -497,16 +499,27 @@ export default function ProcessesPage() {
                 {filteredProcesses.length === 0 && (
                   <div className="col-span-full text-center py-8">
                     <Workflow className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 mb-4">No processes found</p>
-                    <Button onClick={() => setIsCreateDialogOpen(true)}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create First Process
-                    </Button>
+                    <p className="text-gray-600">No processes found</p>
                   </div>
                 )}
               </div>
             </CardContent>
           </Card>
+
+          {/* Process Map Viewer */}
+          {selectedProcess && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Process Map</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ProcessMapViewer 
+                  processId={selectedProcess} 
+                  onClose={() => setSelectedProcess(null)} 
+                />
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

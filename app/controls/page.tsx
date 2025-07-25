@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Shield, Plus, Search, Filter } from 'lucide-react'
 import { controlsApi, formatDate, getStatusColor, getPriorityColor } from '@/lib/api'
+import { ControlDetailView } from '@/components/controls/control-detail-view'
 
 interface CriticalControl {
   id: string
@@ -41,6 +42,7 @@ export default function ControlsPage() {
   const [priorityFilter, setPriorityFilter] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedControl, setSelectedControl] = useState<string | null>(null)
 
   useEffect(() => {
     if (user && !authLoading) {
@@ -223,7 +225,11 @@ export default function ControlsPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredControls.map((control) => (
-                  <Card key={control.id} className="hover:shadow-md transition-shadow">
+                  <Card 
+                    key={control.id} 
+                    className="hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => setSelectedControl(control.id)}
+                  >
                     <CardHeader>
                       <CardTitle className="flex items-center">
                         <Shield className="h-5 w-5 mr-2" />
@@ -250,8 +256,8 @@ export default function ControlsPage() {
                           <span>Type: {control.controlType?.name || 'N/A'}</span>
                         </div>
                         <div className="flex justify-between text-xs text-gray-500">
+                          <span>Effectiveness: {control.effectiveness?.name || 'N/A'}</span>
                           <span>Created: {formatDate(control.createdAt)}</span>
-                          <span>Updated: {formatDate(control.updatedAt)}</span>
                         </div>
                       </div>
                     </CardContent>
@@ -261,16 +267,27 @@ export default function ControlsPage() {
                 {filteredControls.length === 0 && (
                   <div className="col-span-full text-center py-8">
                     <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 mb-4">No controls found</p>
-                    <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create First Control
-                    </Button>
+                    <p className="text-gray-600">No controls found</p>
                   </div>
                 )}
               </div>
             </CardContent>
           </Card>
+
+          {/* Control Detail View */}
+          {selectedControl && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Control Details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ControlDetailView 
+                  controlId={selectedControl} 
+                  onClose={() => setSelectedControl(null)} 
+                />
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
