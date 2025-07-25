@@ -1,0 +1,91 @@
+# Frontend Development Standards
+
+## Technology Stack
+- **Framework:** Next.js 15+ with App Router
+- **Language:** TypeScript (strict mode)
+- **Styling:** Tailwind CSS
+- **UI Components:** Custom components based on shadcn/ui patterns
+- **State Management:** React hooks and context
+- **Forms:** React Hook Form with Zod validation
+
+## Component Standards
+
+### Component Structure
+```typescript
+// Component template
+interface ComponentProps {
+  // Props interface at top
+}
+
+export function ComponentName({ prop1, prop2 }: ComponentProps) {
+  // Component logic
+  return (
+    // JSX with proper semantic HTML
+  );
+}
+```
+
+### Styling Guidelines
+- **Always use Tailwind CSS** for styling
+- **Use semantic HTML** elements
+- **Follow accessibility guidelines** (WCAG 2.1 AA)
+- **Use CSS Grid and Flexbox** for layouts
+- **Implement responsive design** for all components
+- **Use design tokens** for consistent spacing, colors, and typography
+
+### Button Standards
+- **Primary buttons** must always have rainbow shadow effect
+- **Use `rounded-full`** for pill-shaped buttons (remove custom `btn-pill` class)
+- **Standard Tailwind classes** preferred over custom CSS
+- **Consistent hover and focus states**
+
+### Form Standards
+- **Use React Hook Form** for form management
+- **Zod schemas** for validation
+- **Proper error handling** and user feedback
+- **Accessible form labels** and descriptions
+- **Loading states** for form submissions
+
+## File Organization
+```
+app/
+  components/          # App-specific components
+  controls/           # Control-related pages
+  globals.css         # Global styles
+  layout.tsx          # Root layout
+  page.tsx            # Home page
+
+components/
+  ui/                 # Reusable UI components
+  controls/           # Control-related components
+  facility/           # Facility-related components
+  navigation/         # Navigation components
+```
+
+## Performance Guidelines
+- **Use Next.js Image component** for optimized images
+- **Implement proper loading states**
+- **Lazy load components** when appropriate
+- **Optimize bundle size** with dynamic imports
+- **Use React.memo** for expensive components
+
+## Accessibility Requirements
+- **Semantic HTML** structure
+- **ARIA labels** where needed
+- **Keyboard navigation** support
+- **Screen reader** compatibility
+- **Color contrast** compliance
+- **Focus management** for modals and dialogs
+
+## Testing Requirements
+- **Unit tests** for utility functions
+- **Component tests** for complex components
+- **Integration tests** for user workflows
+- **Accessibility tests** for compliance
+
+---
+description: Frontend development standards for React/Next.js components, styling with Tailwind CSS, accessibility requirements, and performance guidelines. Apply when working with frontend files, components, or UI-related code.
+
+
+- **Accessibility tests** for compliance
+

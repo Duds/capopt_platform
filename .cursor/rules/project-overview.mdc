@@ -1,0 +1,34 @@
+---
+alwaysApply: true
+---
+# CapOpt Platform - Project Overview
+
+## Project Purpose
+CapOpt Platform is a comprehensive operational capability optimisation system designed for high-risk industries (mining, minerals, petrochemicals, defence). The platform embeds Critical Controls Theory across all organisational layers, ensuring risk and control are central to every decision and process.
+
+## Key Principles
+- **Critical Controls Theory-Led:** Risk management and control assurance at every layer
+- **Regulatory Alignment:** Compliance with WHS, ISO, ICMM, and defence standards
+- **Operational Assurance:** Real-time visibility and monitoring of critical controls
+- **Strategic Integration:** Alignment of business objectives with operational reality
+
+## Technology Stack
+- **Frontend:** React 18+, Next.js 15+, TypeScript, Tailwind CSS
+- **Backend:** Node.js, Express.js/Fastify, PostgreSQL, Redis, Prisma, JWT
+- **Deployment:** Docker, Kubernetes, Azure Cloud Services
+- **Analytics:** Data Warehouse, ETL Pipelines, BI Tools, AI/ML Engine
+
+## Architecture Layers
+1. **Strategic Layer:** Business Canvas and Operating Model Canvas
+2. **Value & Service Layer:** Value Chain, Value Model, Service Model, Experience Model
+3. **Operational Layer:** Process Maps, Processes, Playbooks, Maturity Scoring
+4. **Control & Risk Layer:** Critical Control Mapping, Critical Processes, Critical Assets
+
+## Current Phase
+- **Phase 1:** Functional PoC (4-6 weeks) - Database plumbed, working hooks, core functionality
+- **Phase 2:** Functional MVP (8-12 weeks) - Customer-ready with RBAC, login, Azure deployment
+- **Phase 3:** Extended Rollout (6-12 months) - Full feature set and advanced capabilities
+
+## Documentation as Code
+This project follows Documentation as Code practices. All documentation is version-controlled in Git, uses Markdown format, and requires review before merging. Documentation must be updated alongside code changes.
+

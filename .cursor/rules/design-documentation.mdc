@@ -1,0 +1,62 @@
+---
+alwaysApply: true
+---
+# Design Document Integration
+
+## Mandatory Document References
+When making development decisions or implementing features, **ALWAYS** reference and follow these established design documents:
+
+### 1. Solution Architecture Design (SAD)
+**Location:** `docs/design/solution-architecture-design.md`
+**Use for:**
+- Database schema decisions
+- API design patterns
+- Integration approaches
+- System component architecture
+- Error handling strategies
+- Entity Relationship Diagrams (ERDs)
+- Sequence diagrams and workflows
+
+### 2. UX Architecture Design
+**Location:** `docs/design/ux-architecture-design.md`
+**Use for:**
+- User interface patterns
+- User journey flows
+- Component design decisions
+- Accessibility considerations
+- User experience consistency
+- User persona journey diagrams
+
+### 3. Reference Architecture
+**Location:** `docs/design/reference-architecture.md`
+**Use for:**
+- Layered architecture decisions
+- Control & Risk vertical implementation
+- Industry-specific requirements
+- Regulatory compliance patterns
+- Critical Controls Theory application
+
+### 4. Product Backlog
+**Location:** `docs/design/product-backlog.md`
+**Use for:**
+- Feature prioritisation
+- User story implementation
+- Phase-appropriate development
+- Success criteria validation
+- Epic and Feature alignment
+
+## Decision Framework
+Before implementing any feature or making architectural decisions:
+
+1. **Check Design Documents** - Review relevant sections of SAD, UXD, and Reference Architecture
+2. **Validate Against Backlog** - Ensure implementation aligns with prioritised features
+3. **Update Documentation** - Modify design documents if implementation reveals new requirements
+4. **Follow Documentation as Code** - Update documentation alongside code changes
+5. **Maintain Consistency** - Ensure decisions align with established patterns and principles
+
+## Documentation as Code Requirements
+- All new features must include documentation before merging
+- API changes require documentation updates
+- Architecture changes must be reflected in design documents
+- User-facing features require user documentation
+- Technical implementations require technical documentation

@@ -1,0 +1,166 @@
+# Backend Development Standards
+
+## Technology Stack
+- **Runtime:** Node.js 18+
+- **Framework:** Express.js or Fastify
+- **Language:** TypeScript (strict mode)
+- **Database:** PostgreSQL with Prisma ORM
+- **Caching:** Redis
+- **Authentication:** JWT with refresh tokens
+- **Validation:** Zod schemas
+- **Testing:** Jest with supertest
+
+## API Design Standards
+
+### RESTful API Principles
+- **Use proper HTTP methods** (GET, POST, PUT, DELETE, PATCH)
+- **Consistent URL structure** following REST conventions
+- **Proper HTTP status codes** for responses
+- **Standardized error responses** with error codes and messages
+- **API versioning** in URL path (/api/v1/)
+
+### Response Format
+```typescript
+// Success response
+{
+  "success": true,
+  "data": { /* response data */ },
+  "message": "Operation successful"
+}
+
+// Error response
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Validation failed",
+    "details": [ /* validation errors */ ]
+  }
+}
+```
+
+### Validation Standards
+- **Use Zod schemas** for all input validation
+- **Validate request body, query, and params**
+- **Provide clear error messages** for validation failures
+- **Sanitize inputs** to prevent injection attacks
+
+## Database Standards
+
+### Prisma Schema Guidelines
+- **Use descriptive table and column names**
+- **Implement proper relationships** between entities
+- **Add indexes** for frequently queried columns
+- **Use enums** for status and type fields
+- **Implement soft deletes** where appropriate
+- **Add timestamps** (createdAt, updatedAt) to all tables
+
+### Migration Best Practices
+- **Write reversible migrations** when possible
+- **Test migrations** on development data
+- **Backup production data** before migrations
+- **Use descriptive migration names**
+
+## Security Standards
+
+### Authentication & Authorization
+- **JWT tokens** with appropriate expiration times
+- **Refresh token rotation** for security
+- **Role-based access control (RBAC)** implementation
+- **Password hashing** with bcrypt
+- **Rate limiting** on authentication endpoints
+
+### Data Protection
+- **Input sanitization** to prevent injection attacks
+- **Output encoding** to prevent XSS
+- **CORS configuration** for cross-origin requests
+- **Environment variables** for sensitive configuration
+- **Encryption** for sensitive data at rest
+
+## Error Handling
+
+### Global Error Handler
+```typescript
+// Centralized error handling
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+  // Log error details
+  // Return appropriate error response
+  // Handle different error types
+});
+```
+
+### Error Types
+- **ValidationError:** Input validation failures
+- **AuthenticationError:** Authentication/authorization failures
+- **NotFoundError:** Resource not found
+- **DatabaseError:** Database operation failures
+- **ExternalServiceError:** Third-party service failures
+
+## Testing Standards
+
+### Unit Tests
+- **Test all business logic** functions
+- **Mock external dependencies**
+- **Test error scenarios**
+- **Maintain 80%+ code coverage**
+
+### Integration Tests
+- **Test API endpoints** with supertest
+- **Test database operations**
+- **Test authentication flows**
+- **Test error handling**
+
+### Test Structure
+```typescript
+describe('UserService', () => {
+  describe('createUser', () => {
+    it('should create a new user successfully', async () => {
+      // Test implementation
+    });
+    
+    it('should throw error for invalid data', async () => {
+      // Error test
+    });
+  });
+});
+```
+
+## Performance Guidelines
+
+### Database Optimization
+- **Use database indexes** for query optimization
+- **Implement connection pooling**
+- **Use database transactions** for complex operations
+- **Optimize queries** to minimize N+1 problems
+
+### Caching Strategy
+- **Cache frequently accessed data** in Redis
+- **Implement cache invalidation** strategies
+- **Use cache headers** for HTTP responses
+- **Monitor cache hit rates**
+
+## Logging Standards
+
+### Log Levels
+- **ERROR:** Application errors and exceptions
+- **WARN:** Warning conditions
+- **INFO:** General information
+- **DEBUG:** Detailed debugging information
+
+### Log Format
+```typescript
+{
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "level": "INFO",
+  "message": "User created successfully",
+  "userId": "123",
+  "requestId": "req-123",
+  "metadata": { /* additional context */ }
+}
+```
+
+---
+description: Backend development standards for Node.js/Express APIs, database design with Prisma, security practices, error handling, and testing requirements. Apply when working with server-side code, API endpoints, database schemas, or backend services.
+
+}
+```

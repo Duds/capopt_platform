@@ -1,0 +1,263 @@
+# Testing Standards and Requirements
+
+## Testing Philosophy
+- **Test-driven development (TDD)** encouraged for complex features
+- **Comprehensive coverage** required for all business logic
+- **Quality over quantity** - focus on meaningful tests
+- **Automated testing** integrated into CI/CD pipeline
+- **Testing is documentation** - tests should explain expected behavior
+
+## Testing Pyramid
+
+### Unit Tests (Foundation - 70%)
+- **Test individual functions** and methods
+- **Mock external dependencies** (databases, APIs, services)
+- **Fast execution** (< 100ms per test)
+- **High coverage** of business logic
+- **Isolated testing** of components
+
+### Integration Tests (Middle - 20%)
+- **Test component interactions** and API endpoints
+- **Use test databases** for data persistence
+- **Test authentication** and authorization flows
+- **Validate data flow** between components
+- **Test error handling** and edge cases
+
+### End-to-End Tests (Top - 10%)
+- **Test complete user workflows**
+- **Use real browser** or headless browser
+- **Test critical user journeys**
+- **Validate system integration**
+- **Test performance** under realistic conditions
+
+## Frontend Testing Standards
+
+### Component Testing
+```typescript
+// Component test template
+import { render, screen, fireEvent } from '@testing-library/react';
+import { ComponentName } from './ComponentName';
+
+describe('ComponentName', () => {
+  it('should render correctly', () => {
+    render(<ComponentName prop1="value" />);
+    expect(screen.getByText('Expected Text')).toBeInTheDocument();
+  });
+
+  it('should handle user interactions', () => {
+    render(<ComponentName prop1="value" />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(screen.getByText('Updated Text')).toBeInTheDocument();
+  });
+
+  it('should handle error states', () => {
+    render(<ComponentName prop1="value" error={true} />);
+    expect(screen.getByText('Error Message')).toBeInTheDocument();
+  });
+});
+```
+
+### Testing Requirements
+- **Test component rendering** with different props
+- **Test user interactions** (clicks, form submissions, etc.)
+- **Test error states** and loading states
+- **Test accessibility** features (ARIA labels, keyboard navigation)
+- **Test responsive behavior** on different screen sizes
+
+### Testing Tools
+- **React Testing Library** for component testing
+- **Jest** for test runner and assertions
+- **MSW (Mock Service Worker)** for API mocking
+- **@testing-library/jest-dom** for custom matchers
+- **@testing-library/user-event** for user interactions
+
+## Backend Testing Standards
+
+### API Testing
+```typescript
+// API test template
+import request from 'supertest';
+import { app } from '../app';
+
+describe('API Endpoint', () => {
+  it('should return data successfully', async () => {
+    const response = await request(app)
+      .get('/api/v1/resource')
+      .set('Authorization', 'Bearer token')
+      .expect(200);
+
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toBeDefined();
+  });
+
+  it('should handle validation errors', async () => {
+    const response = await request(app)
+      .post('/api/v1/resource')
+      .send({ invalid: 'data' })
+      .expect(400);
+
+    expect(response.body.success).toBe(false);
+    expect(response.body.error.code).toBe('VALIDATION_ERROR');
+  });
+});
+```
+
+### Service Testing
+```typescript
+// Service test template
+import { UserService } from './UserService';
+import { mockUserRepository } from './__mocks__/UserRepository';
+
+jest.mock('./UserRepository');
+
+describe('UserService', () => {
+  let userService: UserService;
+
+  beforeEach(() => {
+    userService = new UserService();
+    jest.clearAllMocks();
+  });
+
+  it('should create user successfully', async () => {
+    const userData = { name: 'John', email: 'john@example.com' };
+    mockUserRepository.create.mockResolvedValue({ id: '1', ...userData });
+
+    const result = await userService.createUser(userData);
+
+    expect(result.id).toBe('1');
+    expect(mockUserRepository.create).toHaveBeenCalledWith(userData);
+  });
+});
+```
+
+### Testing Requirements
+- **Test all API endpoints** with various scenarios
+- **Test authentication** and authorization
+- **Test validation** and error handling
+- **Test database operations** with test database
+- **Test external service integrations** with mocks
+
+## Database Testing
+
+### Test Database Setup
+- **Use separate test database** for integration tests
+- **Reset database state** between tests
+- **Use database transactions** for test isolation
+- **Seed test data** for consistent test scenarios
+- **Clean up test data** after tests complete
+
+### Migration Testing
+- **Test all database migrations** in test environment
+- **Validate migration rollbacks** work correctly
+- **Test data integrity** after migrations
+- **Test performance** impact of migrations
+
+## Performance Testing
+
+### Load Testing
+- **Test API endpoints** under load
+- **Validate response times** under stress
+- **Test database performance** with large datasets
+- **Monitor memory usage** and resource consumption
+- **Test concurrent user scenarios**
+
+### Frontend Performance
+- **Test component rendering** performance
+- **Validate bundle size** and loading times
+- **Test image optimization** and lazy loading
+- **Monitor Core Web Vitals** metrics
+
+## Security Testing
+
+### Authentication Testing
+- **Test login/logout flows**
+- **Validate token expiration** and refresh
+- **Test password security** (hashing, validation)
+- **Test session management**
+
+### Authorization Testing
+- **Test role-based access control**
+- **Validate permission checks**
+- **Test API endpoint security**
+- **Test data access controls**
+
+## Test Coverage Requirements
+
+### Minimum Coverage Targets
+- **Unit Tests:** 80% line coverage
+- **Integration Tests:** 70% API endpoint coverage
+- **E2E Tests:** Critical user journey coverage
+
+### Coverage Exclusions
+- **Generated code** (Prisma client, etc.)
+- **Configuration files**
+- **Test files themselves**
+- **Third-party library code**
+
+## Testing Best Practices
+
+### Test Organization
+- **Group related tests** in describe blocks
+- **Use descriptive test names** that explain the scenario
+- **Follow AAA pattern** (Arrange, Act, Assert)
+- **Keep tests independent** and isolated
+- **Use meaningful test data**
+
+### Test Data Management
+- **Use factories** for creating test data
+- **Avoid hardcoded values** in tests
+- **Use realistic test scenarios**
+- **Clean up test data** after tests
+- **Use database transactions** for isolation
+
+### Continuous Integration
+- **Run tests automatically** on every commit
+- **Fail builds** on test failures
+- **Generate coverage reports** in CI
+- **Run performance tests** in staging environment
+- **Automate security testing** in pipeline
+
+## Testing Tools and Configuration
+
+### Frontend Testing Stack
+- **Jest** - Test runner and assertion library
+- **React Testing Library** - Component testing utilities
+- **MSW** - API mocking for integration tests
+- **Playwright** - E2E testing framework
+- **@testing-library/jest-dom** - Custom matchers
+
+### Backend Testing Stack
+- **Jest** - Test runner and assertion library
+- **Supertest** - HTTP assertion library
+- **Prisma** - Database testing utilities
+- **MSW** - API mocking for external services
+- **Faker.js** - Test data generation
+
+### Configuration
+```javascript
+// jest.config.js
+module.exports = {
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/**/*.test.{ts,tsx}',
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
+};
+```
+
+---
+description: Testing standards and requirements including unit, integration, and E2E testing strategies, testing tools, coverage requirements, and best practices. Apply when working with test files, implementing testing, or reviewing test coverage.
+
+
+```
+

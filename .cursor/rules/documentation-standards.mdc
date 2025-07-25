@@ -1,0 +1,188 @@
+# Documentation as Code Standards
+
+## Core Principles
+Following the [Docs as Code philosophy](https://www.writethedocs.org/guide/docs-as-code/), this project implements documentation using the same tools and workflows as code development.
+
+### Documentation as Code Workflow
+1. **Version Control:** All documentation stored in Git alongside code
+2. **Plain Text Markup:** Documentation uses Markdown format
+3. **Code Reviews:** Documentation changes require review before merging
+4. **Automated Tests:** Documentation is validated and tested
+5. **Issue Tracking:** Documentation tasks tracked in the same system as code
+
+## Documentation Structure
+
+### Design Documentation (`docs/design/`)
+- **README.md:** Overview and navigation
+- **solution-architecture-design.md:** Technical architecture and ERDs
+- **ux-architecture-design.md:** User experience and interface design
+- **reference-architecture.md:** Layered architecture and patterns
+- **product-backlog.md:** Prioritised feature backlog
+- **gtm-strategy.md:** Go-to-market strategy
+- **regulatory-standards-mapping.md:** Compliance and standards
+- **value-proposition.md:** Business value proposition
+
+### Code Documentation
+- **README.md:** Project overview and setup
+- **API Documentation:** All APIs must be documented
+- **Component Documentation:** Complex components require documentation
+- **Architecture Documentation:** System architecture and patterns
+
+## Documentation Standards
+
+### Markdown Formatting
+- **Use consistent heading structure** (H1, H2, H3, etc.)
+- **Include table of contents** for long documents
+- **Use code blocks** with language specification
+- **Include diagrams** using Mermaid or PlantUML
+- **Use proper link formatting** for internal and external references
+
+### Content Guidelines
+- **Write for the intended audience** (developers, stakeholders, users)
+- **Use clear, concise language** with Australian English spelling
+- **Include examples** and code snippets where appropriate
+- **Provide context** and background information
+- **Keep content current** with code changes
+
+### Documentation Requirements by Feature Type
+
+#### New Features
+- **Feature description** and purpose
+- **User stories** and acceptance criteria
+- **Technical implementation** details
+- **API documentation** if applicable
+- **User guide** for user-facing features
+
+#### API Changes
+- **Endpoint documentation** with examples
+- **Request/response schemas**
+- **Authentication requirements**
+- **Error handling** and status codes
+- **Usage examples**
+
+#### Architecture Changes
+- **Updated architecture diagrams**
+- **Design rationale** and decisions
+- **Impact analysis** on existing systems
+- **Migration guides** if needed
+
+## Documentation Workflow
+
+### Creating Documentation
+1. **Create documentation issue** alongside feature development
+2. **Write documentation** using Markdown format
+3. **Include diagrams** and visual aids where helpful
+4. **Review and validate** content accuracy
+5. **Submit for review** with code changes
+
+### Review Process
+- **Peer review** required for all documentation changes
+- **Technical accuracy** validation
+- **Content clarity** and completeness review
+- **Formatting and style** consistency check
+- **Link validation** and cross-reference verification
+
+### Maintenance
+- **Regular reviews** of documentation currency
+- **Update documentation** alongside code changes
+- **Remove outdated** or obsolete content
+- **Validate links** and references
+- **Improve clarity** based on user feedback
+
+## Documentation Tools and Automation
+
+### Validation Tools
+- **Markdown linting** for formatting consistency
+- **Link checking** for broken references
+- **Spell checking** for content quality
+- **Diagram validation** for visual content
+
+### Automation
+- **Automated link validation** in CI/CD pipeline
+- **Documentation generation** from code comments
+- **Version tagging** with code releases
+- **Change tracking** and audit trails
+
+## Quality Assurance
+
+### Documentation Reviews
+- **Content accuracy** and technical correctness
+- **Clarity and readability** for target audience
+- **Completeness** and coverage of required topics
+- **Consistency** with project standards and style
+
+### User Testing
+- **Validate documentation** meets user needs
+- **Test usability** and navigation
+- **Gather feedback** from actual users
+- **Iterate and improve** based on feedback
+
+### Continuous Improvement
+- **Regular documentation audits**
+- **User feedback collection** and analysis
+- **Process improvement** based on lessons learned
+- **Tool and workflow optimization**
+
+## Documentation Templates
+
+### Feature Documentation Template
+```markdown
+# Feature Name
+
+## Overview
+Brief description of the feature and its purpose.
+
+## User Stories
+- As a [user], I want [capability], so that [benefit]
+
+## Technical Implementation
+Details about how the feature is implemented.
+
+## API Documentation
+If applicable, include API endpoints and examples.
+
+## User Guide
+Step-by-step instructions for using the feature.
+
+## Testing
+Information about testing the feature.
+```
+
+### API Documentation Template
+```markdown
+# API Endpoint Name
+
+## Endpoint
+`GET /api/v1/resource`
+
+## Description
+Brief description of what the endpoint does.
+
+## Authentication
+Authentication requirements.
+
+## Parameters
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| id | string | Yes | Resource identifier |
+
+## Response
+```json
+{
+  "success": true,
+  "data": { /* response data */ }
+}
+```
+
+## Error Responses
+Common error responses and their meanings.
+
+## Examples
+Usage examples with sample requests and responses.
+```
+
+---
+description: Documentation as Code standards, Markdown formatting guidelines, documentation workflow, and templates for creating and maintaining project documentation. Apply when working with documentation files, README files, or creating technical documentation.
+
+alwaysApply: false
+---

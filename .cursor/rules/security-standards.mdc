@@ -1,0 +1,219 @@
+---
+alwaysApply: true
+---
+# Security Standards for High-Risk Industries
+
+## Security Philosophy
+- **Security by Design:** Security integrated into every layer of the architecture
+- **Defence in Depth:** Multiple layers of security controls
+- **Least Privilege:** Users and systems have minimum necessary access
+- **Zero Trust:** Never trust, always verify
+- **Continuous Monitoring:** Real-time security monitoring and alerting
+
+## Authentication & Authorization
+
+### Multi-Factor Authentication (MFA)
+- **Require MFA** for all user accounts
+- **Support multiple MFA methods** (SMS, authenticator apps, hardware tokens)
+- **Enforce MFA** on all sensitive operations
+- **Graceful MFA failure handling** with clear user guidance
+- **MFA bypass procedures** for emergency access
+
+### Role-Based Access Control (RBAC)
+- **Implement granular roles** based on job functions
+- **Dynamic role assignment** based on context
+- **Role inheritance** for hierarchical organizations
+- **Temporary role elevation** for specific tasks
+- **Regular role reviews** and access audits
+
+### Session Management
+- **Secure session tokens** with appropriate expiration
+- **Session timeout** for inactivity
+- **Concurrent session limits** per user
+- **Session invalidation** on logout
+- **Session monitoring** for suspicious activity
+
+## Data Protection
+
+### Data Classification
+- **Classify data** by sensitivity level (Public, Internal, Confidential, Restricted)
+- **Apply appropriate controls** based on classification
+- **Data labeling** and handling procedures
+- **Data retention policies** by classification
+- **Data disposal procedures** for sensitive data
+
+### Encryption Standards
+- **Encryption at rest** for all sensitive data
+- **Encryption in transit** using TLS 1.3
+- **Key management** with Azure Key Vault
+- **Database encryption** for all stored data
+- **File encryption** for uploaded documents
+
+### Data Privacy
+- **Privacy by Design** principles implementation
+- **Data minimization** - collect only necessary data
+- **User consent** management for data processing
+- **Data portability** and export capabilities
+- **Right to be forgotten** implementation
+
+## API Security
+
+### API Authentication
+- **JWT tokens** with short expiration times
+- **Refresh token rotation** for security
+- **API key management** for external integrations
+- **Rate limiting** to prevent abuse
+- **API versioning** for security updates
+
+### Input Validation & Sanitization
+- **Validate all inputs** using Zod schemas
+- **Sanitize user inputs** to prevent injection attacks
+- **Parameterized queries** for database operations
+- **Content Security Policy (CSP)** headers
+- **Input length limits** and validation rules
+
+### API Security Headers
+```typescript
+// Security headers configuration
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  },
+}));
+```
+
+## Infrastructure Security
+
+### Azure Security Configuration
+- **Network Security Groups (NSGs)** for traffic control
+- **Azure Firewall** for application protection
+- **Private endpoints** for database access
+- **Azure DDoS Protection** for availability
+- **Azure Security Center** for monitoring
+
+### Container Security
+- **Scan container images** for vulnerabilities
+- **Use minimal base images** (Alpine Linux)
+- **Run containers as non-root** users
+- **Implement resource limits** for containers
+- **Regular security updates** for base images
+
+### Database Security
+- **Database firewall rules** for access control
+- **Encrypted connections** to database
+- **Database user permissions** with least privilege
+- **Regular database backups** with encryption
+- **Database activity monitoring** and logging
+
+## Application Security
+
+### Secure Development Practices
+- **Code security reviews** for all changes
+- **Static code analysis** with security focus
+- **Dependency vulnerability scanning**
+- **Secure coding guidelines** enforcement
+- **Security testing** in CI/CD pipeline
+
+### Error Handling & Logging
+- **Secure error messages** (no sensitive data exposure)
+- **Structured logging** with security events
+- **Log integrity** and tamper detection
+- **Log retention** and archival policies
+- **Security event correlation** and alerting
+
+### Security Monitoring
+- **Real-time security monitoring** with Azure Sentinel
+- **Anomaly detection** for user behavior
+- **Security incident response** procedures
+- **Threat intelligence** integration
+- **Security metrics** and reporting
+
+## Compliance Requirements
+
+### Industry Standards
+- **ISO 27001** Information Security Management
+- **SOC 2 Type II** Security and Availability
+- **WHS Act & Regulations** (Australia)
+- **ICMM Critical Control Management**
+- **Defence Industry Security Standards**
+
+### Regulatory Compliance
+- **Data protection regulations** (GDPR, CCPA)
+- **Industry-specific regulations** for mining, petrochemicals, defence
+- **Export control regulations** for defence industry
+- **Environmental regulations** for high-risk industries
+- **Safety regulations** for critical infrastructure
+
+## Security Testing
+
+### Penetration Testing
+- **Regular penetration testing** by external security firms
+- **Vulnerability assessments** for all systems
+- **Security code reviews** for critical components
+- **Red team exercises** for incident response testing
+- **Security architecture reviews**
+
+### Security Controls Testing
+- **Authentication mechanism testing**
+- **Authorization controls validation**
+- **Data encryption verification**
+- **Network security testing**
+- **Physical security assessment**
+
+## Incident Response
+
+### Security Incident Procedures
+- **Incident detection** and classification
+- **Response team activation** procedures
+- **Containment and eradication** steps
+- **Recovery and restoration** procedures
+- **Post-incident analysis** and lessons learned
+
+### Business Continuity
+- **Disaster recovery** procedures
+- **Backup and restoration** testing
+- **Alternative system** availability
+- **Communication plans** for stakeholders
+- **Regulatory reporting** requirements
+
+## Security Awareness
+
+### Training Requirements
+- **Security awareness training** for all users
+- **Role-specific security training** for administrators
+- **Phishing awareness** and reporting procedures
+- **Social engineering** awareness training
+- **Regular security updates** and reminders
+
+### Security Culture
+- **Security champions** program
+- **Security reporting** and feedback mechanisms
+- **Security best practices** sharing
+- **Security innovation** and improvement initiatives
+- **Security recognition** and rewards program
+
+## Security Metrics & Reporting
+
+### Key Security Metrics
+- **Security incident response time**
+- **Vulnerability remediation time**
+- **Security training completion rates**
+- **Access review completion rates**
+- **Security control effectiveness**
+
+### Executive Reporting
+- **Monthly security dashboards** for executives
+- **Quarterly security assessments** and reports
+- **Annual security program** evaluation
+- **Security risk assessments** and mitigation plans
+- **Compliance status** reporting

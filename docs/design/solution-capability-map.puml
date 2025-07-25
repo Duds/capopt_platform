@@ -1,0 +1,70 @@
+@startwbs
+* CapOpt Platform Solution Capability Map
+** Strategic Layer
+*** Business Model Canvas
+*** Strategy Mapping
+*** Value Proposition Design
+*** Market Analysis
+*** Partnership Management
+** Value & Service Layer
+*** Value Chain Mapping
+*** Service Model Design
+*** Experience Model Framework
+*** Capability Mapping
+*** Value Stream Analysis
+*** Bottleneck Identification
+*** Optimisation Opportunities
+** Operational Layer
+*** Process Mapping & Documentation
+*** Playbook Management
+*** Procedure & Best Practice Repository
+*** Training Material Management
+*** Maturity Assessment & Benchmarking
+*** Improvement Roadmaps
+*** KPI & Metrics Tracking
+** Control & Risk Layer
+*** Critical Control Management
+*** Risk Assessment & Bowtie Analysis
+*** Control Effectiveness Evaluation
+*** Compliance Monitoring
+*** Incident Reporting & Response
+*** Asset Management & Protection
+*** Assurance & Audit Trails
+** Integration & Analytics Layer
+*** Cross-Layer Integration Engine
+*** Data Warehouse & ETL
+*** Analytics & BI Dashboards
+*** Predictive Analytics & AI/ML
+*** Reporting System
+**** Executive Dashboards
+**** Operational Reports
+**** Risk Reports
+**** Compliance Reports
+**** Maturity Reports
+**** Custom Report Builder
+**** Board Reporting
+**** Regulatory Reporting
+**** Export & Distribution
+*** Traceability & Data Lineage
+** Platform Capabilities
+*** Role-Based Access Control (RBAC)
+**** User Management
+**** Role Definition & Assignment
+**** Permission Management
+**** Multi-Factor Authentication
+**** Single Sign-On (SSO)
+**** Session Management
+**** Access Auditing
+*** Security & Compliance
+**** Data Encryption
+**** Audit Logging
+**** Privacy Controls
+**** Data Retention
+** External Integration
+*** ERP Integration (SAP, Oracle, Dynamics)
+*** MES Integration (Siemens, Rockwell, GE)
+*** Condition Monitoring Integration (OSIsoft PI, Emerson)
+*** SCADA/PLM/CRM Integration
+*** API & Webhook Framework
+*** Middleware & Data Mapping
+@endwbs 

@@ -1,0 +1,113 @@
+---
+alwaysApply: true
+---
+# Phase-Based Development Prioritisation
+
+## Current Development Phase: Phase 1 - Functional PoC
+
+### Phase 1 Focus (4-6 weeks)
+**Goal:** Database plumbed, working hooks, core functionality demonstrated
+**Success Criteria:** Core data models working, basic CRUD operations, fundamental workflows functional
+
+### Phase 1 Priority Features
+1. **Critical Control Management (Core)**
+   - Basic critical control identification and mapping
+   - Bowtie analysis functionality
+   - Control-process linking
+
+2. **Process Management and Documentation (Core)**
+   - Basic process mapping and documentation
+   - Visual process designer
+   - Version control for process documents
+
+3. **Basic Analytics and Reporting (Core)**
+   - Simple dashboards
+   - Basic report generation
+   - Data visualisation
+
+## Development Guidelines by Phase
+
+### Phase 1 Guidelines
+- **Focus on core functionality** over polish
+- **Implement basic CRUD operations** for all entities
+- **Use simple, functional UI** (no advanced styling yet)
+- **Prioritise database schema** and data relationships
+- **Implement basic authentication** (no RBAC yet)
+- **Focus on backend APIs** and data flow
+
+### Phase 2 Guidelines (MVP - 8-12 weeks)
+- **Implement RBAC** and security features
+- **Enhance UI/UX** with proper styling and accessibility
+- **Add real-time monitoring** capabilities
+- **Implement Azure deployment** pipeline
+- **Add comprehensive testing** coverage
+- **Focus on customer-ready features**
+
+### Phase 3 Guidelines (Extended Rollout - 6-12 months)
+- **Advanced analytics** and AI/ML features
+- **External system integrations** (ERP, MES, etc.)
+- **Advanced reporting** and dashboards
+- **Performance optimization** and scaling
+- **Advanced security** features
+
+## Feature Implementation Priority
+
+### High Priority (Phase 1)
+- Database schema implementation
+- Basic API endpoints
+- Core business logic
+- Simple user interface
+- Basic authentication
+
+### Medium Priority (Phase 2)
+- Enhanced UI components
+- RBAC implementation
+- Real-time features
+- Comprehensive testing
+- Azure deployment
+
+### Low Priority (Phase 3)
+- Advanced integrations
+- AI/ML features
+- Advanced analytics
+- Performance optimization
+- Advanced security features
+
+## Decision Making Framework
+
+### When Implementing Features
+1. **Check current phase** - Ensure feature aligns with phase goals
+2. **Validate against backlog** - Confirm feature is in current phase
+3. **Consider dependencies** - Implement prerequisites first
+4. **Focus on core value** - Prioritise features that demonstrate platform value
+5. **Maintain quality** - Don't sacrifice code quality for speed
+
+### When Making Technical Decisions
+1. **Phase-appropriate complexity** - Don't over-engineer for current phase
+2. **Future-proofing** - Consider how decisions impact future phases
+3. **Scalability** - Ensure architecture supports future growth
+4. **Maintainability** - Write code that can be enhanced in future phases
+
+## Success Metrics by Phase
+
+### Phase 1 Success Metrics
+- Core data models implemented and working
+- Basic CRUD operations functional
+- Fundamental workflows operational
+- Database properly plumbed
+- Basic UI functional
+
+### Phase 2 Success Metrics
+- Customer-ready product
+- RBAC and authentication working
+- Azure deployment successful
+- Core features fully functional
+- Comprehensive testing coverage
+
+### Phase 3 Success Metrics
+- Full feature set implemented
+- Advanced integrations working
+- Performance optimized
+- Scalable architecture
+- Enterprise-ready platform
+
