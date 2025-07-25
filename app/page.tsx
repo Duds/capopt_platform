@@ -51,6 +51,10 @@ import {
 } from 'lucide-react'
 import { controlsApi, processesApi, assetsApi, formatDate, getStatusColor, getPriorityColor } from '@/lib/api'
 import { BusinessCanvas } from '@/app/components/business-canvas'
+import { EnterpriseContext } from '@/components/navigation/enterprise-context'
+import { StrategicContext } from '@/components/navigation/strategic-context'
+import { StrategicBreadcrumbs } from '@/components/navigation/strategic-breadcrumbs'
+import { StrategicNavigationFlow } from '@/components/navigation/strategic-navigation-flow'
 
 interface DashboardMetrics {
   totalControls: number
@@ -338,6 +342,11 @@ export default function CapOptPlatform() {
           </div>
         </header>
 
+        {/* Strategic Navigation Breadcrumbs */}
+        <div className="border-b bg-white px-6 py-3">
+          <StrategicBreadcrumbs showStrategic={true} />
+        </div>
+
         <div className="flex w-full">
           {/* Sidebar Navigation */}
           <nav className="w-64 bg-white border-r border-gray-200 min-h-screen p-4 flex-shrink-0">
@@ -490,6 +499,13 @@ export default function CapOptPlatform() {
                           </CardContent>
                         </Card>
                       ))}
+                    </div>
+
+                    {/* Strategic Navigation Components */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      <EnterpriseContext showDetails={true} />
+                      <StrategicContext showDetails={true} />
+                      <StrategicNavigationFlow currentLayer="operational" currentContext="dashboard" />
                     </div>
 
                     {/* Real Database Metrics */}

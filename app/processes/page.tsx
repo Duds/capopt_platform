@@ -13,6 +13,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label'
 import { Workflow, Plus, Search, Filter, Edit, Eye, Trash2 } from 'lucide-react'
 import { processesApi, formatDate, getStatusColor, getPriorityColor } from '@/lib/api'
+import { EnterpriseContext } from '@/components/navigation/enterprise-context'
+import { StrategicContext } from '@/components/navigation/strategic-context'
+import { StrategicNavigationFlow } from '@/components/navigation/strategic-navigation-flow'
 
 interface Process {
   id: string
@@ -407,6 +410,13 @@ export default function ProcessesPage() {
                 </p>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Strategic Navigation Components */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <EnterpriseContext showDetails={false} />
+            <StrategicContext showDetails={false} />
+            <StrategicNavigationFlow currentLayer="operational" currentContext="processes" />
           </div>
 
           {/* Processes List */}
