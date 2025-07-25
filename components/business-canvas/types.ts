@@ -33,6 +33,9 @@ export interface CanvasVisualizationProps {
   businessModel: BusinessModel
   onUpdate: (updatedModel: BusinessModel) => void
   isEditing?: boolean
+  viewMode?: 'list' | 'canvas'
+  onViewModeChange?: (mode: 'list' | 'canvas') => void
+  onEditingChange?: (editing: boolean) => void
 }
 
 export interface CanvasItemProps {

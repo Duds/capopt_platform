@@ -1,14 +1,4 @@
-import { 
-  Users, 
-  Handshake, 
-  Activity, 
-  Package, 
-  Heart, 
-  Radio, 
-  DollarSign, 
-  TrendingDown
-} from 'lucide-react'
-import { CanvasSection, CanvasItem } from './types'
+import { CanvasSection, BusinessModel } from './types'
 
 export const getPriorityColor = (priority: string) => {
   switch (priority) {
@@ -48,12 +38,11 @@ export const getSectionPosition = (position: string) => {
   }
 }
 
-export const canvasSections: CanvasSection[] = [
+export const canvasSections: Omit<CanvasSection, 'icon'>[] = [
   {
     key: 'keyPartners',
     title: 'Key Partners',
     description: 'Who are our key partners?',
-    icon: <Handshake className="h-5 w-5" />,
     color: 'bg-blue-50 border-blue-200',
     position: 'top-left',
     isImplemented: true // ✅ Implemented in database
@@ -62,7 +51,6 @@ export const canvasSections: CanvasSection[] = [
     key: 'keyActivities',
     title: 'Key Activities',
     description: 'What key activities do we perform?',
-    icon: <Activity className="h-5 w-5" />,
     color: 'bg-green-50 border-green-200',
     position: 'top-center',
     isImplemented: true // ✅ Implemented in database
@@ -71,7 +59,6 @@ export const canvasSections: CanvasSection[] = [
     key: 'keyResources',
     title: 'Key Resources',
     description: 'What key resources do we have?',
-    icon: <Package className="h-5 w-5" />,
     color: 'bg-purple-50 border-purple-200',
     position: 'top-right',
     isImplemented: true // ✅ Implemented in database
@@ -80,7 +67,6 @@ export const canvasSections: CanvasSection[] = [
     key: 'valuePropositions',
     title: 'Value Propositions',
     description: 'What value do we deliver?',
-    icon: <Heart className="h-5 w-5" />,
     color: 'bg-red-50 border-red-200',
     position: 'center',
     isImplemented: true // ✅ Implemented in database
@@ -89,7 +75,6 @@ export const canvasSections: CanvasSection[] = [
     key: 'customerRelationships',
     title: 'Customer Relationships',
     description: 'How do we interact with customers?',
-    icon: <Users className="h-5 w-5" />,
     color: 'bg-yellow-50 border-yellow-200',
     position: 'center-left',
     isImplemented: false // ⏳ Not implemented in database
@@ -98,7 +83,6 @@ export const canvasSections: CanvasSection[] = [
     key: 'channels',
     title: 'Channels',
     description: 'How do we reach customers?',
-    icon: <Radio className="h-5 w-5" />,
     color: 'bg-indigo-50 border-indigo-200',
     position: 'center-right',
     isImplemented: false // ⏳ Not implemented in database
@@ -107,7 +91,6 @@ export const canvasSections: CanvasSection[] = [
     key: 'customerSegments',
     title: 'Customer Segments',
     description: 'Who are our customers?',
-    icon: <Users className="h-5 w-5" />,
     color: 'bg-pink-50 border-pink-200',
     position: 'bottom-left',
     isImplemented: true // ✅ Implemented in database
@@ -116,7 +99,6 @@ export const canvasSections: CanvasSection[] = [
     key: 'costStructure',
     title: 'Cost Structure',
     description: 'What are our major costs?',
-    icon: <TrendingDown className="h-5 w-5" />,
     color: 'bg-orange-50 border-orange-200',
     position: 'bottom-center',
     isImplemented: false // ⏳ Not implemented in database
@@ -125,7 +107,6 @@ export const canvasSections: CanvasSection[] = [
     key: 'revenueStreams',
     title: 'Revenue Streams',
     description: 'How do we make money?',
-    icon: <DollarSign className="h-5 w-5" />,
     color: 'bg-emerald-50 border-emerald-200',
     position: 'bottom-right',
     isImplemented: false // ⏳ Not implemented in database

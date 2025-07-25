@@ -32,9 +32,10 @@ interface BreadcrumbItem {
 interface StrategicBreadcrumbsProps {
   className?: string
   showStrategic?: boolean
+  activeLayer?: string
 }
 
-export function StrategicBreadcrumbs({ className = '', showStrategic = false }: StrategicBreadcrumbsProps) {
+export function StrategicBreadcrumbs({ className = '', showStrategic = false, activeLayer }: StrategicBreadcrumbsProps) {
   const router = useRouter()
   const pathname = usePathname()
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([])
@@ -60,15 +61,15 @@ export function StrategicBreadcrumbs({ className = '', showStrategic = false }: 
         type: 'facility'
       })
 
-      // Add business unit based on current page
-      if (pathname.includes('/processes')) {
+      // Add business unit based on current page or active layer
+      if (pathname.includes('/processes') || activeLayer === 'process-maps') {
         items.push({
           label: 'Processing Operations',
           href: '/business-unit/processing',
           icon: <Workflow className="h-4 w-4" />,
           type: 'business-unit'
         })
-      } else if (pathname.includes('/controls')) {
+      } else if (pathname.includes('/controls') || activeLayer === 'critical-controls') {
         items.push({
           label: 'Safety & Health',
           href: '/business-unit/safety',
@@ -84,10 +85,20 @@ export function StrategicBreadcrumbs({ className = '', showStrategic = false }: 
         })
       }
 
-      // Add current page
-      if (pathname === '/') {
+      // Add current page based on pathname or active layer
+      if (pathname === '/' && !activeLayer) {
         items.push({
           label: 'Dashboard',
+          type: 'page'
+        })
+      } else if (activeLayer === 'business-canvas') {
+        items.push({
+          label: 'Business Canvas',
+          type: 'page'
+        })
+      } else if (activeLayer === 'critical-controls') {
+        items.push({
+          label: 'Critical Controls',
           type: 'page'
         })
       } else if (pathname.includes('/processes')) {
@@ -122,10 +133,15 @@ export function StrategicBreadcrumbs({ className = '', showStrategic = false }: 
           label: 'Users',
           type: 'page'
         })
+      } else if (pathname.includes('/business-canvas')) {
+        items.push({
+          label: 'Business Canvas',
+          type: 'page'
+        })
       }
 
       // Add strategic navigation if enabled
-      if (showStrategic && pathname.includes('/processes')) {
+      if (showStrategic && (pathname.includes('/processes') || activeLayer === 'process-maps')) {
         items.push({
           label: 'Strategic View',
           href: '/strategic/processes',
@@ -139,7 +155,7 @@ export function StrategicBreadcrumbs({ className = '', showStrategic = false }: 
     }
 
     generateBreadcrumbs()
-  }, [pathname, showStrategic])
+  }, [pathname, showStrategic, activeLayer])
 
   const handleBreadcrumbClick = (item: BreadcrumbItem) => {
     if (item.href) {

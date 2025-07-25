@@ -18,11 +18,15 @@ import {
 import { CanvasVisualizationProps, BusinessModel } from './types'
 import { canvasSections, getSectionPosition } from './utils'
 import { CanvasSection } from './canvas-section'
+import { canvasSectionIcons } from './icons'
 
 export function CanvasVisualization({ 
   businessModel, 
   onUpdate, 
-  isEditing = false 
+  isEditing = false,
+  viewMode = 'canvas',
+  onViewModeChange,
+  onEditingChange
 }: CanvasVisualizationProps) {
   const [draggedItem, setDraggedItem] = useState<{ item: any; sourceSection: keyof BusinessModel } | null>(null)
   const [hoveredSection, setHoveredSection] = useState<keyof BusinessModel | null>(null)
@@ -90,6 +94,36 @@ export function CanvasVisualization({
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {onViewModeChange && (
+            <>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => onViewModeChange('list')}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                List View
+              </Button>
+              <Button
+                variant={viewMode === 'canvas' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => onViewModeChange('canvas')}
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                Canvas View
+              </Button>
+            </>
+          )}
+          {onEditingChange && (
+            <Button
+              variant={isEditing ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => onEditingChange(!isEditing)}
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              {isEditing ? 'View Mode' : 'Edit Mode'}
+            </Button>
+          )}
           {isEditing && (
             <>
               <Button variant="outline" size="sm" className="opacity-50" disabled>
@@ -113,6 +147,7 @@ export function CanvasVisualization({
       </div>
 
       {/* Canvas Grid */}
+      {viewMode === 'canvas' && (
       <div 
         ref={canvasRef}
         className="grid grid-cols-3 grid-rows-3 gap-4 p-6 bg-gray-100 rounded-lg min-h-[600px]"
@@ -125,7 +160,10 @@ export function CanvasVisualization({
             }`}
           >
             <CanvasSection
-              section={section}
+              section={{
+                ...section,
+                icon: canvasSectionIcons[section.key]
+              }}
               items={businessModel[section.key]}
               isEditing={isEditing}
               onAddItem={handleAddItem}
@@ -139,6 +177,29 @@ export function CanvasVisualization({
           </div>
         ))}
       </div>
+      )}
+
+      {/* List View */}
+      {viewMode === 'list' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {canvasSections.map((section) => (
+              <CanvasSection
+                key={section.key}
+                section={{
+                  ...section,
+                  icon: canvasSectionIcons[section.key]
+                }}
+                items={businessModel[section.key]}
+                isEditing={isEditing}
+                onAddItem={handleAddItem}
+                onEditItem={handleEditItem}
+                onDeleteItem={handleDeleteItem}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Canvas Legend */}
       <div className="bg-white border rounded-lg p-4">

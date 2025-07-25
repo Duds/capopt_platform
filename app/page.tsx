@@ -47,10 +47,17 @@ import {
   Moon,
   Command,
   ChevronDown,
-  Database
+  Database,
+  Eye,
+  Copy,
+  Edit,
+  Download,
+  Share
 } from 'lucide-react'
 import { controlsApi, processesApi, assetsApi, formatDate, getStatusColor, getPriorityColor } from '@/lib/api'
-import { BusinessCanvas } from '@/app/components/business-canvas'
+import { CanvasVisualization } from '@/components/business-canvas/canvas-visualization'
+import { BusinessModel } from '@/components/business-canvas/types'
+import { defaultBusinessModel } from '@/components/business-canvas/utils'
 import { EnterpriseContext } from '@/components/navigation/enterprise-context'
 import { StrategicContext } from '@/components/navigation/strategic-context'
 import { StrategicBreadcrumbs } from '@/components/navigation/strategic-breadcrumbs'
@@ -69,6 +76,8 @@ interface DashboardMetrics {
 export default function CapOptPlatform() {
   const { user, logout } = useAuth()
   const [activeLayer, setActiveLayer] = useState<string>("dashboard")
+  const [viewMode, setViewMode] = useState<'list' | 'canvas'>('canvas')
+  const [isEditing, setIsEditing] = useState(false)
   const [metrics, setMetrics] = useState<DashboardMetrics>({
     totalControls: 0,
     activeControls: 0,
@@ -84,6 +93,7 @@ export default function CapOptPlatform() {
   const [isLoading, setIsLoading] = useState(true)
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [notifications] = useState(3) // Mock notification count
+  const [businessModel, setBusinessModel] = useState<BusinessModel>(defaultBusinessModel)
 
   const maturityScores = {
     strategic: 75,
@@ -344,7 +354,7 @@ export default function CapOptPlatform() {
 
         {/* Strategic Navigation Breadcrumbs */}
         <div className="border-b bg-white px-6 py-3">
-          <StrategicBreadcrumbs showStrategic={true} />
+          <StrategicBreadcrumbs showStrategic={true} activeLayer={activeLayer} />
         </div>
 
         <div className="flex w-full">
@@ -695,11 +705,14 @@ export default function CapOptPlatform() {
 
                 {activeLayer === "business-canvas" && (
                   <div className="space-y-6">
-                    <div>
-                      <h2 className="text-3xl font-bold">Business Model Canvas</h2>
-                      <p className="text-gray-600">Define and visualize your business model across 9 key components</p>
-                    </div>
-                    <BusinessCanvas />
+                    <CanvasVisualization 
+                      businessModel={businessModel} 
+                      onUpdate={setBusinessModel} 
+                      isEditing={isEditing}
+                      viewMode={viewMode}
+                      onViewModeChange={setViewMode}
+                      onEditingChange={setIsEditing}
+                    />
                   </div>
                 )}
 

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { CanvasSection as CanvasSectionType, BusinessModel } from './types'
 import { CanvasItem } from './canvas-item'
+import { canvasSectionIcons } from './icons'
 
 interface CanvasSectionProps {
   section: CanvasSectionType
@@ -32,6 +33,8 @@ export function CanvasSection({
   onDrop,
   onDragEnd
 }: CanvasSectionProps) {
+  const icon = canvasSectionIcons[section.key]
+
   return (
     <Card 
       className={`${section.color} min-h-[350px] h-full ${!section.isImplemented ? 'opacity-50' : ''}`}
@@ -41,7 +44,7 @@ export function CanvasSection({
     >
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center text-xl">
-          {section.icon}
+          {icon}
           <span className="ml-3">{section.title}</span>
           {!section.isImplemented && (
             <Badge variant="outline" className="ml-2 text-xs">Mock Data</Badge>
