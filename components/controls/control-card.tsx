@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import React from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 import { 
   Shield, 
   AlertTriangle, 
@@ -12,10 +13,34 @@ import {
   Settings,
   Eye,
   Edit,
-  MoreHorizontal
-} from "lucide-react"
-import { CriticalControl } from "@/types"
-import { cn, formatDate, getStatusColor, getPriorityLabel } from "@/lib/utils"
+  MoreHorizontal,
+  TrendingUp,
+  TrendingDown
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { formatDate, getStatusColor, getPriorityColor } from '@/lib/api'
+
+interface CriticalControl {
+  id: string
+  name: string
+  description: string | null
+  complianceStatus: string
+  priority: string
+  createdAt: string
+  updatedAt: string
+  riskCategory?: {
+    id: string
+    name: string
+  }
+  controlType?: {
+    id: string
+    name: string
+  }
+  effectiveness?: {
+    id: string
+    name: string
+  }
+}
 
 interface ControlCardProps {
   control: CriticalControl
@@ -25,179 +50,134 @@ interface ControlCardProps {
 }
 
 export function ControlCard({ control, onView, onEdit, onVerify }: ControlCardProps) {
-  const [isHovered, setIsHovered] = useState(false)
+  const getControlTypeIcon = (type: string) => {
+    switch (type) {
+      case 'PREVENTIVE':
+        return <Shield className="h-4 w-4 text-blue-600" />
+      case 'DETECTIVE':
+        return <Eye className="h-4 w-4 text-green-600" />
+      case 'CORRECTIVE':
+        return <Settings className="h-4 w-4 text-orange-600" />
+      default:
+        return <Shield className="h-4 w-4 text-gray-600" />
+    }
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active':
-        return <CheckCircle className="h-4 w-4 text-control-active" />
-      case 'testing':
-        return <Clock className="h-4 w-4 text-control-testing" />
-      case 'maintenance':
-        return <Settings className="h-4 w-4 text-control-maintenance" />
-      case 'failed':
-        return <AlertTriangle className="h-4 w-4 text-control-critical" />
+      case 'COMPLIANT':
+        return <CheckCircle className="h-4 w-4 text-green-600" />
+      case 'PARTIALLY_COMPLIANT':
+        return <AlertTriangle className="h-4 w-4 text-yellow-600" />
+      case 'NON_COMPLIANT':
+        return <AlertTriangle className="h-4 w-4 text-red-600" />
+      case 'UNDER_REVIEW':
+        return <Clock className="h-4 w-4 text-blue-600" />
       default:
-        return <Shield className="h-4 w-4 text-muted-foreground" />
+        return <Clock className="h-4 w-4 text-gray-600" />
     }
   }
 
-  const getControlTypeIcon = (type: string) => {
-    switch (type) {
-      case 'engineering':
-        return <Settings className="h-4 w-4" />
-      case 'administrative':
-        return <Shield className="h-4 w-4" />
-      case 'ppe':
-        return <CheckCircle className="h-4 w-4" />
-      case 'monitoring':
-        return <Eye className="h-4 w-4" />
-      default:
-        return <Shield className="h-4 w-4" />
-    }
-  }
-
-  const isVerificationDue = () => {
-    const nextDue = new Date(control.verificationSchedule.nextDue)
-    const now = new Date()
-    return nextDue <= now
-  }
-
-  const getPerformanceColor = (score: number) => {
-    if (score >= 90) return 'text-control-active'
-    if (score >= 75) return 'text-control-warning'
-    return 'text-control-critical'
+  const getPerformanceColor = (value: number) => {
+    if (value >= 80) return 'text-green-600'
+    if (value >= 60) return 'text-yellow-600'
+    return 'text-red-600'
   }
 
   return (
-    <Card 
-      className={cn(
-        "control-card transition-all duration-200 cursor-pointer",
-        control.status,
-        isHovered && "shadow-lg scale-[1.02]"
-      )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() => onView?.(control)}
-    >
+    <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-2">
-            {getControlTypeIcon(control.type)}
+            <Shield className="h-4 w-4 text-blue-600" />
             <CardTitle className="text-lg">{control.name}</CardTitle>
           </div>
           <div className="flex items-center space-x-2">
-            {getStatusIcon(control.status)}
             <Badge 
               variant="outline" 
-              className={cn("capitalize", getStatusColor(control.status))}
+              className={getStatusColor(control.complianceStatus)}
             >
-              {control.status}
+              {control.complianceStatus}
             </Badge>
           </div>
         </div>
         
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">{control.code}</p>
+          <p className="text-sm text-muted-foreground">
+            {control.riskCategory?.name || 'No category'}
+          </p>
           <Badge 
             variant="outline" 
-            className={cn("text-xs", getStatusColor(control.category))}
+            className={getPriorityColor(control.priority)}
           >
-            {control.category}
+            {control.priority}
           </Badge>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground line-clamp-2">
-          {control.description}
+          {control.description || 'No description available'}
         </p>
 
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="text-muted-foreground">Priority</p>
-            <p className={cn("font-medium", getStatusColor(getPriorityLabel(control.priority).toLowerCase()))}>
-              {getPriorityLabel(control.priority)}
-            </p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Performance</p>
-            <p className={cn("font-medium", getPerformanceColor(control.performance?.value || 0))}>
-              {control.performance?.value || 0}%
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Last Verified</span>
-            <span>{formatDate(control.currentStatus.lastVerified)}</span>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Next Due</span>
-            <span className={cn(
-              isVerificationDue() ? "text-control-critical font-medium" : ""
-            )}>
-              {formatDate(control.verificationSchedule.nextDue)}
-            </span>
-          </div>
-        </div>
-
-        {control.hazards.length > 0 && (
-          <div>
-            <p className="text-sm text-muted-foreground mb-1">Hazards</p>
-            <div className="flex flex-wrap gap-1">
-              {control.hazards.slice(0, 3).map((hazard, index) => (
-                <Badge key={index} variant="outline" className="text-xs">
-                  {hazard}
-                </Badge>
-              ))}
-              {control.hazards.length > 3 && (
-                <Badge variant="outline" className="text-xs">
-                  +{control.hazards.length - 3} more
-                </Badge>
-              )}
+            <p className="text-muted-foreground">Type</p>
+            <div className="flex items-center space-x-1">
+              {getControlTypeIcon(control.controlType?.name || 'PREVENTIVE')}
+              <p className="font-medium">
+                {control.controlType?.name || 'Not specified'}
+              </p>
             </div>
           </div>
-        )}
+          <div>
+            <p className="text-muted-foreground">Effectiveness</p>
+            <div className="flex items-center space-x-1">
+              {getStatusIcon(control.complianceStatus)}
+              <p className="font-medium">
+                {control.effectiveness?.name || 'Not rated'}
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Created</span>
+            <span>{formatDate(control.createdAt)}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Updated</span>
+            <span>{formatDate(control.updatedAt)}</span>
+          </div>
+        </div>
 
         <div className="flex items-center justify-between pt-2 border-t">
           <div className="flex items-center space-x-2">
             <Button 
               variant="outline" 
               size="sm"
-              onClick={(e) => {
-                e.stopPropagation()
-                onView?.(control)
-              }}
+              onClick={() => onView?.(control)}
             >
               <Eye className="h-4 w-4 mr-1" />
               View
             </Button>
-            {isVerificationDue() && (
-              <Button 
-                variant="warning" 
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onVerify?.(control)
-                }}
-              >
-                <CheckCircle className="h-4 w-4 mr-1" />
-                Verify
-              </Button>
-            )}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => onEdit?.(control)}
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Edit
+            </Button>
           </div>
           
           <Button 
-            variant="ghost" 
+            variant="outline" 
             size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              onEdit?.(control)
-            }}
+            onClick={() => onVerify?.(control)}
           >
-            <Edit className="h-4 w-4" />
+            <CheckCircle className="h-4 w-4" />
           </Button>
         </div>
       </CardContent>

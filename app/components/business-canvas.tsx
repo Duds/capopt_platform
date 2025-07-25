@@ -305,7 +305,7 @@ export function BusinessCanvas() {
 
           {viewMode === "edit" && (
             <Button
-              variant="dashed"
+variant="outline"
               className="w-full border-2 border-dashed border-gray-300 hover:border-gray-400 bg-transparent py-3"
               onClick={() => setNewItem({ section: sectionKey })}
             >

@@ -1,330 +1,276 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { 
-  Shield, 
-  AlertTriangle, 
-  CheckCircle, 
-  Clock, 
-  Settings,
-  Search,
-  Filter,
-  Plus,
-  Eye,
-  Edit,
-  MoreHorizontal
-} from "lucide-react"
-import { ControlCard } from "@/components/controls/control-card"
-import { CriticalControl } from "@/types"
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/hooks/use-auth'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Shield, Plus, Search, Filter } from 'lucide-react'
+import { controlsApi, formatDate, getStatusColor, getPriorityColor } from '@/lib/api'
 
-// Mock data for demonstration
-const mockControls: CriticalControl[] = [
-  {
-    id: "1",
-    facilityId: "1",
-    name: "Pressure Relief Valve PRV-001",
-    code: "PRV-001",
-    type: "engineering",
-    category: "prevention",
-    description: "Primary pressure relief valve for distillation column T-101. Prevents overpressure conditions in the column.",
-    location: { x: 25, y: 30 },
-    specifications: {
-      manufacturer: "Crosby",
-      model: "JOSV-6",
-      serialNumber: "CRB-2024-001",
-      installationDate: new Date("2024-01-15"),
-      lastCalibration: new Date("2024-06-15"),
-      nextCalibration: new Date("2024-12-15")
-    },
-    hazards: ["Overpressure", "Thermal expansion", "Chemical reaction"],
-    status: "active",
-    priority: 1,
-    currentStatus: {
-      id: "1",
-      controlId: "1",
-      status: "active",
-      reliability: 95,
-      availability: 98,
-      effectiveness: 92,
-      lastVerified: new Date("2024-07-20"),
-      nextVerificationDue: new Date("2024-08-20"),
-      verifiedBy: "John Smith",
-      notes: "All parameters within normal range",
-      createdAt: new Date()
-    },
-    verificationSchedule: {
-      id: "1",
-      controlId: "1",
-      frequency: "monthly",
-      frequencyValue: 1,
-      lastVerified: new Date("2024-07-20"),
-      nextDue: new Date("2024-08-20"),
-      responsibleRole: "Process Engineer",
-      status: "active",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    performance: {
-      id: "1",
-      controlId: "1",
-      metricType: "effectiveness",
-      value: 92,
-      unit: "%",
-      timestamp: new Date(),
-      createdAt: new Date()
-    },
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: "2",
-    facilityId: "1",
-    name: "Emergency Shutdown System ESD-001",
-    code: "ESD-001",
-    type: "engineering",
-    category: "mitigation",
-    description: "Emergency shutdown system for the entire facility. Activates on critical safety conditions.",
-    location: { x: 45, y: 60 },
-    specifications: {
-      manufacturer: "Honeywell",
-      model: "Safety Manager",
-      serialNumber: "HNY-2024-002",
-      installationDate: new Date("2024-02-01"),
-      lastCalibration: new Date("2024-07-01"),
-      nextCalibration: new Date("2024-10-01")
-    },
-    hazards: ["Fire", "Explosion", "Toxic release", "Equipment failure"],
-    status: "active",
-    priority: 1,
-    currentStatus: {
-      id: "2",
-      controlId: "2",
-      status: "active",
-      reliability: 99,
-      availability: 100,
-      effectiveness: 98,
-      lastVerified: new Date("2024-07-15"),
-      nextVerificationDue: new Date("2024-08-15"),
-      verifiedBy: "Sarah Johnson",
-      notes: "System tested successfully",
-      createdAt: new Date()
-    },
-    verificationSchedule: {
-      id: "2",
-      controlId: "2",
-      frequency: "monthly",
-      frequencyValue: 1,
-      lastVerified: new Date("2024-07-15"),
-      nextDue: new Date("2024-08-15"),
-      responsibleRole: "Safety Engineer",
-      status: "active",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    performance: {
-      id: "2",
-      controlId: "2",
-      metricType: "effectiveness",
-      value: 98,
-      unit: "%",
-      timestamp: new Date(),
-      createdAt: new Date()
-    },
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: "3",
-    facilityId: "1",
-    name: "Gas Detection System GDS-001",
-    code: "GDS-001",
-    type: "monitoring",
-    category: "detection",
-    description: "Fixed gas detection system for hydrogen sulfide and other toxic gases.",
-    location: { x: 70, y: 40 },
-    specifications: {
-      manufacturer: "MSA",
-      model: "Ultima X5000",
-      serialNumber: "MSA-2024-003",
-      installationDate: new Date("2024-03-10"),
-      lastCalibration: new Date("2024-06-10"),
-      nextCalibration: new Date("2024-09-10")
-    },
-    hazards: ["Toxic gas exposure", "Asphyxiation", "Corrosion"],
-    status: "testing",
-    priority: 2,
-    currentStatus: {
-      id: "3",
-      controlId: "3",
-      status: "testing",
-      reliability: 85,
-      availability: 90,
-      effectiveness: 88,
-      lastVerified: new Date("2024-07-18"),
-      nextVerificationDue: new Date("2024-07-25"),
-      verifiedBy: "Mike Wilson",
-      notes: "Calibration in progress",
-      createdAt: new Date()
-    },
-    verificationSchedule: {
-      id: "3",
-      controlId: "3",
-      frequency: "quarterly",
-      frequencyValue: 3,
-      lastVerified: new Date("2024-07-18"),
-      nextDue: new Date("2024-07-25"),
-      responsibleRole: "Instrument Technician",
-      status: "active",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    performance: {
-      id: "3",
-      controlId: "3",
-      metricType: "effectiveness",
-      value: 88,
-      unit: "%",
-      timestamp: new Date(),
-      createdAt: new Date()
-    },
-    createdAt: new Date(),
-    updatedAt: new Date()
+interface CriticalControl {
+  id: string
+  name: string
+  description: string | null
+  complianceStatus: string
+  priority: string
+  createdAt: string
+  updatedAt: string
+  riskCategory?: {
+    id: string
+    name: string
   }
-]
+  controlType?: {
+    id: string
+    name: string
+  }
+  effectiveness?: {
+    id: string
+    name: string
+  }
+}
 
 export default function ControlsPage() {
-  const [controls] = useState<CriticalControl[]>(mockControls)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const { user, isLoading: authLoading } = useAuth()
+  const [controls, setControls] = useState<CriticalControl[]>([])
+  const [filteredControls, setFilteredControls] = useState<CriticalControl[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [priorityFilter, setPriorityFilter] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const filteredControls = controls.filter(control => {
-    const matchesSearch = control.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         control.code.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || control.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+  useEffect(() => {
+    if (user && !authLoading) {
+      fetchControls()
+    } else if (!user && !authLoading) {
+      setIsLoading(false)
+    }
+  }, [user, authLoading])
 
-  const getStatusCount = (status: string) => {
-    return controls.filter(control => control.status === status).length
+  useEffect(() => {
+    filterControls()
+  }, [controls, searchTerm, statusFilter, priorityFilter])
+
+  const fetchControls = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      
+      const controlsData = await controlsApi.getAll({ 
+        include: 'riskCategory,controlType,effectiveness' 
+      })
+      setControls(controlsData)
+    } catch (error: any) {
+      console.error('Error fetching controls:', error)
+      setError(error.message)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleViewControl = (control: CriticalControl) => {
-    console.log("View control:", control.name)
-    // Navigate to control detail page
+  const filterControls = () => {
+    let filtered = controls
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(control =>
+        control.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (control.description && control.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      )
+    }
+
+    // Status filter
+    if (statusFilter) {
+      filtered = filtered.filter(control => control.complianceStatus === statusFilter)
+    }
+
+    // Priority filter
+    if (priorityFilter) {
+      filtered = filtered.filter(control => control.priority === priorityFilter)
+    }
+
+    setFilteredControls(filtered)
   }
 
-  const handleEditControl = (control: CriticalControl) => {
-    console.log("Edit control:", control.name)
-    // Open edit modal or navigate to edit page
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading controls...</p>
+        </div>
+      </div>
+    )
   }
 
-  const handleVerifyControl = (control: CriticalControl) => {
-    console.log("Verify control:", control.name)
-    // Open verification workflow
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Shield className="h-8 w-8 text-red-600 mx-auto mb-4" />
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button onClick={fetchControls}>Retry</Button>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="border-b bg-card sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Critical Controls</h1>
-              <p className="text-sm text-muted-foreground">
-                Manage and monitor critical safety controls
-              </p>
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <Shield className="h-8 w-8 text-blue-600 mr-3" />
+              <h1 className="text-xl font-bold text-gray-900">Critical Controls</h1>
             </div>
-            
-            <Button className="bg-control-active hover:bg-control-active/90">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Control
-            </Button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
-        {/* Filters and Search */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search controls..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          {/* Page Header */}
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">Controls</h2>
+            <p className="text-gray-600">Manage critical controls and compliance</p>
+          </div>
+
+          {/* Filters */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Filter className="h-5 w-5 mr-2" />
+                Filters
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Search
+                  </label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Search controls..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All status</SelectItem>
+                      <SelectItem value="COMPLIANT">Compliant</SelectItem>
+                      <SelectItem value="PARTIALLY_COMPLIANT">Partially Compliant</SelectItem>
+                      <SelectItem value="NON_COMPLIANT">Non-Compliant</SelectItem>
+                      <SelectItem value="UNDER_REVIEW">Under Review</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Priority
+                  </label>
+                  <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All priorities" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All priorities</SelectItem>
+                      <SelectItem value="CRITICAL">Critical</SelectItem>
+                      <SelectItem value="HIGH">High</SelectItem>
+                      <SelectItem value="MEDIUM">Medium</SelectItem>
+                      <SelectItem value="LOW">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex items-end">
+                  <Button className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Control
+                  </Button>
                 </div>
               </div>
-              
-              <div className="flex gap-2">
-                <Button
-                  variant={statusFilter === "all" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStatusFilter("all")}
-                >
-                  All ({controls.length})
-                </Button>
-                <Button
-                  variant={statusFilter === "active" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStatusFilter("active")}
-                >
-                  Active ({getStatusCount("active")})
-                </Button>
-                <Button
-                  variant={statusFilter === "testing" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStatusFilter("testing")}
-                >
-                  Testing ({getStatusCount("testing")})
-                </Button>
-                <Button
-                  variant={statusFilter === "maintenance" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStatusFilter("maintenance")}
-                >
-                  Maintenance ({getStatusCount("maintenance")})
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Controls Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredControls.map((control) => (
-            <ControlCard
-              key={control.id}
-              control={control}
-              onView={handleViewControl}
-              onEdit={handleEditControl}
-              onVerify={handleVerifyControl}
-            />
-          ))}
-        </div>
-
-        {filteredControls.length === 0 && (
-          <Card className="text-center py-12">
-            <CardContent>
-              <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">No controls found</h3>
-              <p className="text-muted-foreground">
-                Try adjusting your search or filter criteria
-              </p>
             </CardContent>
           </Card>
-        )}
-      </main>
+
+          {/* Controls List */}
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {filteredControls.length} control{filteredControls.length !== 1 ? 's' : ''} found
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredControls.map((control) => (
+                  <Card key={control.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Shield className="h-5 w-5 mr-2" />
+                        {control.name}
+                      </CardTitle>
+                      <CardDescription>{control.description || 'No description'}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm">Status</span>
+                          <Badge variant="secondary" className={getStatusColor(control.complianceStatus)}>
+                            {control.complianceStatus}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Priority</span>
+                          <Badge variant="secondary" className={getPriorityColor(control.priority)}>
+                            {control.priority}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between text-xs text-gray-500">
+                          <span>Category: {control.riskCategory?.name || 'N/A'}</span>
+                          <span>Type: {control.controlType?.name || 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between text-xs text-gray-500">
+                          <span>Created: {formatDate(control.createdAt)}</span>
+                          <span>Updated: {formatDate(control.updatedAt)}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+                
+                {filteredControls.length === 0 && (
+                  <div className="col-span-full text-center py-8">
+                    <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500 mb-4">No controls found</p>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create First Control
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 } 

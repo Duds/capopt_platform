@@ -1,0 +1,1022 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// USER MANAGEMENT & AUTHENTICATION
+// ============================================================================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  createdProcesses    Process[]    @relation("ProcessCreator")
+  createdControls     CriticalControl[] @relation("ControlCreator")
+  createdAssets       Asset[]      @relation("AssetCreator")
+  maturityAssessments MaturityAssessment[] @relation("AssessmentCreator")
+  auditLogs          AuditLog[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  USER
+  AUDITOR
+  SUPERADMIN
+  SECURITY_OFFICER
+  DATA_STEWARD
+  PROCESS_OWNER
+  CONTROL_OWNER
+  VIEWER
+  EXTERNAL_AUDITOR
+  MAINTENANCE
+  DOCUMENTATION_SPECIALIST
+}
+
+// ============================================================================
+// STRATEGIC LAYER
+// ============================================================================
+
+model BusinessCanvas {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  version     String   @default("1.0")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  valuePropositions ValueProposition[]
+  customerSegments  CustomerSegment[]
+  revenueStreams    RevenueStream[]
+  partnerships      Partnership[]
+  resources         Resource[]
+  activities        Activity[]
+  costStructures    CostStructure[]
+  channels          Channel[]
+
+  @@map("business_canvases")
+}
+
+model ValueProposition {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  description     String
+  priority        Priority       @default(MEDIUM)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+
+  @@map("value_propositions")
+}
+
+model CustomerSegment {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  name            String
+  description     String?
+  size            Int?
+  priority        Priority       @default(MEDIUM)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+
+  @@map("customer_segments")
+}
+
+model RevenueStream {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  type            String
+  description     String?
+  estimatedValue  Float?
+  frequency       String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+
+  @@map("revenue_streams")
+}
+
+model Partnership {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  name            String
+  type            String?
+  description     String?
+  value           String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+
+  @@map("partnerships")
+}
+
+model Resource {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  name            String
+  type            ResourceType
+  description     String?
+  availability    String?
+  cost            Float?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+
+  @@map("resources")
+}
+
+model Activity {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  name            String
+  description     String?
+  priority        Priority       @default(MEDIUM)
+  cost            Float?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+
+  @@map("activities")
+}
+
+model CostStructure {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  description     String
+  category        String?
+  amount          Float?
+  frequency       String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+
+  @@map("cost_structures")
+}
+
+model Channel {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  type            String
+  description     String?
+  effectiveness   String?
+  cost            Float?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+
+  @@map("channels")
+}
+
+// Operating Model Canvas
+model OperatingModel {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  version     String   @default("1.0")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  valueChains     ValueChain[]
+  serviceModels   ServiceModel[]
+  experienceModels ExperienceModel[]
+  capabilityModels CapabilityModel[]
+  operatingPrinciples OperatingPrinciple[]
+
+  @@map("operating_models")
+}
+
+model ValueChain {
+  id              String        @id @default(cuid())
+  operatingModelId String
+  name            String
+  description     String?
+  sequence        Int
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relationships
+  operatingModel  OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+
+  @@map("value_chains")
+}
+
+model ServiceModel {
+  id              String        @id @default(cuid())
+  operatingModelId String
+  name            String
+  description     String?
+  type            String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relationships
+  operatingModel  OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+
+  @@map("service_models")
+}
+
+model ExperienceModel {
+  id              String        @id @default(cuid())
+  operatingModelId String
+  name            String
+  description     String?
+  touchpoints     String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relationships
+  operatingModel  OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+
+  @@map("experience_models")
+}
+
+model CapabilityModel {
+  id              String        @id @default(cuid())
+  operatingModelId String
+  name            String
+  description     String?
+  maturityLevel   MaturityLevel @default(INITIAL)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relationships
+  operatingModel  OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+
+  @@map("capability_models")
+}
+
+model OperatingPrinciple {
+  id              String        @id @default(cuid())
+  operatingModelId String
+  name            String
+  description     String?
+  priority        Priority      @default(MEDIUM)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relationships
+  operatingModel  OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+
+  @@map("operating_principles")
+}
+
+// ============================================================================
+// OPERATIONAL LAYER
+// ============================================================================
+
+model Process {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  version     String   @default("1.0")
+  status      ProcessStatus @default(DRAFT)
+  priority    Priority @default(MEDIUM)
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  createdBy       User           @relation("ProcessCreator", fields: [createdById], references: [id])
+  steps           ProcessStep[]
+  inputs          ProcessInput[]
+  outputs         ProcessOutput[]
+  metrics         ProcessMetric[]
+  risks           ProcessRisk[]
+  controls        ProcessControl[]
+  playbooks       ProcessPlaybook[]
+  maturityScores  ProcessMaturityScore[]
+
+  @@map("processes")
+}
+
+model ProcessStep {
+  id          String   @id @default(cuid())
+  processId   String
+  name        String
+  description String?
+  orderIndex  Int
+  duration    Int? // in minutes
+  responsible String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  process     Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  @@map("process_steps")
+}
+
+model ProcessInput {
+  id          String   @id @default(cuid())
+  processId   String
+  name        String
+  type        String?
+  description String?
+  required    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  process     Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  @@map("process_inputs")
+}
+
+model ProcessOutput {
+  id          String   @id @default(cuid())
+  processId   String
+  name        String
+  type        String?
+  description String?
+  quality     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  process     Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  @@map("process_outputs")
+}
+
+model ProcessMetric {
+  id          String   @id @default(cuid())
+  processId   String
+  name        String
+  value       Float
+  unit        String?
+  target      Float?
+  frequency   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  process     Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  @@map("process_metrics")
+}
+
+model ProcessRisk {
+  id          String      @id @default(cuid())
+  processId   String
+  name        String
+  description String?
+  severity    RiskSeverity
+  likelihood  RiskLikelihood @default(MEDIUM)
+  impact      RiskImpact     @default(MEDIUM)
+  mitigation  String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relationships
+  process     Process     @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  @@map("process_risks")
+}
+
+// Playbook Management
+model Playbook {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  version     String   @default("1.0")
+  status      PlaybookStatus @default(DRAFT)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  procedures      Procedure[]
+  trainingMaterials TrainingMaterial[]
+  bestPractices   BestPractice[]
+  improvements    Improvement[]
+  processes       ProcessPlaybook[]
+
+  @@map("playbooks")
+}
+
+model Procedure {
+  id          String   @id @default(cuid())
+  playbookId  String
+  name        String
+  description String?
+  steps       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  playbook    Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+
+  @@map("procedures")
+}
+
+model TrainingMaterial {
+  id          String   @id @default(cuid())
+  playbookId  String
+  title       String
+  type        String?
+  content     String?
+  url         String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  playbook    Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+
+  @@map("training_materials")
+}
+
+model BestPractice {
+  id          String   @id @default(cuid())
+  playbookId  String
+  name        String
+  description String?
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  playbook    Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+
+  @@map("best_practices")
+}
+
+model Improvement {
+  id          String   @id @default(cuid())
+  playbookId  String
+  name        String
+  description String?
+  status      ImprovementStatus @default(PROPOSED)
+  priority    Priority @default(MEDIUM)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  playbook    Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+
+  @@map("improvements")
+}
+
+// Maturity Assessment
+model MaturityAssessment {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  framework   String?
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  createdBy       User                @relation("AssessmentCreator", fields: [createdById], references: [id])
+  capabilityScores CapabilityScore[]
+  improvementRoadmaps ImprovementRoadmap[]
+  benchmarks     Benchmark[]
+  progress       Progress[]
+
+  @@map("maturity_assessments")
+}
+
+model CapabilityScore {
+  id                  String   @id @default(cuid())
+  maturityAssessmentId String
+  capability          String
+  score               Int
+  maxScore            Int      @default(5)
+  description         String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relationships
+  maturityAssessment  MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
+
+  @@map("capability_scores")
+}
+
+model ImprovementRoadmap {
+  id                  String   @id @default(cuid())
+  maturityAssessmentId String
+  name                String
+  description         String?
+  priority            Priority @default(MEDIUM)
+  targetDate          DateTime?
+  status              RoadmapStatus @default(PLANNED)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relationships
+  maturityAssessment  MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
+
+  @@map("improvement_roadmaps")
+}
+
+model Benchmark {
+  id                  String   @id @default(cuid())
+  maturityAssessmentId String
+  metric              String
+  value               Float
+  industry            String?
+  description         String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relationships
+  maturityAssessment  MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
+
+  @@map("benchmarks")
+}
+
+model Progress {
+  id                  String   @id @default(cuid())
+  maturityAssessmentId String
+  milestone           String
+  status              ProgressStatus @default(IN_PROGRESS)
+  completion          Float    @default(0) // percentage
+  notes               String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relationships
+  maturityAssessment  MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
+
+  @@map("progress")
+}
+
+// ============================================================================
+// CONTROL & RISK LAYER
+// ============================================================================
+
+model CriticalControl {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  riskCategoryId  String?
+  controlTypeId   String?
+  effectivenessId String?
+  complianceStatus ComplianceStatus @default(COMPLIANT)
+  priority        Priority @default(MEDIUM)
+  createdById     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  createdBy       User                @relation("ControlCreator", fields: [createdById], references: [id])
+  riskCategory    RiskCategory?       @relation(fields: [riskCategoryId], references: [id])
+  controlType     ControlType?        @relation(fields: [controlTypeId], references: [id])
+  effectiveness   ControlEffectiveness? @relation(fields: [effectivenessId], references: [id])
+  processes       ProcessControl[]
+  assets          AssetControl[]
+  bowtieAnalyses  BowtieAnalysis[]
+
+  @@map("critical_controls")
+}
+
+model RiskCategory {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  controls    CriticalControl[]
+
+  @@map("risk_categories")
+}
+
+model ControlType {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  controls    CriticalControl[]
+
+  @@map("control_types")
+}
+
+model ControlEffectiveness {
+  id          String   @id @default(cuid())
+  rating      String   // "Effective", "Needs Attention", "Critical"
+  description String?
+  score       Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  controls    CriticalControl[]
+
+  @@map("control_effectiveness")
+}
+
+// Bowtie Analysis
+model BowtieAnalysis {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  controlId   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  control     CriticalControl? @relation(fields: [controlId], references: [id])
+  threats     Threat[]
+  consequences Consequence[]
+  barriers    Barrier[]
+
+  @@map("bowtie_analyses")
+}
+
+model Threat {
+  id              String   @id @default(cuid())
+  bowtieAnalysisId String
+  name            String
+  description     String?
+  likelihood      RiskLikelihood @default(MEDIUM)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  bowtieAnalysis  BowtieAnalysis @relation(fields: [bowtieAnalysisId], references: [id], onDelete: Cascade)
+
+  @@map("threats")
+}
+
+model Consequence {
+  id              String   @id @default(cuid())
+  bowtieAnalysisId String
+  name            String
+  description     String?
+  severity        RiskSeverity
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  bowtieAnalysis  BowtieAnalysis @relation(fields: [bowtieAnalysisId], references: [id], onDelete: Cascade)
+
+  @@map("consequences")
+}
+
+model Barrier {
+  id              String   @id @default(cuid())
+  bowtieAnalysisId String
+  name            String
+  description     String?
+  type            BarrierType
+  effectiveness   BarrierEffectiveness @default(EFFECTIVE)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  bowtieAnalysis  BowtieAnalysis @relation(fields: [bowtieAnalysisId], references: [id], onDelete: Cascade)
+
+  @@map("barriers")
+}
+
+// Asset Management
+model Asset {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  type        AssetType
+  location    String?
+  status      AssetStatus @default(OPERATIONAL)
+  criticality AssetCriticality @default(MEDIUM)
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  createdBy       User          @relation("AssetCreator", fields: [createdById], references: [id])
+  controls        AssetControl[]
+  risks           AssetRisk[]
+  protections     AssetProtection[]
+  monitors        AssetMonitor[]
+  optimisations   AssetOptimisation[]
+
+  @@map("assets")
+}
+
+model AssetRisk {
+  id          String   @id @default(cuid())
+  assetId     String
+  name        String
+  description String?
+  severity    RiskSeverity
+  likelihood  RiskLikelihood @default(MEDIUM)
+  mitigation  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  asset       Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@map("asset_risks")
+}
+
+model AssetProtection {
+  id          String   @id @default(cuid())
+  assetId     String
+  name        String
+  measure     String?
+  type        String?
+  effectiveness String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  asset       Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@map("asset_protections")
+}
+
+model AssetMonitor {
+  id          String   @id @default(cuid())
+  assetId     String
+  name        String
+  type        String?
+  status      MonitorStatus @default(ACTIVE)
+  frequency   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  asset       Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@map("asset_monitors")
+}
+
+model AssetOptimisation {
+  id          String   @id @default(cuid())
+  assetId     String
+  name        String
+  opportunity String?
+  benefit     String?
+  cost        Float?
+  priority    Priority @default(MEDIUM)
+  status      OptimisationStatus @default(PROPOSED)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  asset       Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@map("asset_optimisations")
+}
+
+// ============================================================================
+// CROSS-ENTITY RELATIONSHIPS
+// ============================================================================
+
+model ProcessControl {
+  processId String
+  controlId String
+
+  // Relationships
+  process   Process        @relation(fields: [processId], references: [id], onDelete: Cascade)
+  control   CriticalControl @relation(fields: [controlId], references: [id], onDelete: Cascade)
+
+  @@id([processId, controlId])
+  @@map("process_controls")
+}
+
+model AssetControl {
+  assetId   String
+  controlId String
+
+  // Relationships
+  asset     Asset          @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  control   CriticalControl @relation(fields: [controlId], references: [id], onDelete: Cascade)
+
+  @@id([assetId, controlId])
+  @@map("asset_controls")
+}
+
+model ProcessPlaybook {
+  processId  String
+  playbookId String
+
+  // Relationships
+  process    Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+  playbook   Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+
+  @@id([processId, playbookId])
+  @@map("process_playbooks")
+}
+
+model ProcessMaturityScore {
+  processId String
+  capability String
+  score      Int
+  maxScore   Int      @default(5)
+  assessedAt DateTime @default(now())
+
+  // Relationships
+  process    Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  @@id([processId, capability])
+  @@map("process_maturity_scores")
+}
+
+// ============================================================================
+// AUDIT & TRACEABILITY
+// ============================================================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  entity    String
+  entityId  String
+  changes   Json?
+  timestamp DateTime @default(now())
+
+  // Relationships
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ProcessStatus {
+  DRAFT
+  ACTIVE
+  DEPRECATED
+  ARCHIVED
+}
+
+enum PlaybookStatus {
+  DRAFT
+  ACTIVE
+  DEPRECATED
+  ARCHIVED
+}
+
+enum ImprovementStatus {
+  PROPOSED
+  APPROVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum RoadmapStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  BLOCKED
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  NON_COMPLIANT
+  PARTIALLY_COMPLIANT
+  UNDER_REVIEW
+}
+
+enum BarrierType {
+  PREVENTIVE
+  DETECTIVE
+  CORRECTIVE
+  RECOVERY
+}
+
+enum BarrierEffectiveness {
+  EFFECTIVE
+  PARTIALLY_EFFECTIVE
+  INEFFECTIVE
+  UNKNOWN
+}
+
+enum AssetType {
+  EQUIPMENT
+  FACILITY
+  SYSTEM
+  PROCESS
+  PERSONNEL
+  INFORMATION
+}
+
+enum AssetStatus {
+  OPERATIONAL
+  MAINTENANCE
+  OFFLINE
+  RETIRED
+}
+
+enum AssetCriticality {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum MonitorStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+  FAILED
+}
+
+enum OptimisationStatus {
+  PROPOSED
+  APPROVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ResourceType {
+  HUMAN
+  FINANCIAL
+  PHYSICAL
+  INTELLECTUAL
+  DIGITAL
+}
+
+enum MaturityLevel {
+  INITIAL
+  REPEATABLE
+  DEFINED
+  MANAGED
+  OPTIMISING
+}
+
+enum RiskSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RiskLikelihood {
+  LOW
+  MEDIUM
+  HIGH
+  VERY_HIGH
+}
+
+enum RiskImpact {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}

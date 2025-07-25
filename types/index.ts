@@ -1,258 +1,492 @@
-// Core domain types for the petrochemical critical controls platform
+// Core domain types for the CapOpt Platform
 
-export interface Facility {
+// API-compatible types based on Prisma schema
+export interface User {
   id: string
+  email: string
   name: string
-  code: string
-  type: 'refinery' | 'chemical_plant' | 'terminal' | 'storage_facility'
-  location: {
-    lat: number
-    lng: number
-    address: string
-  }
-  timezone: string
-  status: 'active' | 'inactive' | 'maintenance' | 'emergency'
-  units: Unit[]
-  createdAt: Date
-  updatedAt: Date
-}
-
-export interface Unit {
-  id: string
-  facilityId: string
-  name: string
-  code: string
-  type: 'distillation' | 'reactor' | 'storage' | 'piping' | 'compressor' | 'pump'
-  location: {
-    x: number
-    y: number
-    width: number
-    height: number
-  }
-  capacity: {
-    value: number
-    unit: string
-  }
-  status: 'active' | 'inactive' | 'maintenance' | 'emergency'
-  controls: CriticalControl[]
+  role: 'ADMIN' | 'MANAGER' | 'USER' | 'AUDITOR' | 'SUPERADMIN' | 'SECURITY_OFFICER' | 'DATA_STEWARD' | 'PROCESS_OWNER' | 'CONTROL_OWNER' | 'VIEWER' | 'EXTERNAL_AUDITOR' | 'MAINTENANCE' | 'DOCUMENTATION_SPECIALIST'
+  isActive: boolean
+  lastLogin?: Date
   createdAt: Date
   updatedAt: Date
 }
 
 export interface CriticalControl {
   id: string
-  facilityId: string
-  unitId?: string
   name: string
-  code: string
-  type: 'engineering' | 'administrative' | 'ppe' | 'monitoring'
-  category: 'prevention' | 'mitigation' | 'detection'
-  description: string
-  location: {
-    x: number
-    y: number
-  }
-  specifications: {
-    manufacturer?: string
-    model?: string
-    serialNumber?: string
-    installationDate?: Date
-    lastCalibration?: Date
-    nextCalibration?: Date
-  }
-  hazards: string[]
-  status: 'active' | 'inactive' | 'maintenance' | 'testing' | 'failed'
-  priority: 1 | 2 | 3 | 4 | 5
-  currentStatus: ControlStatus
-  verificationSchedule: VerificationSchedule
-  performance: PerformanceMetrics
+  description?: string
+  riskCategoryId?: string
+  controlTypeId?: string
+  effectivenessId?: string
+  complianceStatus?: 'COMPLIANT' | 'NON_COMPLIANT' | 'PARTIALLY_COMPLIANT' | 'UNDER_REVIEW'
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdById: string
+  createdAt: Date
+  updatedAt: Date
+  
+  // Relations
+  riskCategory?: RiskCategory
+  controlType?: ControlType
+  effectiveness?: ControlEffectiveness
+  createdBy?: User
+  processes?: Process[]
+  assets?: Asset[]
+  bowtieAnalyses?: BowtieAnalysis[]
+}
+
+export interface RiskCategory {
+  id: string
+  name: string
+  description?: string
+  color?: string
   createdAt: Date
   updatedAt: Date
 }
 
-export interface ControlStatus {
+export interface ControlType {
   id: string
-  controlId: string
-  status: 'active' | 'testing' | 'maintenance' | 'failed'
-  reliability: number // 0-100
-  availability: number // 0-100
-  effectiveness: number // 0-100
-  lastVerified: Date
-  nextVerificationDue: Date
-  verifiedBy: string
-  notes: string
-  createdAt: Date
-}
-
-export interface VerificationSchedule {
-  id: string
-  controlId: string
-  frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'annually'
-  frequencyValue: number
-  lastVerified: Date
-  nextDue: Date
-  responsibleRole: string
-  checklistTemplateId?: string
-  status: 'active' | 'inactive'
+  name: string
+  description?: string
+  category?: string
   createdAt: Date
   updatedAt: Date
 }
 
-export interface VerificationWorkflow {
+export interface ControlEffectiveness {
   id: string
-  scheduleId: string
-  controlId: string
-  status: 'pending' | 'in_progress' | 'completed' | 'failed'
-  startedAt: Date
-  completedAt?: Date
-  startedBy: string
-  completedBy?: string
-  result?: 'pass' | 'fail' | 'conditional'
-  notes: string
-  checklist: VerificationChecklist[]
+  rating: string
+  description?: string
+  score?: number
   createdAt: Date
+  updatedAt: Date
 }
 
-export interface VerificationChecklist {
+export interface Process {
   id: string
-  workflowId: string
-  question: string
-  type: 'yes_no' | 'numeric' | 'text' | 'photo'
-  required: boolean
-  answer?: string
-  photoUrl?: string
-  completed: boolean
-  completedAt?: Date
+  name: string
+  description?: string
+  version?: string
+  status?: 'DRAFT' | 'ACTIVE' | 'DEPRECATED' | 'ARCHIVED'
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdById: string
+  createdAt: Date
+  updatedAt: Date
+  
+  // Relations
+  createdBy?: User
+  steps?: ProcessStep[]
+  inputs?: ProcessInput[]
+  outputs?: ProcessOutput[]
+  metrics?: ProcessMetric[]
+  risks?: ProcessRisk[]
+  controls?: CriticalControl[]
+  playbooks?: Playbook[]
+  maturityScores?: MaturityAssessment[]
 }
 
-export interface PerformanceMetrics {
+export interface ProcessStep {
   id: string
-  controlId: string
-  metricType: 'reliability' | 'availability' | 'effectiveness'
+  processId: string
+  name: string
+  description?: string
+  orderIndex: number
+  duration?: number
+  responsible?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ProcessInput {
+  id: string
+  processId: string
+  name: string
+  type?: string
+  description?: string
+  required?: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ProcessOutput {
+  id: string
+  processId: string
+  name: string
+  type?: string
+  description?: string
+  quality?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ProcessMetric {
+  id: string
+  processId: string
+  name: string
   value: number
-  unit: string
-  timestamp: Date
+  unit?: string
+  target?: number
+  frequency?: string
   createdAt: Date
+  updatedAt: Date
+}
+
+export interface ProcessRisk {
+  id: string
+  processId: string
+  name: string
+  description?: string
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  likelihood?: 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH'
+  impact?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  mitigation?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Asset {
+  id: string
+  name: string
+  description?: string
+  type: 'EQUIPMENT' | 'FACILITY' | 'SYSTEM' | 'INFRASTRUCTURE' | 'VEHICLE' | 'TOOL'
+  location?: string
+  status: 'OPERATIONAL' | 'MAINTENANCE' | 'OUT_OF_SERVICE' | 'RETIRED'
+  criticality: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdById: string
+  createdAt: Date
+  updatedAt: Date
+  
+  // Relations
+  createdBy?: User
+  risks?: AssetRisk[]
+  protections?: AssetProtection[]
+  monitors?: AssetMonitor[]
+  optimisations?: AssetOptimisation[]
+  controls?: CriticalControl[]
+}
+
+export interface AssetRisk {
+  id: string
+  assetId: string
+  name: string
+  description?: string
+  likelihood: 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH'
+  impact: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  mitigation?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface AssetProtection {
+  id: string
+  assetId: string
+  name: string
+  description?: string
+  type: 'PHYSICAL' | 'CYBER' | 'PROCEDURAL' | 'TECHNICAL'
+  effectiveness?: 'EFFECTIVE' | 'PARTIALLY_EFFECTIVE' | 'INEFFECTIVE' | 'UNKNOWN'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface AssetMonitor {
+  id: string
+  assetId: string
+  name: string
+  description?: string
+  type: 'CONTINUOUS' | 'PERIODIC' | 'EVENT_DRIVEN'
+  status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE' | 'FAILED'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface AssetOptimisation {
+  id: string
+  assetId: string
+  name: string
+  description?: string
+  type: 'PERFORMANCE' | 'EFFICIENCY' | 'RELIABILITY' | 'COST'
+  status: 'PROPOSED' | 'APPROVED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface BusinessCanvas {
+  id: string
+  name: string
+  description?: string
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+  
+  // Relations
+  valuePropositions?: ValueProposition[]
+  customerSegments?: CustomerSegment[]
+  revenueStreams?: RevenueStream[]
+  partnerships?: Partnership[]
+  resources?: Resource[]
+  activities?: Activity[]
+  costStructure?: CostStructure[]
+  channels?: Channel[]
+}
+
+export interface ValueProposition {
+  id: string
+  businessCanvasId: string
+  name: string
+  description?: string
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface CustomerSegment {
+  id: string
+  businessCanvasId: string
+  name: string
+  description?: string
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface RevenueStream {
+  id: string
+  businessCanvasId: string
+  name: string
+  description?: string
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Partnership {
+  id: string
+  businessCanvasId: string
+  name: string
+  description?: string
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Resource {
+  id: string
+  businessCanvasId: string
+  name: string
+  description?: string
+  type?: 'PHYSICAL' | 'INTELLECTUAL' | 'HUMAN' | 'FINANCIAL'
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Activity {
+  id: string
+  businessCanvasId: string
+  name: string
+  description?: string
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface CostStructure {
+  id: string
+  businessCanvasId: string
+  name: string
+  description?: string
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Channel {
+  id: string
+  businessCanvasId: string
+  name: string
+  description?: string
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Playbook {
+  id: string
+  name: string
+  description?: string
+  version?: string
+  status?: 'DRAFT' | 'ACTIVE' | 'DEPRECATED' | 'ARCHIVED'
+  createdAt: Date
+  updatedAt: Date
+  
+  // Relations
+  procedures?: Procedure[]
+  trainingMaterials?: TrainingMaterial[]
+  bestPractices?: BestPractice[]
+  improvements?: Improvement[]
+  processes?: Process[]
 }
 
 export interface Procedure {
   id: string
-  facilityId: string
-  title: string
-  code: string
-  type: 'operational' | 'emergency' | 'maintenance' | 'safety'
-  category: string
-  version: string
-  status: 'draft' | 'review' | 'approved' | 'archived'
-  content: {
-    steps: ProcedureStep[]
-    attachments: ProcedureAttachment[]
-    relatedControls: string[]
-    relatedHazards: string[]
-  }
-  approvalWorkflow: {
-    steps: ApprovalStep[]
-    currentStep: number
-  }
-  createdBy: string
-  approvedBy?: string
-  approvedAt?: Date
+  playbookId: string
+  name: string
+  description?: string
+  steps?: string
   createdAt: Date
   updatedAt: Date
 }
 
-export interface ProcedureStep {
+export interface TrainingMaterial {
   id: string
-  order: number
+  playbookId: string
   title: string
-  description: string
-  type: 'instruction' | 'checkpoint' | 'decision' | 'action'
-  required: boolean
-  estimatedTime?: number // minutes
-  relatedControls?: string[]
-  attachments?: string[]
+  type?: string
+  content?: string
+  url?: string
+  createdAt: Date
+  updatedAt: Date
 }
 
-export interface ProcedureAttachment {
+export interface BestPractice {
+  id: string
+  playbookId: string
+  name: string
+  description?: string
+  category?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Improvement {
+  id: string
+  playbookId: string
+  name: string
+  description?: string
+  status?: 'PROPOSED' | 'APPROVED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface MaturityAssessment {
   id: string
   name: string
-  type: 'image' | 'document' | 'video'
-  url: string
-  size: number
-  uploadedAt: Date
+  description?: string
+  framework: string
+  createdById: string
+  createdAt: Date
+  updatedAt: Date
+  
+  // Relations
+  createdBy?: User
+  capabilityScores?: CapabilityScore[]
+  improvementRoadmaps?: ImprovementRoadmap[]
+  benchmarks?: Benchmark[]
+  progress?: Progress[]
 }
 
-export interface ApprovalStep {
+export interface CapabilityScore {
   id: string
-  order: number
-  role: string
-  status: 'pending' | 'approved' | 'rejected'
-  approvedBy?: string
-  approvedAt?: Date
-  comments?: string
-}
-
-export interface User {
-  id: string
-  email: string
-  firstName: string
-  lastName: string
-  role: 'operator' | 'supervisor' | 'engineer' | 'manager' | 'admin'
-  facilityId: string
-  department: string
-  permissions: string[]
-  status: 'active' | 'inactive'
-  lastLogin?: Date
+  maturityAssessmentId: string
+  capability: string
+  score: number
+  level: 'INITIAL' | 'REPEATABLE' | 'DEFINED' | 'MANAGED' | 'OPTIMISING'
+  description?: string
   createdAt: Date
   updatedAt: Date
 }
 
-export interface Alert {
+export interface ImprovementRoadmap {
   id: string
-  facilityId: string
+  maturityAssessmentId: string
+  name: string
+  description?: string
+  targetLevel: 'INITIAL' | 'REPEATABLE' | 'DEFINED' | 'MANAGED' | 'OPTIMISING'
+  status?: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'ON_HOLD'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Benchmark {
+  id: string
+  maturityAssessmentId: string
+  name: string
+  description?: string
+  score: number
+  industry?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Progress {
+  id: string
+  maturityAssessmentId: string
+  milestone: string
+  status?: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'BLOCKED'
+  completionDate?: Date
+  notes?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface BowtieAnalysis {
+  id: string
+  name: string
+  description?: string
   controlId?: string
-  type: 'control_failure' | 'verification_due' | 'maintenance_required' | 'safety_incident'
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  title: string
-  description: string
-  status: 'active' | 'acknowledged' | 'resolved'
-  acknowledgedBy?: string
-  acknowledgedAt?: Date
-  resolvedBy?: string
-  resolvedAt?: Date
   createdAt: Date
+  updatedAt: Date
+  
+  // Relations
+  control?: CriticalControl
+  threats?: Threat[]
+  consequences?: Consequence[]
+  barriers?: Barrier[]
 }
 
-export interface MaintenanceSchedule {
+export interface Threat {
   id: string
-  controlId: string
-  type: 'preventive' | 'corrective' | 'predictive'
-  frequency: string
-  lastMaintenance?: Date
-  nextMaintenance: Date
-  estimatedDuration: number // minutes
-  requiredPersonnel: number
-  requiredEquipment: string[]
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
+  bowtieAnalysisId: string
+  name: string
+  description?: string
+  likelihood?: 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH'
   createdAt: Date
   updatedAt: Date
 }
 
-export interface MaintenanceWorkOrder {
+export interface Consequence {
   id: string
-  scheduleId: string
-  controlId: string
-  title: string
-  description: string
-  priority: 'low' | 'normal' | 'high' | 'critical'
-  status: 'open' | 'assigned' | 'in_progress' | 'completed' | 'cancelled'
-  assignedTo?: string
-  estimatedStart: Date
-  estimatedEnd: Date
-  actualStart?: Date
-  actualEnd?: Date
+  bowtieAnalysisId: string
+  name: string
+  description?: string
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
   createdAt: Date
   updatedAt: Date
+}
+
+export interface Barrier {
+  id: string
+  bowtieAnalysisId: string
+  name: string
+  description?: string
+  type: 'PREVENTIVE' | 'DETECTIVE' | 'CORRECTIVE' | 'RECOVERY'
+  effectiveness?: 'EFFECTIVE' | 'PARTIALLY_EFFECTIVE' | 'INEFFECTIVE' | 'UNKNOWN'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface AuditLog {
+  id: string
+  userId: string
+  action: string
+  entityType: string
+  entityId: string
+  details?: string
+  timestamp: Date
+  
+  // Relations
+  user?: User
 }
 
 // API Response types
@@ -276,79 +510,82 @@ export interface PaginatedResponse<T> {
 export interface DashboardMetrics {
   totalControls: number
   activeControls: number
-  criticalAlerts: number
-  pendingVerifications: number
-  facilityStatus: 'normal' | 'alert' | 'emergency'
-  performanceScore: number
-}
-
-export interface FacilityOverview {
-  facility: Facility
-  metrics: DashboardMetrics
-  recentAlerts: Alert[]
-  upcomingMaintenance: MaintenanceSchedule[]
-  controlsByStatus: Record<string, number>
-}
-
-// Real-time types
-export interface RealTimeUpdate {
-  type: 'control_status' | 'alert' | 'verification' | 'maintenance'
-  data: any
-  timestamp: Date
+  totalProcesses: number
+  activeProcesses: number
+  totalAssets: number
+  operationalAssets: number
+  maturityScore: number
 }
 
 // Form types
 export interface ControlFormData {
   name: string
-  code: string
-  type: CriticalControl['type']
-  category: CriticalControl['category']
-  description: string
-  unitId?: string
-  hazards: string[]
-  priority: CriticalControl['priority']
-  specifications: CriticalControl['specifications']
+  description?: string
+  riskCategoryId?: string
+  controlTypeId?: string
+  effectivenessId?: string
+  complianceStatus?: CriticalControl['complianceStatus']
+  priority?: CriticalControl['priority']
 }
 
-export interface VerificationFormData {
-  controlId: string
-  status: ControlStatus['status']
-  reliability: number
-  availability: number
-  effectiveness: number
-  notes: string
-  checklist: VerificationChecklist[]
+export interface ProcessFormData {
+  name: string
+  description?: string
+  version?: string
+  status?: Process['status']
+  priority?: Process['priority']
+  steps?: ProcessStep[]
+  inputs?: ProcessInput[]
+  outputs?: ProcessOutput[]
+  metrics?: ProcessMetric[]
+  risks?: ProcessRisk[]
+}
+
+export interface AssetFormData {
+  name: string
+  description?: string
+  type: Asset['type']
+  location?: string
+  status: Asset['status']
+  criticality: Asset['criticality']
+  risks?: AssetRisk[]
+  protections?: AssetProtection[]
+  monitors?: AssetMonitor[]
+  optimisations?: AssetOptimisation[]
 }
 
 // Filter and search types
 export interface ControlFilters {
-  status?: CriticalControl['status']
-  type?: CriticalControl['type']
+  riskCategoryId?: string
+  controlTypeId?: string
   priority?: CriticalControl['priority']
-  unitId?: string
-  verificationDue?: boolean
+  complianceStatus?: CriticalControl['complianceStatus']
 }
 
-export interface AlertFilters {
-  severity?: Alert['severity']
-  type?: Alert['type']
-  status?: Alert['status']
-  facilityId?: string
+export interface ProcessFilters {
+  status?: Process['status']
+  priority?: Process['priority']
+  createdById?: string
+}
+
+export interface AssetFilters {
+  type?: Asset['type']
+  status?: Asset['status']
+  criticality?: Asset['criticality']
+  createdById?: string
 }
 
 // Chart and analytics types
 export interface PerformanceTrend {
   date: Date
-  reliability: number
-  availability: number
-  effectiveness: number
+  value: number
+  metric: string
 }
 
 export interface ControlPerformance {
   controlId: string
   controlName: string
-  averageReliability: number
-  averageAvailability: number
-  averageEffectiveness: number
+  complianceStatus: CriticalControl['complianceStatus']
+  priority: CriticalControl['priority']
   trend: PerformanceTrend[]
 } 

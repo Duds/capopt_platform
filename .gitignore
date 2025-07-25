@@ -20,3 +20,5 @@ out/
 # Logs
 *.log
 npm-debug.log*
+
+/lib/generated/prisma

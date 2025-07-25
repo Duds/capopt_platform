@@ -1,288 +1,350 @@
-"use client"
+'use client'
 
-import { useState, useRef, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import React, { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { 
-  ZoomIn, 
-  ZoomOut, 
-  RotateCcw, 
+  MapPin, 
+  Building, 
+  Settings, 
+  Shield, 
+  AlertTriangle, 
+  CheckCircle, 
+  Clock,
   Eye,
-  Settings,
-  AlertTriangle,
-  CheckCircle,
-  Clock
-} from "lucide-react"
-import { Facility, Unit, CriticalControl } from "@/types"
-import { cn, getStatusColor } from "@/lib/utils"
+  Edit,
+  Plus
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { getStatusColor } from '@/lib/api'
+
+interface Asset {
+  id: string
+  name: string
+  description: string | null
+  type: string
+  location: string | null
+  status: string
+  criticality: string
+}
+
+interface CriticalControl {
+  id: string
+  name: string
+  description: string | null
+  complianceStatus: string
+  priority: string
+}
+
+interface Unit {
+  id: string
+  name: string
+  description: string | null
+  assets: Asset[]
+  controls: CriticalControl[]
+}
+
+interface Facility {
+  id: string
+  name: string
+  description: string | null
+  units: Unit[]
+}
 
 interface FacilityMapProps {
   facility: Facility
-  onUnitClick?: (unit: Unit) => void
-  onControlClick?: (control: CriticalControl) => void
-  selectedUnitId?: string
-  selectedControlId?: string
+  onViewAsset?: (asset: Asset) => void
+  onEditAsset?: (asset: Asset) => void
+  onViewControl?: (control: CriticalControl) => void
+  onEditControl?: (control: CriticalControl) => void
+  onAddAsset?: (unitId: string) => void
+  onAddControl?: (unitId: string) => void
 }
 
 export function FacilityMap({ 
   facility, 
-  onUnitClick, 
-  onControlClick, 
-  selectedUnitId,
-  selectedControlId 
+  onViewAsset, 
+  onEditAsset, 
+  onViewControl, 
+  onEditControl,
+  onAddAsset,
+  onAddControl
 }: FacilityMapProps) {
-  const [zoom, setZoom] = useState(1)
-  const [pan, setPan] = useState({ x: 0, y: 0 })
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-  const mapRef = useRef<HTMLDivElement>(null)
+  const [selectedUnit, setSelectedUnit] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState<'overview' | 'detailed'>('overview')
 
-  const handleZoomIn = () => setZoom(prev => Math.min(prev * 1.2, 3))
-  const handleZoomOut = () => setZoom(prev => Math.max(prev / 1.2, 0.5))
-  const handleReset = () => {
-    setZoom(1)
-    setPan({ x: 0, y: 0 })
-  }
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true)
-    setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y })
-  }
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging) {
-      setPan({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
-      })
+  const getAssetTypeIcon = (type: string) => {
+    switch (type) {
+      case 'EQUIPMENT':
+        return <Settings className="h-4 w-4" />
+      case 'INFRASTRUCTURE':
+        return <Building className="h-4 w-4" />
+      case 'VEHICLE':
+        return <MapPin className="h-4 w-4" />
+      case 'SYSTEM':
+        return <Shield className="h-4 w-4" />
+      default:
+        return <Settings className="h-4 w-4" />
     }
-  }
-
-  const handleMouseUp = () => {
-    setIsDragging(false)
   }
 
   const getControlStatusIcon = (status: string) => {
     switch (status) {
-      case 'active':
-        return <CheckCircle className="h-3 w-3 text-control-active" />
-      case 'testing':
-        return <Clock className="h-3 w-3 text-control-testing" />
-      case 'maintenance':
-        return <Settings className="h-3 w-3 text-control-maintenance" />
-      case 'failed':
-        return <AlertTriangle className="h-3 w-3 text-control-critical" />
+      case 'COMPLIANT':
+        return <CheckCircle className="h-4 w-4 text-green-600" />
+      case 'PARTIALLY_COMPLIANT':
+        return <AlertTriangle className="h-4 w-4 text-yellow-600" />
+      case 'NON_COMPLIANT':
+        return <AlertTriangle className="h-4 w-4 text-red-600" />
+      case 'UNDER_REVIEW':
+        return <Clock className="h-4 w-4 text-blue-600" />
       default:
-        return <Eye className="h-3 w-3 text-muted-foreground" />
+        return <Clock className="h-4 w-4 text-gray-600" />
     }
   }
 
-  const getUnitStatusColor = (status: string) => {
+  const getAssetStatusIcon = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'border-control-active bg-control-active/10'
-      case 'maintenance':
-        return 'border-control-maintenance bg-control-maintenance/10'
-      case 'emergency':
-        return 'border-control-critical bg-control-critical/10'
+      case 'OPERATIONAL':
+        return <CheckCircle className="h-4 w-4 text-green-600" />
+      case 'MAINTENANCE':
+        return <Clock className="h-4 w-4 text-yellow-600" />
+      case 'OUT_OF_SERVICE':
+        return <AlertTriangle className="h-4 w-4 text-red-600" />
       default:
-        return 'border-muted bg-muted/10'
+        return <Clock className="h-4 w-4 text-gray-600" />
     }
   }
 
   return (
-    <Card className="w-full h-full">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center space-x-2">
-            <Settings className="h-5 w-5" />
-            <span>{facility.name} - Facility Map</span>
-          </CardTitle>
-          
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" onClick={handleZoomOut}>
-              <ZoomOut className="h-4 w-4" />
-            </Button>
-            <Badge variant="outline" className="min-w-[60px] justify-center">
-              {Math.round(zoom * 100)}%
-            </Badge>
-            <Button variant="outline" size="sm" onClick={handleZoomIn}>
-              <ZoomIn className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleReset}>
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-          </div>
+    <div className="space-y-6">
+      {/* Facility Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">{facility.name}</h2>
+          <p className="text-gray-600">{facility.description}</p>
         </div>
-      </CardHeader>
-
-      <CardContent className="p-0">
-        <div 
-          ref={mapRef}
-          className="facility-map relative w-full h-[600px] overflow-hidden cursor-grab active:cursor-grabbing"
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-        >
-          {/* Map Background */}
-          <div 
-            className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100"
-            style={{
-              transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
-              transformOrigin: 'center',
-              transition: isDragging ? 'none' : 'transform 0.1s ease-out'
-            }}
+        <div className="flex items-center space-x-2">
+          <Button
+            variant={viewMode === 'overview' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('overview')}
           >
-            {/* Grid Lines */}
-            <div className="absolute inset-0 opacity-20">
-              <svg width="100%" height="100%">
-                <defs>
-                  <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                    <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" strokeWidth="1"/>
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#grid)" />
-              </svg>
-            </div>
+            Overview
+          </Button>
+          <Button
+            variant={viewMode === 'detailed' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('detailed')}
+          >
+            Detailed
+          </Button>
+        </div>
+      </div>
 
-            {/* Facility Units */}
-            {facility.units.map((unit) => (
-              <div
-                key={unit.id}
-                className={cn(
-                  "facility-unit absolute border-2 rounded-lg cursor-pointer transition-all duration-200",
-                  getUnitStatusColor(unit.status),
-                  selectedUnitId === unit.id && "ring-2 ring-facility-accent ring-offset-2",
-                  "hover:shadow-lg hover:scale-105"
-                )}
-                style={{
-                  left: `${unit.location.x}%`,
-                  top: `${unit.location.y}%`,
-                  width: `${unit.location.width}%`,
-                  height: `${unit.location.height}%`,
-                }}
-                onClick={() => onUnitClick?.(unit)}
-              >
-                <div className="absolute inset-0 p-2">
-                  <div className="flex items-center justify-between">
-                    <div className="text-xs font-medium truncate">
-                      {unit.name}
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="text-xs capitalize"
-                    >
-                      {unit.status}
-                    </Badge>
-                  </div>
-                  
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {unit.type}
-                  </div>
-
-                  {/* Controls within unit */}
-                  <div className="absolute bottom-1 right-1 flex items-center space-x-1">
-                    {unit.controls.slice(0, 3).map((control) => (
-                      <div
-                        key={control.id}
-                        className={cn(
-                          "w-2 h-2 rounded-full cursor-pointer transition-all duration-200",
-                          "hover:scale-125 hover:shadow-sm",
-                          selectedControlId === control.id && "ring-2 ring-white ring-offset-1",
-                          control.status === 'active' && "bg-control-active",
-                          control.status === 'testing' && "bg-control-testing",
-                          control.status === 'maintenance' && "bg-control-maintenance",
-                          control.status === 'failed' && "bg-control-critical animate-pulse"
-                        )}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onControlClick?.(control)
-                        }}
-                        title={`${control.name} - ${control.status}`}
-                      />
-                    ))}
-                    {unit.controls.length > 3 && (
-                      <div className="text-xs text-muted-foreground">
-                        +{unit.controls.length - 3}
+      {/* Units Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {facility.units.map((unit) => (
+          <Card 
+            key={unit.id} 
+            className={cn(
+              "hover:shadow-md transition-shadow cursor-pointer",
+              selectedUnit === unit.id && "ring-2 ring-blue-500"
+            )}
+            onClick={() => setSelectedUnit(selectedUnit === unit.id ? null : unit.id)}
+          >
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center">
+                  <Building className="h-5 w-5 mr-2" />
+                  {unit.name}
+                </CardTitle>
+                <Badge variant="outline">
+                  {unit.assets.length} assets
+                </Badge>
+              </div>
+              <CardDescription>{unit.description}</CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              {/* Assets in Unit */}
+              <div>
+                <h4 className="font-medium text-sm mb-2">Assets</h4>
+                <div className="space-y-2">
+                  {unit.assets.slice(0, 3).map((asset) => (
+                    <div key={asset.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div className="flex items-center space-x-2">
+                        {getAssetTypeIcon(asset.type)}
+                        <span className="text-sm font-medium">{asset.name}</span>
                       </div>
-                    )}
-                  </div>
+                      <div className="flex items-center space-x-1">
+                        {getAssetStatusIcon(asset.status)}
+                        <Badge variant="outline" className={getStatusColor(asset.status)}>
+                          {asset.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                  {unit.assets.length > 3 && (
+                    <div className="text-sm text-gray-500 text-center">
+                      +{unit.assets.length - 3} more assets
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Controls in Unit */}
+              <div>
+                <h4 className="font-medium text-sm mb-2">Controls</h4>
+                <div className="space-y-2">
+                  {unit.controls.slice(0, 3).map((control) => (
+                    <div key={control.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div className="flex items-center space-x-2">
+                        <Shield className="h-4 w-4" />
+                        <span className="text-sm font-medium">{control.name}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        {getControlStatusIcon(control.complianceStatus)}
+                        <Badge variant="outline" className={getStatusColor(control.complianceStatus)}>
+                          {control.complianceStatus}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                  {unit.controls.length > 3 && (
+                    <div className="text-sm text-gray-500 text-center">
+                      +{unit.controls.length - 3} more controls
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between pt-2 border-t">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onAddAsset?.(unit.id)
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Asset
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onAddControl?.(unit.id)
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Control
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Facility-wide Controls */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Facility-wide Controls</CardTitle>
+          <CardDescription>
+            Controls that apply to the entire facility
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {facility.units.flatMap(unit => unit.controls).filter(control => !control.id.includes('unit')).map((control) => (
+              <div key={control.id} className="flex items-center justify-between p-3 border rounded">
+                <div className="flex items-center space-x-2">
+                  <Shield className="h-4 w-4" />
+                  <span className="font-medium">{control.name}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {getControlStatusIcon(control.complianceStatus)}
+                  <Badge variant="outline" className={getStatusColor(control.complianceStatus)}>
+                    {control.complianceStatus}
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onViewControl?.(control)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ))}
-
-            {/* Standalone Controls (not in units) */}
-            {facility.units.flatMap(unit => unit.controls).filter(control => !control.unitId).map((control) => (
-              <div
-                key={control.id}
-                className={cn(
-                  "absolute w-4 h-4 rounded-full cursor-pointer transition-all duration-200",
-                  "hover:scale-125 hover:shadow-lg",
-                  selectedControlId === control.id && "ring-2 ring-white ring-offset-1",
-                  control.status === 'active' && "bg-control-active",
-                  control.status === 'testing' && "bg-control-testing",
-                  control.status === 'maintenance' && "bg-control-maintenance",
-                  control.status === 'failed' && "bg-control-critical animate-pulse"
-                )}
-                style={{
-                  left: `${control.location.x}%`,
-                  top: `${control.location.y}%`,
-                }}
-                onClick={() => onControlClick?.(control)}
-                title={`${control.name} - ${control.status}`}
-              />
-            ))}
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Legend */}
-          <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm rounded-lg p-3 border">
-            <div className="text-xs font-medium mb-2">Legend</div>
-            <div className="space-y-1 text-xs">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-control-active rounded-full"></div>
-                <span>Active</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-control-testing rounded-full"></div>
-                <span>Testing</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-control-maintenance rounded-full"></div>
-                <span>Maintenance</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-control-critical rounded-full"></div>
-                <span>Critical</span>
-              </div>
+      {/* Facility Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Units</CardTitle>
+            <Building className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{facility.units.length}</div>
+            <p className="text-xs text-muted-foreground">
+              Operational units
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
+            <Settings className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {facility.units.reduce((sum, unit) => sum + unit.assets.length, 0)}
             </div>
-          </div>
+            <p className="text-xs text-muted-foreground">
+              All assets
+            </p>
+          </CardContent>
+        </Card>
 
-          {/* Status Summary */}
-          <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm rounded-lg p-3 border">
-            <div className="text-xs font-medium mb-2">Status</div>
-            <div className="space-y-1 text-xs">
-              <div className="flex items-center justify-between">
-                <span>Total Units:</span>
-                <span className="font-medium">{facility.units.length}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Total Controls:</span>
-                <span className="font-medium">
-                  {facility.units.reduce((sum, unit) => sum + unit.controls.length, 0)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Active:</span>
-                <span className="font-medium text-control-active">
-                  {facility.units.flatMap(u => u.controls).filter(c => c.status === 'active').length}
-                </span>
-              </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Controls</CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {facility.units.flatMap(u => u.controls).filter(c => c.complianceStatus === 'COMPLIANT').length}
             </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+            <p className="text-xs text-muted-foreground">
+              Compliant controls
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Operational Assets</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {facility.units.flatMap(u => u.assets).filter(a => a.status === 'OPERATIONAL').length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Currently operational
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   )
 } 
