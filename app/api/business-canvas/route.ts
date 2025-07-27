@@ -26,10 +26,10 @@ export async function GET(request: NextRequest) {
       where.businessUnitId = businessUnitId
     }
 
-    // Build include clause with enhanced relationships
+    // Build include clause with basic relationships only
     const includeClause: any = {}
 
-    // Canvas content relationships
+    // Canvas content relationships (these should always exist)
     if (include.includes('valuePropositions')) {
       includeClause.valuePropositions = true
     }
@@ -55,87 +55,8 @@ export async function GET(request: NextRequest) {
       includeClause.channels = true
     }
 
-    // Enterprise context relationships
-    if (include.includes('enterprise')) {
-      includeClause.enterprise = true
-    }
-    if (include.includes('facility')) {
-      includeClause.facility = true
-    }
-    if (include.includes('businessUnit')) {
-      includeClause.businessUnit = true
-    }
-
-    // Version control and collaboration relationships
-    if (include.includes('versions')) {
-      includeClause.versions = {
-        include: {
-          createdBy: {
-            select: {
-              id: true,
-              name: true,
-              email: true
-            }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc'
-        }
-      }
-    }
-    if (include.includes('collaborators')) {
-      includeClause.collaborators = {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true
-            }
-          }
-        },
-        where: {
-          isActive: true
-        }
-      }
-    }
-    if (include.includes('sharingSettings')) {
-      includeClause.sharingSettings = {
-        where: {
-          isActive: true
-        }
-      }
-    }
-    if (include.includes('exportHistory')) {
-      includeClause.exportHistory = {
-        include: {
-          exportedBy: {
-            select: {
-              id: true,
-              name: true,
-              email: true
-            }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc'
-        },
-        take: 10 // Limit to last 10 exports
-      }
-    }
-    if (include.includes('templateSource')) {
-      includeClause.templateSource = {
-        include: {
-          createdBy: {
-            select: {
-              id: true,
-              name: true,
-              email: true
-            }
-          }
-        }
-      }
-    }
+    // Note: Enterprise context and enhanced features will be added back
+    // once the database schema is fully migrated and tested
 
     const businessCanvases = await prisma.businessCanvas.findMany({
       where,

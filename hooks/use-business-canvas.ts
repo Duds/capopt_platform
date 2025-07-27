@@ -230,7 +230,8 @@ export function useBusinessCanvas() {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/business-canvas?include=valuePropositions,customerSegments,revenueStreams,partnerships,resources,activities,costStructures,channels,versions,collaborators,sharingSettings,exportHistory,templateSource,enterprise,facility,businessUnit', {
+      // Temporarily use only basic relationships until new tables are fully set up
+      const response = await fetch('/api/business-canvas?include=valuePropositions,customerSegments,revenueStreams,partnerships,resources,activities,costStructures,channels', {
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
