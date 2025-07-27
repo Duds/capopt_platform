@@ -4,8 +4,8 @@
  * Provides sidebar navigation for the CapOps Platform:
  * - Progress indicator with current implementation status
  * - Strategic layer navigation (Business Canvas, Operating Model, Value Chain)
- * - CapOps modules navigation (ControlOps, BowtieLab, RiskMap)
- * - Operational layer navigation (Process Maps, Playbooks)
+ * - Operational layer navigation (Process Maps, Playbooks, ControlOps)
+ * - Tactical layer navigation (BowtieLab, RiskMap)
  * - Collapsible sidebar with responsive design
  * - Implementation status indicators
  * - Visual feedback for active and disabled states
@@ -105,40 +105,20 @@ export function SidebarNav({
             <Network className="h-4 w-4" />
             {!sidebarCollapsed && <span className="ml-2">Operating Model</span>}
           </Button>
-        </div>
-
-        {/* CapOps Modules */}
-        <div className="pt-4">
-          {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">CAPOPS MODULES</h3>}
           <Button
-            variant={activeLayer === "controlops" ? "default" : "ghost"}
+            variant={activeLayer === "value-chain" ? "default" : "ghost"}
             className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
-            onClick={() => onLayerChange("controlops")}
+            onClick={() => onLayerChange("value-chain")}
+            disabled
           >
-            <Shield className="h-4 w-4" />
-            {!sidebarCollapsed && <span className="ml-2">ControlOps</span>}
-          </Button>
-          <Button
-            variant={activeLayer === "bowtielab" ? "default" : "ghost"}
-            className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
-            onClick={() => onLayerChange("bowtielab")}
-          >
-            <Activity className="h-4 w-4" />
-            {!sidebarCollapsed && <span className="ml-2">BowtieLab</span>}
-          </Button>
-          <Button
-            variant={activeLayer === "riskmap" ? "default" : "ghost"}
-            className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
-            onClick={() => onLayerChange("riskmap")}
-          >
-            <TrendingUp className="h-4 w-4" />
-            {!sidebarCollapsed && <span className="ml-2">RiskMap</span>}
+            <Workflow className="h-4 w-4" />
+            {!sidebarCollapsed && <span className="ml-2">Value Chain</span>}
           </Button>
         </div>
 
         {/* Operational Layer */}
         <div className="pt-4">
-          {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">OPERATIONAL</h3>}
+          {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">OPERATIONAL LAYER</h3>}
           <Button
             variant={activeLayer === "process-maps" ? "default" : "ghost"}
             className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
@@ -156,28 +136,34 @@ export function SidebarNav({
             <BookOpen className="h-4 w-4" />
             {!sidebarCollapsed && <span className="ml-2">Playbooks</span>}
           </Button>
+          <Button
+            variant={activeLayer === "controlops" ? "default" : "ghost"}
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
+            onClick={() => onLayerChange("controlops")}
+          >
+            <Shield className="h-4 w-4" />
+            {!sidebarCollapsed && <span className="ml-2">ControlOps</span>}
+          </Button>
         </div>
 
-        {/* Strategic Layer (Remaining) */}
+        {/* Tactical Layer */}
         <div className="pt-4">
-          {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">STRATEGIC LAYER</h3>}
+          {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">TACTICAL LAYER</h3>}
           <Button
-            variant={activeLayer === "operating-model" ? "default" : "ghost"}
+            variant={activeLayer === "bowtielab" ? "default" : "ghost"}
             className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
-            onClick={() => onLayerChange("operating-model")}
-            disabled
+            onClick={() => onLayerChange("bowtielab")}
           >
-            <Network className="h-4 w-4" />
-            {!sidebarCollapsed && <span className="ml-2">Operating Model</span>}
+            <Activity className="h-4 w-4" />
+            {!sidebarCollapsed && <span className="ml-2">BowtieLab</span>}
           </Button>
           <Button
-            variant={activeLayer === "value-chain" ? "default" : "ghost"}
+            variant={activeLayer === "riskmap" ? "default" : "ghost"}
             className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
-            onClick={() => onLayerChange("value-chain")}
-            disabled
+            onClick={() => onLayerChange("riskmap")}
           >
-            <Workflow className="h-4 w-4" />
-            {!sidebarCollapsed && <span className="ml-2">Value Chain</span>}
+            <TrendingUp className="h-4 w-4" />
+            {!sidebarCollapsed && <span className="ml-2">RiskMap</span>}
           </Button>
         </div>
       </div>
