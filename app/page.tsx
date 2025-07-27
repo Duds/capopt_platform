@@ -391,15 +391,15 @@ export default function CapOptPlatform() {
             {!sidebarCollapsed && (
               <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-blue-900">Implementation Progress</span>
-                  <Badge variant="secondary" className="text-xs">3/12</Badge>
+                  <span className="text-sm font-medium text-blue-900">CapOps Progress</span>
+                  <Badge variant="secondary" className="text-xs">9/12</Badge>
                 </div>
                 <div className="w-full bg-blue-200 rounded-full h-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: '25%' }}></div>
+                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }}></div>
                 </div>
-                <p className="text-xs text-blue-700 mt-1">25% Complete</p>
-                <p className="text-xs text-blue-600 mt-1">✓ Real data metrics enabled</p>
-                <p className="text-xs text-gray-500 mt-1">Mock data greyed out</p>
+                <p className="text-xs text-blue-700 mt-1">75% Complete</p>
+                <p className="text-xs text-blue-600 mt-1">✓ CCT, Bowtie, RiskMap implemented</p>
+                <p className="text-xs text-gray-500 mt-1">Strategic layer remaining</p>
               </div>
             )}
             
@@ -435,24 +435,30 @@ export default function CapOptPlatform() {
               </div>
 
               <div className="pt-4">
-                {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">VALUE & SERVICE</h3>}
+                {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">CAPOPS MODULES</h3>}
                 <Button
-                  variant={activeLayer === "value-chain" ? "default" : "ghost"}
+                  variant={activeLayer === "controlops" ? "default" : "ghost"}
                   className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
-                  onClick={() => setActiveLayer("value-chain")}
-                  disabled
+                  onClick={() => setActiveLayer("controlops")}
                 >
-                  <Workflow className="h-4 w-4" />
-                  {!sidebarCollapsed && <span className="ml-2">Value Chain</span>}
+                  <Shield className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">ControlOps</span>}
                 </Button>
                 <Button
-                  variant={activeLayer === "service-model" ? "default" : "ghost"}
+                  variant={activeLayer === "bowtielab" ? "default" : "ghost"}
                   className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
-                  onClick={() => setActiveLayer("service-model")}
-                  disabled
+                  onClick={() => setActiveLayer("bowtielab")}
                 >
-                  <Users className="h-4 w-4" />
-                  {!sidebarCollapsed && <span className="ml-2">Service Model</span>}
+                  <Activity className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">BowtieLab</span>}
+                </Button>
+                <Button
+                  variant={activeLayer === "riskmap" ? "default" : "ghost"}
+                  className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
+                  onClick={() => setActiveLayer("riskmap")}
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">RiskMap</span>}
                 </Button>
               </div>
 
@@ -462,7 +468,6 @@ export default function CapOptPlatform() {
                   variant={activeLayer === "process-maps" ? "default" : "ghost"}
                   className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
                   onClick={() => setActiveLayer("process-maps")}
-                  disabled
                 >
                   <Map className="h-4 w-4" />
                   {!sidebarCollapsed && <span className="ml-2">Process Maps</span>}
@@ -479,23 +484,24 @@ export default function CapOptPlatform() {
               </div>
 
               <div className="pt-4">
-                {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">CONTROL & RISK</h3>}
+                {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">STRATEGIC LAYER</h3>}
                 <Button
-                  variant={activeLayer === "critical-controls" ? "default" : "ghost"}
+                  variant={activeLayer === "operating-model" ? "default" : "ghost"}
                   className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
-                  onClick={() => setActiveLayer("critical-controls")}
-                >
-                  <Shield className="h-4 w-4" />
-                  {!sidebarCollapsed && <span className="ml-2">Critical Controls</span>}
-                </Button>
-                <Button
-                  variant={activeLayer === "analytics" ? "default" : "ghost"}
-                  className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
-                  onClick={() => setActiveLayer("analytics")}
+                  onClick={() => setActiveLayer("operating-model")}
                   disabled
                 >
-                  <Activity className="h-4 w-4" />
-                  {!sidebarCollapsed && <span className="ml-2">Analytics</span>}
+                  <Network className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">Operating Model</span>}
+                </Button>
+                <Button
+                  variant={activeLayer === "value-chain" ? "default" : "ghost"}
+                  className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
+                  onClick={() => setActiveLayer("value-chain")}
+                  disabled
+                >
+                  <Workflow className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">Value Chain</span>}
                 </Button>
               </div>
 
