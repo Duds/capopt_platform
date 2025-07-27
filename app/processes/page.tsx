@@ -1,3 +1,19 @@
+/**
+ * Processes Management Page - Operational Process Overview
+ * 
+ * Provides comprehensive process management capabilities for the CapOpt Platform:
+ * - List and search all operational processes
+ * - Create, edit, and delete processes
+ * - Filter processes by status and priority
+ * - View process details and relationships
+ * - Integration with process map visualization
+ * - Role-based access control for process management
+ * - Real-time data from the database
+ * 
+ * This page serves as the central hub for managing operational processes
+ * that support the organization's capability optimization framework.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'

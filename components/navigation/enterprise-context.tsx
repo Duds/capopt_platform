@@ -1,3 +1,20 @@
+/**
+ * Enterprise Context Component - Organizational Structure Display
+ * 
+ * Provides enterprise-level context and organizational information:
+ * - Enterprise details and legal information
+ * - Facility and location information
+ * - Business unit and department structure
+ * - Operational stream performance metrics
+ * - Organizational hierarchy visualization
+ * - Performance targets and status indicators
+ * - Real-time data integration capabilities
+ * - Context switching for multi-enterprise environments
+ * 
+ * This component provides organizational context for users
+ * navigating the operational capability platform.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'

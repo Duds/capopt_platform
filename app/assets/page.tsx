@@ -1,3 +1,20 @@
+/**
+ * Assets Management Page - Critical Asset Overview
+ * 
+ * Provides comprehensive asset management capabilities for the CapOpt Platform:
+ * - List and search all critical assets
+ * - Filter assets by status, type, and criticality
+ * - Asset location and status tracking
+ * - Risk assessment and protection mapping
+ * - Asset lifecycle management
+ * - Criticality classification and monitoring
+ * - Integration with risk and control frameworks
+ * - Real-time asset status from database
+ * 
+ * This page serves as the central hub for managing critical assets
+ * that support operational capabilities in high-risk industries.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'

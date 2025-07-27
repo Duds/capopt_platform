@@ -5,7 +5,7 @@ skinparam backgroundColor #FFFFFF
 skinparam defaultFontName Arial
 skinparam defaultFontSize 10
 
-title CapOpt Platform - Solution Capability Map
+title CapOpt Platform - Solution Capability Map (CapOps)
 
 package "Enterprise Information System" {
   [Enterprise Management] as EM
@@ -24,15 +24,15 @@ package "Strategic Layer" {
   [Capability Model] as CM
 }
 
-package "Value & Service Layer" {
-  [Value Proposition] as VP
-  [Customer Segments] as CS
-  [Revenue Streams] as RS
-  [Partnerships] as P
-  [Resources] as R
-  [Activities] as A
-  [Cost Structures] as CS2
-  [Channels] as C
+package "CapOps Platform Modules" {
+  [ControlOps] as CO
+  [BowtieLab] as BL
+  [RiskMap] as RM
+  [PlayFlow] as PF
+  [TraceLine] as TL
+  [AssureBoard] as AB
+  [PulseDeck] as PD
+  [CapFrame] as CF
 }
 
 package "Operational Layer" {
@@ -45,15 +45,23 @@ package "Operational Layer" {
   [Improvements] as I
 }
 
-package "Control & Risk Layer" {
+package "Critical Control Theory (CCT)" {
   [Critical Controls] as CC
-  [Risk Categories] as RC
-  [Control Types] as CT
+  [Control Verification] as CV
   [Control Effectiveness] as CE
   [Bowtie Analysis] as BA
   [Threats] as T
   [Consequences] as CON
-  [Barriers] as BAR
+  [Preventive Controls] as PC
+  [Mitigating Controls] as MC
+}
+
+package "Risk Propagation Engine" {
+  [Risk Signals] as RS
+  [Risk Propagation] as RP
+  [Risk Thresholds] as RT
+  [Risk Alerts] as RA
+  [Risk Insights] as RI
 }
 
 package "Asset Management" {
@@ -93,14 +101,34 @@ VCM --> SM : enables
 SM --> EM2 : supports
 EM2 --> CM : measures
 
-' Value & Service Layer Relationships
-VP --> CS : targets
-VP --> RS : generates
-RS --> P : requires
-P --> R : provides
-R --> A : enables
-A --> CS2 : incurs
-CS2 --> C : delivers
+' CapOps Platform Module Relationships
+CO --> CC : manages
+CO --> CV : orchestrates
+CO --> CE : tracks
+BL --> BA : creates
+BL --> T : models
+BL --> CON : maps
+BL --> PC : links
+BL --> MC : links
+RM --> RS : aggregates
+RM --> RP : calculates
+RM --> RT : evaluates
+RM --> RA : generates
+RM --> RI : creates
+PF --> PB : orchestrates
+PF --> PR : manages
+PF --> TM : integrates
+TL --> BMC : traces
+TL --> OMC : maps
+TL --> VCM : links
+AB --> CO : reports
+AB --> BL : exports
+AB --> RM : visualizes
+PD --> RS : monitors
+PD --> CE : tracks
+PD --> MA : scores
+CF --> CM : models
+CF --> CS3 : calculates
 
 ' Operational Layer Relationships
 PM --> PM2 : creates
@@ -110,14 +138,20 @@ PR --> TM : requires
 TM --> BP : shares
 BP --> I : enables
 
-' Control & Risk Layer Relationships
-CC --> RC : categorizes
-CC --> CT : types
-CC --> CE : measures
-CC --> BA : analyzes
+' Critical Control Theory Relationships
+CC --> CV : verified_by
+CC --> CE : measured_by
+CC --> BA : analyzed_in
 BA --> T : identifies
 BA --> CON : assesses
-BA --> BAR : implements
+BA --> PC : implements
+BA --> MC : implements
+
+' Risk Propagation Engine Relationships
+RS --> RP : triggers
+RP --> RT : evaluated_against
+RT --> RA : generates
+RS --> RI : creates
 
 ' Asset Management Relationships
 AT --> AR : tracks
@@ -150,5 +184,22 @@ AUTH --> AUTH2 : enables
 AUTH2 --> RBAC : implements
 RBAC --> UM : controls
 UM --> AL : logs
+
+' Trickle-Up Risk Flow
+RS --> RP : propagates_up
+RP --> RI : generates_insights
+RI --> BMC : informs_strategy
+
+' Control Assurance Flow
+CV --> CE : updates
+CE --> CO : reports
+CO --> AB : feeds_dashboards
+
+' Strategic Traceability Flow
+TL --> BMC : traces_from
+TL --> OMC : traces_from
+TL --> VCM : traces_from
+TL --> PM : traces_to
+TL --> CC : traces_to
 
 @enduml 

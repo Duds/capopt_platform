@@ -6,6 +6,7 @@ import { seedEnterprise } from './enterprise'
 import { seedUsers } from './users'
 import { seedControls } from './controls'
 import { seedOperational } from './operational'
+import { seedStrategic } from './strategic'
 
 const prisma = new PrismaClient()
 
@@ -30,6 +31,7 @@ async function main() {
         users: seedUsers,
         controls: seedControls,
         operational: seedOperational,
+        strategic: seedStrategic,
       }
       
       for (const module of config.seedSpecificModules) {
@@ -64,6 +66,11 @@ async function main() {
       const operationalResult = await seedOperational(prisma, config)
       if (!operationalResult.success) {
         throw new Error(`Failed to seed operational layer: ${operationalResult.message}`)
+      }
+      
+      const strategicResult = await seedStrategic(prisma, config)
+      if (!strategicResult.success) {
+        throw new Error(`Failed to seed strategic layer: ${strategicResult.message}`)
       }
       
       console.log('✅ All modules seeded successfully')

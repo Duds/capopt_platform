@@ -1,3 +1,20 @@
+/**
+ * Strategic Context Component - Strategic Alignment Display
+ * 
+ * Provides strategic-level context and alignment information:
+ * - Strategic alignment scores across all layers
+ * - Business canvas and value chain alignment
+ * - Operating model and risk alignment metrics
+ * - Strategic objective tracking and progress
+ * - Performance alignment indicators
+ * - Strategic navigation context
+ * - Real-time alignment monitoring
+ * - Strategic decision support information
+ * 
+ * This component provides strategic context for users
+ * navigating the operational capability platform.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'

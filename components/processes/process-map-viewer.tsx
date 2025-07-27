@@ -1,3 +1,21 @@
+/**
+ * Process Map Viewer Component - Process Visualization Interface
+ * 
+ * Provides interactive process map visualization and management:
+ * - Visual process flow diagrams with step-by-step representation
+ * - Process step types (start, process, decision, end, subprocess)
+ * - Real-time process execution simulation
+ * - Zoom and pan controls for large process maps
+ * - Step status tracking and progress monitoring
+ * - Control and risk integration for each step
+ * - Process metadata and version control
+ * - Export and sharing capabilities
+ * - Interactive step selection and editing
+ * 
+ * This component enables detailed process analysis and optimization
+ * within the operational capability framework.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'

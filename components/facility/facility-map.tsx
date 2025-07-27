@@ -1,3 +1,21 @@
+/**
+ * Facility Map Component - Facility Layout and Asset Visualization
+ * 
+ * Provides facility-level visualization and management capabilities:
+ * - Facility layout and unit organization
+ * - Asset location and status visualization
+ * - Critical control placement and monitoring
+ * - Unit-based asset and control management
+ * - Facility overview and detailed view modes
+ * - Asset type classification and icons
+ * - Control status indicators and monitoring
+ * - Interactive asset and control management
+ * - Facility-wide risk and control assessment
+ * 
+ * This component enables facility-level operational oversight
+ * and asset management within the platform.
+ */
+
 'use client'
 
 import React, { useState } from 'react'

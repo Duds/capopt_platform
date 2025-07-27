@@ -1,7 +1,7 @@
 # CapOpt Platform Solution Architecture Design
 
 ## Executive Summary
-The CapOpt platform is a comprehensive operational capability optimisation system designed to provide end-to-end visibility from strategic planning through operational execution, with integrated risk management and maturity-based improvement frameworks.
+The CapOpt platform is a comprehensive operational capability optimisation system designed to provide end-to-end visibility from strategic planning through operational execution, with integrated Critical Control Theory (CCT) and maturity-based improvement frameworks. The platform implements a "trickle-up" risk model where strategic risk insights are derived from frontline operational data rather than manually declared.
 
 ---
 
@@ -115,7 +115,7 @@ Each business unit contains multiple departments with realistic staffing levels 
 
 ## 1. Strategic Layer
 
-### 1.1 Business Canvas Module
+### 1.1 Business Model Canvas Module
 **Purpose**: Strategic business model visualisation and management
 
 **Key Entities:**
@@ -415,286 +415,10 @@ erDiagram
 
 ---
 
-## 4. Strategic Navigation Flow System
+## 4. Critical Control Theory (CCT) Layer
 
-### 4.1 Navigation Flow Architecture
-**Purpose**: Enable bidirectional navigation between operational and strategic layers, providing traceability and alignment visibility
-
-**Key Components:**
-- NavigationFlow
-- StrategicContext
-- AlignmentScore
-- NavigationBreadcrumb
-- ContextualPanel
-
-**ERD:**
-```mermaid
-erDiagram
-    NavigationFlow {
-        string id
-        string sourceLayer
-        string targetLayer
-        string sourceEntityId
-        string targetEntityId
-        number alignmentScore
-        string navigationType
-    }
-    StrategicContext {
-        string id
-        string entityId
-        string entityType
-        string contextData
-        number strategicAlignment
-    }
-    AlignmentScore {
-        string id
-        string sourceEntityId
-        string targetEntityId
-        number score
-        string metricType
-        date calculatedAt
-    }
-    NavigationBreadcrumb {
-        string id
-        string sessionId
-        string breadcrumbPath
-        string currentLocation
-        date createdAt
-    }
-    ContextualPanel {
-        string id
-        string entityId
-        string panelType
-        string contentData
-        boolean isActive
-    }
-    NavigationFlow ||--o{ StrategicContext : provides
-    NavigationFlow ||--o{ AlignmentScore : calculates
-    NavigationFlow ||--o{ NavigationBreadcrumb : tracks
-    NavigationFlow ||--o{ ContextualPanel : displays
-```
-
-### 4.2 Navigation Flow Patterns
-
-#### **Operational to Strategic Flow**
-```
-Process Maps → Service Model → Value Chain → Operating Model → Business Canvas
-```
-
-**Implementation:**
-- **Process Maps**: Starting point with process detail views
-- **Service Model**: Service blueprint with process linking
-- **Value Chain**: Value flow visualization with optimization opportunities
-- **Operating Model**: Operating principles and capability model
-- **Business Canvas**: Strategic business model with operational impact
-
-#### **Strategic to Operational Flow**
-```
-Business Canvas → Operating Model → Value Chain → Service Model → Process Maps
-```
-
-**Implementation:**
-- **Business Canvas**: Strategic objectives and business model
-- **Operating Model**: Operational strategy and design principles
-- **Value Chain**: Value creation and flow management
-- **Service Model**: Service delivery and customer experience
-- **Process Maps**: Operational execution and process management
-
-### 4.3 Navigation Flow Components
-
-#### **Strategic Context Panel**
-**Purpose**: Display strategic context for operational processes
-
-**Features:**
-- **Alignment Indicators**: Show strategic alignment percentages
-- **Navigation Buttons**: Quick access to strategic layers
-- **Context Information**: Relevant strategic context for current entity
-- **Status Indicators**: Implementation status of navigation targets
-
-**Implementation:**
-```typescript
-interface StrategicContextPanel {
-  entityId: string
-  entityType: 'process' | 'service' | 'valueChain' | 'operatingModel'
-  alignmentScores: {
-    serviceModel: number
-    valueChain: number
-    operatingModel: number
-    businessCanvas: number
-  }
-  navigationTargets: {
-    serviceModel: { id: string, implemented: boolean }
-    valueChain: { id: string, implemented: boolean }
-    operatingModel: { id: string, implemented: boolean }
-    businessCanvas: { id: string, implemented: boolean }
-  }
-}
-```
-
-#### **Navigation Breadcrumbs**
-**Purpose**: Provide clear navigation path through strategic layers
-
-**Features:**
-- **Layer Indicators**: Show current position in strategic hierarchy
-- **Quick Navigation**: Click to navigate to any layer
-- **Status Indicators**: Show implementation status of each layer
-- **Context Preservation**: Maintain context when navigating
-
-**Implementation:**
-```typescript
-interface NavigationBreadcrumb {
-  path: Array<{
-    layer: string
-    entityId: string
-    entityName: string
-    implemented: boolean
-  }>
-  currentLayer: string
-  currentEntityId: string
-}
-```
-
-#### **Alignment Scoring System**
-**Purpose**: Calculate and display strategic alignment between layers
-
-**Metrics:**
-- **Process-Service Alignment**: How well processes deliver services
-- **Service-Value Alignment**: How well services create value
-- **Value-Operating Alignment**: How well value aligns with operating principles
-- **Operating-Strategic Alignment**: How well operations align with strategy
-
-**Implementation:**
-```typescript
-interface AlignmentScore {
-  sourceEntityId: string
-  targetEntityId: string
-  score: number // 0-100
-  metrics: {
-    processEfficiency: number
-    strategicRelevance: number
-    riskAlignment: number
-    valueCreation: number
-  }
-  lastCalculated: Date
-}
-```
-
-### 4.4 Navigation Flow API Design
-
-#### **Navigation Flow Endpoints**
-```typescript
-// Get strategic context for an entity
-GET /api/navigation/context/{entityType}/{entityId}
-
-// Navigate between layers
-POST /api/navigation/flow
-{
-  sourceLayer: string
-  targetLayer: string
-  sourceEntityId: string
-  targetEntityId: string
-}
-
-// Get alignment scores
-GET /api/navigation/alignment/{sourceEntityId}/{targetEntityId}
-
-// Update navigation breadcrumb
-POST /api/navigation/breadcrumb
-{
-  sessionId: string
-  path: NavigationPath[]
-}
-```
-
-#### **Strategic Context API**
-```typescript
-// Get strategic context for a process
-GET /api/processes/{processId}/strategic-context
-
-// Get linked strategic entities
-GET /api/processes/{processId}/strategic-links
-
-// Calculate alignment scores
-POST /api/processes/{processId}/calculate-alignment
-```
-
-### 4.5 Navigation Flow User Experience
-
-#### **Process Detail View Integration**
-- **Strategic Context Panel**: Sidebar showing strategic alignment
-- **Navigation Buttons**: Quick access to Service Model, Value Chain, etc.
-- **Alignment Indicators**: Visual progress bars showing alignment scores
-- **Breadcrumb Navigation**: Clear path through strategic layers
-
-#### **Service Model View Integration**
-- **Process Links**: Show linked processes that deliver the service
-- **Value Chain Navigation**: Connect to value creation flow
-- **Service Blueprint**: Visual service delivery process
-- **Quality Metrics**: Service performance indicators
-
-#### **Value Chain View Integration**
-- **Service Links**: Show services that contribute to value creation
-- **Operating Model Navigation**: Connect to operational strategy
-- **Value Flow Visualization**: Visual value creation process
-- **Optimization Opportunities**: Identify improvement areas
-
-#### **Operating Model View Integration**
-- **Value Chain Links**: Show value chains that align with operating principles
-- **Business Canvas Navigation**: Connect to strategic business model
-- **Capability Model**: Show organizational capabilities
-- **Operating Principles**: Strategic operational guidelines
-
-#### **Business Canvas View Integration**
-- **Operating Model Links**: Show operating models that support business strategy
-- **Strategic Impact Summary**: Show operational impact on strategy
-- **Business Model Sections**: Complete business model canvas
-- **Strategic Metrics**: Business performance indicators
-
-### 4.6 Navigation Flow Implementation Status
-
-#### **Phase 1 Implementation (Current)**
-- ✅ **Process Maps**: 80% complete with navigation foundation
-- ✅ **Business Canvas**: 100% complete
-- 🚧 **Service Model**: 0% complete (Next priority)
-- ⏳ **Value Chain**: 0% complete
-- ⏳ **Operating Model**: 0% complete
-
-#### **Phase 2 Implementation (Weeks 7-8)**
-- **Service Model**: Complete implementation with process linking
-- **Value Chain**: Foundation implementation with service linking
-- **Navigation Integration**: Complete breadcrumb and contextual panels
-
-#### **Phase 3 Implementation (Weeks 9-10)**
-- **Value Chain**: Complete implementation with optimization features
-- **Operating Model**: Complete implementation with capability model
-- **Alignment Scoring**: Complete alignment calculation system
-
-### 4.7 Navigation Flow Success Metrics
-
-#### **User Experience Metrics**
-- **Navigation Effectiveness**: Time to find strategic context
-- **User Adoption**: Percentage of users using navigation flow weekly
-- **Task Completion**: Success rate of strategic navigation tasks
-- **User Satisfaction**: User feedback on navigation experience
-
-#### **Business Impact Metrics**
-- **Strategic Alignment**: Improvement in strategic-operational alignment
-- **Decision Quality**: Faster strategic decision making
-- **Process Optimization**: Better process-strategy alignment
-- **Risk Management**: Improved risk-strategy alignment
-
-#### **Technical Metrics**
-- **Navigation Performance**: Page load times for navigation
-- **Alignment Accuracy**: Accuracy of alignment calculations
-- **System Reliability**: Navigation system uptime
-- **Data Consistency**: Consistency of navigation data
-
----
-
-## 5. Control & Risk Layer
-
-### 5.1 Critical Control Management
-**Purpose**: Identify, monitor, and assure critical controls
+### 4.1 Critical Control Management
+**Purpose**: Identify, monitor, and assure critical controls using Critical Control Theory
 
 **Key Entities:**
 - CriticalControl
@@ -702,6 +426,7 @@ POST /api/processes/{processId}/calculate-alignment
 - ControlEffectiveness
 - RiskCategory
 - ControlProcess
+- VerificationLog
 
 **ERD:**
 ```mermaid
@@ -712,6 +437,9 @@ erDiagram
         string description
         string priority
         string status
+        enum controlType
+        boolean isCritical
+        string verificationFrequency
     }
     ControlType {
         string id
@@ -735,68 +463,259 @@ erDiagram
         string processId
         string relationship
     }
+    VerificationLog {
+        string id
+        string controlId
+        string status
+        string submittedBy
+        datetime submittedAt
+        text notes
+    }
     CriticalControl ||--o{ ControlType : has
     CriticalControl ||--o{ ControlEffectiveness : measures
     CriticalControl ||--o{ RiskCategory : addresses
     CriticalControl ||--o{ ControlProcess : links
+    CriticalControl ||--o{ VerificationLog : verified_by
 ```
 
-### 5.2 Bowtie Analysis System
-**Purpose**: Risk analysis and control mapping
+### 4.2 Bowtie Analysis System
+**Purpose**: Risk analysis and control mapping using bowtie methodology
 
 **Key Entities:**
-- BowtieAnalysis
-- Threat
+- BowtieModel
 - TopEvent
+- Threat
 - Consequence
 - PreventiveControl
-- MitigativeControl
+- MitigatingControl
+- BowtieNode
 
 **ERD:**
 ```mermaid
 erDiagram
-    BowtieAnalysis {
+    BowtieModel {
         string id
         string name
         string description
-    }
-    Threat {
-        string id
-        string name
-        string description
+        string topEventId
+        string linkedRiskId
+        string capabilityId
+        string createdBy
+        enum status
     }
     TopEvent {
         string id
-        string name
+        string title
         string description
+        enum severity
+        enum likelihood
+    }
+    Threat {
+        string id
+        string title
+        string description
+        string topEventId
     }
     Consequence {
         string id
-        string name
-        string severity
+        string title
+        string linkedBmcBlock
+        string topEventId
     }
     PreventiveControl {
         string id
-        string name
-        string effectiveness
+        string title
+        string description
+        enum type
+        string linkedProcessId
+        string linkedPlaybookId
+        string linkedCapabilityId
+        enum verificationStatus
+        datetime verificationDate
+        string threatId
     }
-    MitigativeControl {
+    MitigatingControl {
         string id
-        string name
-        string effectiveness
+        string title
+        string description
+        enum type
+        string linkedProcessId
+        string linkedPlaybookId
+        string linkedCapabilityId
+        enum verificationStatus
+        datetime verificationDate
+        string consequenceId
     }
-    BowtieAnalysis ||--o{ Threat : identifies
-    BowtieAnalysis ||--o{ TopEvent : focuses
-    BowtieAnalysis ||--o{ Consequence : maps
-    BowtieAnalysis ||--o{ PreventiveControl : uses
-    BowtieAnalysis ||--o{ MitigativeControl : uses
+    BowtieNode {
+        string id
+        string bowtieModelId
+        enum type
+        string refId
+        int x
+        int y
+        enum status
+    }
+    BowtieModel ||--o{ TopEvent : focuses
+    BowtieModel ||--o{ Threat : identifies
+    BowtieModel ||--o{ Consequence : maps
+    BowtieModel ||--o{ PreventiveControl : uses
+    BowtieModel ||--o{ MitigatingControl : uses
+    BowtieModel ||--o{ BowtieNode : contains
 ```
 
 ---
 
-## 6. Integration Architecture
+## 5. Risk Propagation Engine
 
-### 6.1 Layer Integration Patterns
+### 5.1 Trickle-Up Risk Model
+**Purpose**: Calculate strategic risk from frontline operational data
+
+**Key Entities:**
+- RiskSignal
+- RiskPropagation
+- RiskThreshold
+- RiskAlert
+- RiskInsight
+
+**ERD:**
+```mermaid
+erDiagram
+    RiskSignal {
+        string id
+        string sourceType
+        string sourceId
+        enum severity
+        string description
+        datetime detectedAt
+        string location
+    }
+    RiskPropagation {
+        string id
+        string sourceEntityId
+        string targetEntityId
+        number propagationScore
+        string propagationPath
+        datetime calculatedAt
+    }
+    RiskThreshold {
+        string id
+        string entityType
+        string thresholdType
+        number thresholdValue
+        string alertMessage
+    }
+    RiskAlert {
+        string id
+        string riskSignalId
+        string thresholdId
+        enum status
+        string assignedTo
+        datetime createdAt
+        datetime resolvedAt
+    }
+    RiskInsight {
+        string id
+        string entityId
+        string entityType
+        number riskScore
+        string insightType
+        string narrative
+        datetime generatedAt
+    }
+    RiskSignal ||--o{ RiskPropagation : triggers
+    RiskPropagation ||--o{ RiskThreshold : evaluated_against
+    RiskThreshold ||--o{ RiskAlert : generates
+    RiskSignal ||--o{ RiskInsight : creates
+```
+
+### 5.2 Risk Calculation Framework
+**Scoring Model (Bottom-Up):**
+- **Control Level**: Status (OK, At Risk, Failed) × Criticality × Weight
+- **Process Level**: Weighted sum of control statuses
+- **Capability Level**: Average adjusted for interdependence and maturity
+- **Strategic Level**: Mapped based on declared dependencies
+
+**Threshold Alerts:**
+- Control failures in high-severity processes
+- Capability load exceeding thresholds
+- Multiple controls linked to strategic channels inactive
+
+**Narrative Risk Indicators:**
+- Human-readable risk narratives from operational data
+- Automated risk briefing generation
+- Regulatory compliance reporting
+
+---
+
+## 6. CapOps Platform Architecture
+
+### 6.1 Module Structure
+**Core Modules:**
+- **ControlOps**: Control assurance & verification engine
+- **RiskMap**: Live risk propagation engine
+- **PlayFlow**: Playbook orchestration
+- **TraceLine**: Strategic traceability engine
+- **AssureBoard**: Executive and regulator reporting
+- **BowtieLab**: Interactive bowtie modeller
+- **PulseDeck**: Operational insight & early warning
+- **CapFrame**: Capability modelling layer
+
+### 6.2 Application Model Architecture
+```mermaid
+flowchart TD
+  %% Strategic Layer
+  A[BMC<br>Business Model Canvas]
+  B[OMC<br>Operating Model Canvas]
+
+  %% Capability & Process Layer
+  C[CapFrame<br>Enterprise Capabilities]
+  D[Processes<br>Process Maps]
+
+  %% Playbooks and Execution
+  E[PlayFlow<br>Playbooks & SOPs]
+  G[FieldActions<br>Frontline Tasks & Verifications]
+
+  %% Controls & Assurance
+  F[ControlOps<br>Critical & Supporting Controls]
+  J[Verification<br>Control Attestation Workflow]
+  K[BowtieLab<br>Embedded Bowtie Risk Scenarios]
+
+  %% Risk & Traceability
+  H[RiskMap<br>Live Risk Propagation Engine]
+  L[TraceLine<br>Strategic Traceability Engine]
+  I[AssureBoard<br>Executive & Regulator Dashboards]
+
+  %% Relationships
+  A -->|Strategic Intent| B
+  B -->|Executes via| C
+  C -->|Depends on| D
+  D -->|Task-steps in| E
+  E -->|Has embedded| F
+  F -->|Verified through| J
+  J -->|Data from| G
+
+  %% Bowtie & Risk Connections
+  F -->|Mapped in| K
+  D -->|Includes threat nodes in| K
+  K -->|Feeds critical controls to| F
+  J -->|Verification outcomes| H
+  G -->|Real-world task signals| H
+  F -->|Effectiveness updates| H
+  H -->|Inferred risk signals to| A
+
+  %% Traceability & Assurance
+  L -->|Traces links| A
+  L -->|Maps dependencies| C
+  H -->|Feeds dashboards| I
+  J -->|Feeds assurance status| I
+  K -->|Scenario impact overlays| I
+```
+
+---
+
+## 7. Integration Architecture
+
+### 7.1 Layer Integration Patterns
 
 #### **Strategic Navigation Integration**
 - **Bidirectional Flow**: Enable navigation between all layers
@@ -810,7 +729,7 @@ erDiagram
 - **Compliance Tracking**: Track compliance across all layers
 - **Assurance Integration**: Integrate assurance activities across layers
 
-### 6.2 API Integration Patterns
+### 7.2 API Integration Patterns
 
 #### **RESTful API Design**
 - **Consistent Endpoints**: Standardized API patterns across all modules
@@ -824,7 +743,7 @@ erDiagram
 - **Schema Evolution**: Backward-compatible schema changes
 - **Performance Optimization**: Efficient data fetching
 
-### 6.3 Data Integration Patterns
+### 7.3 Data Integration Patterns
 
 #### **Event-Driven Architecture**
 - **Domain Events**: Capture business events across all layers
@@ -840,21 +759,21 @@ erDiagram
 
 ---
 
-## 7. Security Architecture
+## 8. Security Architecture
 
-### 7.1 Authentication & Authorization
+### 8.1 Authentication & Authorization
 - **JWT Tokens**: Secure token-based authentication
 - **Role-Based Access Control**: Granular permission management
 - **Multi-Factor Authentication**: Enhanced security for sensitive operations
 - **Session Management**: Secure session handling
 
-### 7.2 Data Protection
+### 8.2 Data Protection
 - **Encryption at Rest**: Encrypt sensitive data in storage
 - **Encryption in Transit**: Secure data transmission
 - **Data Classification**: Classify data by sensitivity level
 - **Access Logging**: Comprehensive access audit trails
 
-### 7.3 Compliance & Governance
+### 8.3 Compliance & Governance
 - **Regulatory Compliance**: Meet industry-specific regulations
 - **Audit Trails**: Complete audit trail for all operations
 - **Data Retention**: Implement data retention policies
@@ -862,21 +781,21 @@ erDiagram
 
 ---
 
-## 8. Performance & Scalability
+## 9. Performance & Scalability
 
-### 8.1 Performance Optimization
+### 9.1 Performance Optimization
 - **Caching Strategy**: Implement multi-level caching
 - **Database Optimization**: Optimize database queries and indexing
 - **CDN Integration**: Use CDN for static content delivery
 - **Load Balancing**: Distribute load across multiple servers
 
-### 8.2 Scalability Patterns
+### 9.2 Scalability Patterns
 - **Horizontal Scaling**: Scale by adding more servers
 - **Vertical Scaling**: Scale by increasing server resources
 - **Microservices Architecture**: Decompose into microservices
 - **Container Orchestration**: Use Kubernetes for container management
 
-### 8.3 Monitoring & Observability
+### 9.3 Monitoring & Observability
 - **Application Monitoring**: Monitor application performance
 - **Infrastructure Monitoring**: Monitor infrastructure health
 - **Log Aggregation**: Centralized log management
@@ -884,21 +803,21 @@ erDiagram
 
 ---
 
-## 9. Deployment Architecture
+## 10. Deployment Architecture
 
-### 9.1 Cloud Infrastructure
+### 10.1 Cloud Infrastructure
 - **Azure Cloud Services**: Leverage Azure cloud capabilities
 - **Container Deployment**: Deploy using Docker containers
 - **Kubernetes Orchestration**: Use Kubernetes for container orchestration
 - **Auto-scaling**: Implement automatic scaling based on demand
 
-### 9.2 CI/CD Pipeline
+### 10.2 CI/CD Pipeline
 - **Automated Testing**: Comprehensive automated testing
 - **Continuous Integration**: Automated build and test process
 - **Continuous Deployment**: Automated deployment to production
 - **Environment Management**: Manage multiple deployment environments
 
-### 9.3 Disaster Recovery
+### 10.3 Disaster Recovery
 - **Backup Strategy**: Regular automated backups
 - **Recovery Procedures**: Documented recovery procedures
 - **High Availability**: Implement high availability patterns
@@ -906,21 +825,48 @@ erDiagram
 
 ---
 
-## 10. Future Enhancements
+## 11. Technology Stack
 
-### 10.1 AI/ML Integration
+### 11.1 Frontend Stack
+- **Next.js 15+**: React framework with SSR and API routes
+- **React 18+**: Component-based UI development
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Utility-first styling
+- **shadcn/ui**: Component library for enterprise UI
+- **React Flow**: Interactive diagrams and flows
+- **DNDKit**: Drag and drop functionality
+- **Tremor**: Dashboard components
+
+### 11.2 Backend Stack
+- **Node.js**: JavaScript runtime
+- **Prisma**: Type-safe database ORM
+- **PostgreSQL**: Primary database
+- **Redis**: Caching and session storage
+- **JWT**: Authentication tokens
+
+### 11.3 Development Tools
+- **Docker**: Containerization
+- **Kubernetes**: Container orchestration
+- **Azure**: Cloud platform
+- **GitHub**: Version control and CI/CD
+
+---
+
+## 12. Future Enhancements
+
+### 12.1 AI/ML Integration
 - **Predictive Analytics**: Predict operational issues and opportunities
 - **Automated Optimization**: Automatically optimize processes and controls
 - **Intelligent Recommendations**: Provide intelligent recommendations
 - **Natural Language Processing**: Enable natural language interactions
 
-### 10.2 Advanced Analytics
+### 12.2 Advanced Analytics
 - **Real-time Analytics**: Real-time operational analytics
 - **Advanced Reporting**: Advanced reporting and visualization
 - **Data Mining**: Discover patterns and insights in data
 - **Business Intelligence**: Comprehensive business intelligence capabilities
 
-### 10.3 External Integrations
+### 12.3 External Integrations
 - **ERP Integration**: Integrate with enterprise resource planning systems
 - **MES Integration**: Integrate with manufacturing execution systems
 - **IoT Integration**: Integrate with Internet of Things devices

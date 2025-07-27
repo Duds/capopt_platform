@@ -1,3 +1,19 @@
+/**
+ * Registration Page - New User Account Creation
+ * 
+ * Provides a comprehensive registration form for new CapOpt Platform users with:
+ * - Full name, email, and password fields
+ * - Role selection for role-based access control
+ * - Password confirmation and validation
+ * - Password visibility toggles
+ * - Loading states and error handling
+ * - Integration with authentication context
+ * - Link to login page for existing users
+ * 
+ * Supports multiple user roles including administrators, managers, auditors,
+ * and specialized roles for high-risk industry compliance.
+ */
+
 'use client'
 
 import { useState } from 'react'

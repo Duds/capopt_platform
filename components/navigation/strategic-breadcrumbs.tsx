@@ -1,3 +1,20 @@
+/**
+ * Strategic Breadcrumbs Component - Hierarchical Navigation
+ * 
+ * Provides hierarchical navigation breadcrumbs for the CapOpt Platform:
+ * - Enterprise to facility to business unit navigation
+ * - Strategic layer context awareness
+ * - Dynamic breadcrumb generation based on current location
+ * - Clickable navigation between organizational levels
+ * - Strategic navigation shortcuts
+ * - Visual indicators for current context
+ * - Integration with routing system
+ * - Context-aware navigation suggestions
+ * 
+ * This component helps users understand their current location
+ * within the organizational and strategic hierarchy.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'

@@ -1,3 +1,19 @@
+/**
+ * Main Navigation Component - Primary Navigation Bar
+ * 
+ * Provides primary navigation links for the CapOpt Platform:
+ * - Dashboard, Controls, Procedures, Analytics navigation
+ * - Active state indicators for current page
+ * - Responsive design for mobile and desktop
+ * - Icon-based navigation with text labels
+ * - Hover effects and visual feedback
+ * - Integration with Next.js routing
+ * - Accessibility features for navigation
+ * 
+ * This component serves as the main navigation bar
+ * for accessing core platform features.
+ */
+
 "use client"
 
 import Link from "next/link"

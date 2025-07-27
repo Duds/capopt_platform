@@ -43,6 +43,9 @@ export async function seedCriticalControls(prisma: PrismaClient, options?: SeedO
     {
       name: 'Emergency Shutdown System',
       description: 'Automated system to safely shut down operations in emergency situations',
+      controlCategory: 'CRITICAL' as const,
+      isCritical: true,
+      verificationFrequency: 'Daily',
       controlTypeId: engineeringType?.id,
       effectivenessId: effectiveRating?.id,
       riskCategoryId: safetyCategory?.id,
@@ -51,6 +54,9 @@ export async function seedCriticalControls(prisma: PrismaClient, options?: SeedO
     {
       name: 'Personal Protective Equipment',
       description: 'Mandatory PPE requirements for all personnel in operational areas',
+      controlCategory: 'CRITICAL' as const,
+      isCritical: true,
+      verificationFrequency: 'Daily',
       controlTypeId: administrativeType?.id,
       effectivenessId: effectiveRating?.id,
       riskCategoryId: safetyCategory?.id,
@@ -59,6 +65,9 @@ export async function seedCriticalControls(prisma: PrismaClient, options?: SeedO
     {
       name: 'Environmental Monitoring',
       description: 'Continuous monitoring of environmental parameters and emissions',
+      controlCategory: 'SUPPORTING' as const,
+      isCritical: false,
+      verificationFrequency: 'Weekly',
       controlTypeId: engineeringType?.id,
       effectivenessId: effectiveRating?.id,
       riskCategoryId: environmentalCategory?.id,
@@ -67,6 +76,9 @@ export async function seedCriticalControls(prisma: PrismaClient, options?: SeedO
     {
       name: 'Maintenance Procedures',
       description: 'Standardized maintenance procedures and checklists',
+      controlCategory: 'SUPPORTING' as const,
+      isCritical: false,
+      verificationFrequency: 'Weekly',
       controlTypeId: administrativeType?.id,
       effectivenessId: effectiveRating?.id,
       riskCategoryId: operationalCategory?.id,

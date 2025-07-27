@@ -1,3 +1,18 @@
+/**
+ * CapOpt Platform - Main Dashboard Page
+ * 
+ * This is the primary dashboard interface for the CapOpt Platform, providing:
+ * - Real-time metrics and KPIs from the database
+ * - Strategic navigation across all platform layers
+ * - Quick access to key features (Business Canvas, Critical Controls)
+ * - User authentication and role-based access control
+ * - Implementation progress tracking
+ * - Mock data indicators for features not yet implemented
+ * 
+ * The dashboard serves as the central hub for operational capability optimization
+ * in high-risk industries, embedding Critical Controls Theory across all layers.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -94,6 +109,7 @@ export default function CapOptPlatform() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [notifications] = useState(3) // Mock notification count
   const [businessModel, setBusinessModel] = useState<BusinessModel>(defaultBusinessModel)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const maturityScores = {
     strategic: 75,
@@ -359,119 +375,131 @@ export default function CapOptPlatform() {
 
         <div className="flex w-full">
           {/* Sidebar Navigation */}
-          <nav className="w-64 bg-white border-r border-gray-200 min-h-screen p-4 flex-shrink-0">
+          <nav className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white border-r border-gray-200 min-h-screen p-4 flex-shrink-0 transition-all duration-300 relative`}>
+            {/* Toggle Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute -right-3 top-6 h-8 w-8 rounded-full border bg-white shadow-sm hover:bg-gray-50 flex items-center justify-center"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            >
+              <span className="font-mono text-xs">
+                {sidebarCollapsed ? '▶' : '◀'}
+              </span>
+            </Button>
             {/* Progress Indicator */}
-            <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-blue-900">Implementation Progress</span>
-                <Badge variant="secondary" className="text-xs">3/12</Badge>
+            {!sidebarCollapsed && (
+              <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-blue-900">Implementation Progress</span>
+                  <Badge variant="secondary" className="text-xs">3/12</Badge>
+                </div>
+                <div className="w-full bg-blue-200 rounded-full h-2">
+                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: '25%' }}></div>
+                </div>
+                <p className="text-xs text-blue-700 mt-1">25% Complete</p>
+                <p className="text-xs text-blue-600 mt-1">✓ Real data metrics enabled</p>
+                <p className="text-xs text-gray-500 mt-1">Mock data greyed out</p>
               </div>
-              <div className="w-full bg-blue-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full" style={{ width: '25%' }}></div>
-              </div>
-              <p className="text-xs text-blue-700 mt-1">25% Complete</p>
-              <p className="text-xs text-blue-600 mt-1">✓ Real data metrics enabled</p>
-              <p className="text-xs text-gray-500 mt-1">Mock data greyed out</p>
-            </div>
+            )}
             
             <div className="space-y-2">
-                              <Button
-                  variant={activeLayer === "dashboard" ? "default" : "ghost"}
-                  className="w-full justify-start"
-                  onClick={() => setActiveLayer("dashboard")}
-                >
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Dashboard
-                  <Badge variant="secondary" className="ml-auto text-xs">✓</Badge>
-                </Button>
+              <Button
+                variant={activeLayer === "dashboard" ? "default" : "ghost"}
+                className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
+                onClick={() => setActiveLayer("dashboard")}
+              >
+                <BarChart3 className="h-4 w-4" />
+                {!sidebarCollapsed && <span className="ml-2">Dashboard</span>}
+              </Button>
 
               <div className="pt-4">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">STRATEGIC LAYER</h3>
+                {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">STRATEGIC LAYER</h3>}
                 <Button
                   variant={activeLayer === "business-canvas" ? "default" : "ghost"}
-                  className="w-full justify-start"
+                  className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
                   onClick={() => setActiveLayer("business-canvas")}
                 >
-                  <Target className="h-4 w-4 mr-2" />
-                  Business Canvas
-                  <Badge variant="secondary" className="ml-auto text-xs">✓</Badge>
+                  <Target className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">Business Canvas</span>}
                 </Button>
                 <Button
                   variant={activeLayer === "operating-model" ? "default" : "ghost"}
-                  className="w-full justify-start"
+                  className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
                   onClick={() => setActiveLayer("operating-model")}
                   disabled
                 >
-                  <Network className="h-4 w-4 mr-2" />
-                  Operating Model
+                  <Network className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">Operating Model</span>}
                 </Button>
               </div>
 
               <div className="pt-4">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">VALUE & SERVICE</h3>
+                {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">VALUE & SERVICE</h3>}
                 <Button
                   variant={activeLayer === "value-chain" ? "default" : "ghost"}
-                  className="w-full justify-start"
+                  className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
                   onClick={() => setActiveLayer("value-chain")}
                   disabled
                 >
-                  <Workflow className="h-4 w-4 mr-2" />
-                  Value Chain
+                  <Workflow className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">Value Chain</span>}
                 </Button>
                 <Button
                   variant={activeLayer === "service-model" ? "default" : "ghost"}
-                  className="w-full justify-start"
+                  className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
                   onClick={() => setActiveLayer("service-model")}
                   disabled
                 >
-                  <Users className="h-4 w-4 mr-2" />
-                  Service Model
+                  <Users className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">Service Model</span>}
                 </Button>
               </div>
 
               <div className="pt-4">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">OPERATIONAL</h3>
+                {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">OPERATIONAL</h3>}
                 <Button
                   variant={activeLayer === "process-maps" ? "default" : "ghost"}
-                  className="w-full justify-start"
+                  className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
                   onClick={() => setActiveLayer("process-maps")}
                   disabled
                 >
-                  <Map className="h-4 w-4 mr-2" />
-                  Process Maps
+                  <Map className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">Process Maps</span>}
                 </Button>
                 <Button
                   variant={activeLayer === "playbooks" ? "default" : "ghost"}
-                  className="w-full justify-start"
+                  className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
                   onClick={() => setActiveLayer("playbooks")}
                   disabled
                 >
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Playbooks
+                  <BookOpen className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">Playbooks</span>}
                 </Button>
               </div>
 
               <div className="pt-4">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">CONTROL & RISK</h3>
+                {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">CONTROL & RISK</h3>}
                 <Button
                   variant={activeLayer === "critical-controls" ? "default" : "ghost"}
-                  className="w-full justify-start"
+                  className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
                   onClick={() => setActiveLayer("critical-controls")}
                 >
-                  <Shield className="h-4 w-4 mr-2" />
-                  Critical Controls
-                  <Badge variant="secondary" className="ml-auto text-xs">✓</Badge>
+                  <Shield className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">Critical Controls</span>}
                 </Button>
                 <Button
                   variant={activeLayer === "analytics" ? "default" : "ghost"}
-                  className="w-full justify-start"
+                  className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
                   onClick={() => setActiveLayer("analytics")}
                   disabled
                 >
-                  <Activity className="h-4 w-4 mr-2" />
-                  Analytics
+                  <Activity className="h-4 w-4" />
+                  {!sidebarCollapsed && <span className="ml-2">Analytics</span>}
                 </Button>
               </div>
+
+
             </div>
           </nav>
 

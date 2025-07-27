@@ -1,3 +1,20 @@
+/**
+ * Strategic Navigation Flow Component - Layer Navigation Interface
+ * 
+ * Provides strategic navigation between platform layers and contexts:
+ * - Navigation between strategic and operational layers
+ * - Layer alignment scores and status indicators
+ * - Implementation status for each layer
+ * - Context-aware navigation suggestions
+ * - Strategic flow visualization
+ * - Layer-specific routing and navigation
+ * - Performance and alignment metrics
+ * - Visual status indicators for layer health
+ * 
+ * This component enables strategic navigation through the
+ * operational capability optimization framework.
+ */
+
 'use client'
 
 import { useState } from 'react'

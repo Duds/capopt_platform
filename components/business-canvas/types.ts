@@ -1,3 +1,17 @@
+/**
+ * Business Canvas Types - TypeScript Type Definitions
+ * 
+ * Defines TypeScript interfaces for the business canvas functionality:
+ * - CanvasItem: Individual elements within canvas sections
+ * - BusinessModel: Complete business model with 9 canvas sections
+ * - CanvasSection: Section configuration and layout information
+ * - CanvasVisualizationProps: Props for the main visualization component
+ * - CanvasItemProps: Props for individual canvas items
+ * 
+ * These types ensure type safety and consistency across
+ * the business canvas implementation.
+ */
+
 export interface CanvasItem {
   id: string
   title: string

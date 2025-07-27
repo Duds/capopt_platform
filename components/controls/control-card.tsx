@@ -1,3 +1,20 @@
+/**
+ * Control Card Component - Critical Control Display
+ * 
+ * Renders individual critical control information in card format:
+ * - Displays control name, description, and status
+ * - Shows compliance status with color-coded indicators
+ * - Control type and effectiveness information
+ * - Risk category and priority classification
+ * - Performance metrics and trends
+ * - Action buttons for view, edit, and verify operations
+ * - Visual status indicators and icons
+ * - Integration with control management system
+ * 
+ * This component provides a compact view of critical controls
+ * for risk management and compliance monitoring.
+ */
+
 "use client"
 
 import React from 'react'

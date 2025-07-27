@@ -1,3 +1,18 @@
+/**
+ * Login Page - User Authentication Interface
+ * 
+ * Provides a secure login form for the CapOpt Platform with:
+ * - Email and password authentication
+ * - Password visibility toggle
+ * - Loading states and error handling
+ * - Responsive design for all devices
+ * - Integration with the authentication context
+ * - Redirect to registration page for new users
+ * 
+ * This page serves as the entry point for authenticated users
+ * accessing the operational capability optimization platform.
+ */
+
 'use client'
 
 import { useState } from 'react'

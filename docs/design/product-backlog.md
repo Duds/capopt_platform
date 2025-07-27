@@ -1,7 +1,7 @@
 # CapOpt Platform - Product Backlog
 
 ## Backlog Overview
-This backlog reflects the current state of the CapOpt Platform with the completed Strategic Navigation Flow implementation and updated priorities.
+This backlog reflects the current state of the CapOpt Platform with the completed Strategic Navigation Flow implementation and updated priorities. The platform is now positioned as "CapOps" - a comprehensive operational capability optimisation system with Critical Control Theory (CCT) at its core.
 
 ## Sprint 1: Enterprise Foundation ✅ **COMPLETED**
 
@@ -61,7 +61,51 @@ This backlog reflects the current state of the CapOpt Platform with the complete
 - **Operational Stream Tracking**: Stream indicators in enterprise context
 - **Address Management**: Address information in enterprise context
 
-## Sprint 3: Strategic Layer Implementation ⏳ **PLANNED**
+## Sprint 3: ControlOps Implementation ⏳ **PLANNED**
+
+### ⏳ ControlOps Core Engine
+- **Priority**: HIGH
+- **Effort**: 3-4 weeks
+- **Description**: Implement the core ControlOps module for critical control assurance
+- **Acceptance Criteria**:
+  - Critical Control Theory implementation
+  - Control verification workflow
+  - Control effectiveness tracking
+  - Control-process-playbook linking
+  - Real-time control status monitoring
+  - Control failure escalation system
+  - Database schema for control entities
+  - API endpoints for control management
+
+### ⏳ BowtieLab Implementation
+- **Priority**: HIGH
+- **Effort**: 2-3 weeks
+- **Description**: Implement interactive bowtie risk modelling
+- **Acceptance Criteria**:
+  - Interactive bowtie diagram editor
+  - Threat-consequence-control mapping
+  - Bowtie model data persistence
+  - Integration with ControlOps
+  - Real-time bowtie status updates
+  - Bowtie export for regulatory reporting
+  - Database schema for bowtie entities
+  - API endpoints for bowtie management
+
+### ⏳ RiskMap Engine
+- **Priority**: MEDIUM
+- **Effort**: 2-3 weeks
+- **Description**: Implement trickle-up risk propagation engine
+- **Acceptance Criteria**:
+  - Risk signal aggregation from frontline
+  - Risk propagation calculations
+  - Risk threshold management
+  - Risk alert generation
+  - Risk insight narratives
+  - Integration with strategic layers
+  - Database schema for risk entities
+  - API endpoints for risk management
+
+## Sprint 4: Strategic Layer Completion ⏳ **PLANNED**
 
 ### ⏳ Operating Model Canvas
 - **Priority**: HIGH
@@ -100,7 +144,7 @@ This backlog reflects the current state of the CapOpt Platform with the complete
   - Strategic navigation flow integration
   - Database schema and API endpoints
 
-## Sprint 4: Enhanced Operational Layer ⏳ **PLANNED**
+## Sprint 5: Enhanced Operational Layer ⏳ **PLANNED**
 
 ### ⏳ Process Maps Implementation
 - **Priority**: HIGH
@@ -127,10 +171,10 @@ This backlog reflects the current state of the CapOpt Platform with the complete
   - Database schema for process steps
   - API endpoints for step management
 
-### ⏳ Playbook Management
+### ⏳ PlayFlow Implementation
 - **Priority**: MEDIUM
 - **Effort**: 2-3 weeks
-- **Description**: Implement playbook creation and management
+- **Description**: Implement playbook orchestration and management
 - **Acceptance Criteria**:
   - Playbook creation interface
   - Procedure management
@@ -140,92 +184,66 @@ This backlog reflects the current state of the CapOpt Platform with the complete
   - Database schema for playbooks
   - Integration with strategic navigation
 
-## Sprint 5: Advanced Asset Management ⏳ **PLANNED**
-
-### ⏳ Asset Management Enhancement
-- **Priority**: MEDIUM
-- **Effort**: 3-4 weeks
-- **Description**: Enhance asset management with advanced features
-- **Acceptance Criteria**:
-  - Asset risk assessment
-  - Asset protection measures
-  - Asset monitoring and alerts
-  - Asset optimization recommendations
-  - Asset performance tracking
-  - Database schema for asset management
-  - Integration with enterprise context
-
-### ⏳ Asset Monitoring System
-- **Priority**: MEDIUM
-- **Effort**: 2-3 weeks
-- **Description**: Implement real-time asset monitoring
-- **Acceptance Criteria**:
-  - Real-time asset status monitoring
-  - Performance metrics tracking
-  - Predictive maintenance alerts
-  - Asset health scoring
-  - Integration with control systems
-  - Database schema for asset monitoring
-  - Real-time data feeds
-
 ## Sprint 6: Advanced Features ⏳ **PLANNED**
 
-### ⏳ Search and Filtering
+### ⏳ TraceLine Implementation
 - **Priority**: MEDIUM
 - **Effort**: 2-3 weeks
-- **Description**: Implement comprehensive search and filtering
+- **Description**: Implement strategic traceability engine
 - **Acceptance Criteria**:
-  - Global search functionality
-  - Advanced filtering options
-  - Search result ranking
-  - Search history and suggestions
-  - Enterprise-aware search
-  - Database search optimization
-  - Real-time search results
+  - End-to-end traceability mapping
+  - Strategic-operational linkage
+  - Dependency visualization
+  - Impact analysis tools
+  - Database schema for traceability
+  - API endpoints for traceability
 
-### ⏳ Notification System
+### ⏳ AssureBoard Implementation
+- **Priority**: MEDIUM
+- **Effort**: 2-3 weeks
+- **Description**: Implement executive and regulator reporting
+- **Acceptance Criteria**:
+  - Executive dashboards
+  - Regulatory compliance reports
+  - Control health summaries
+  - Audit trail generation
+  - Export functionality (PDF, CSV)
+  - Database schema for reporting
+  - API endpoints for reporting
+
+### ⏳ PulseDeck Implementation
 - **Priority**: LOW
 - **Effort**: 2-3 weeks
-- **Description**: Implement notification and alert system
+- **Description**: Implement operational insight and early warning system
 - **Acceptance Criteria**:
-  - Real-time notifications
-  - Alert management
-  - User preference settings
-  - Notification history
-  - Integration with control systems
-  - Database schema for notifications
-  - Email and push notifications
-
-### ⏳ Theme Management
-- **Priority**: LOW
-- **Effort**: 1-2 weeks
-- **Description**: Implement theme and customization options
-- **Acceptance Criteria**:
-  - Dark/light mode toggle
-  - Theme persistence
-  - Custom theme options
-  - Accessibility improvements
-  - User preference storage
-  - Database schema for user preferences
+  - Real-time operational insights
+  - Early warning indicators
+  - Heatmap visualizations
+  - Performance metrics
+  - Database schema for insights
+  - API endpoints for insights
 
 ## Updated Priority Matrix
 
 ### High Priority (Must Have)
-1. **Operating Model Canvas** - Strategic layer completion
-2. **Value Chain Management** - Strategic-operational alignment
-3. **Process Maps Implementation** - Operational layer enhancement
-4. **Process Step Management Backend** - Complete process functionality
+1. **ControlOps Core Engine** - Critical Control Theory implementation
+2. **BowtieLab Implementation** - Interactive risk modelling
+3. **Operating Model Canvas** - Strategic layer completion
+4. **Value Chain Management** - Strategic-operational alignment
+5. **Process Maps Implementation** - Operational layer enhancement
 
 ### Medium Priority (Should Have)
-1. **Service Model Implementation** - Strategic layer completion
-2. **Playbook Management** - Operational excellence
-3. **Asset Management Enhancement** - Asset layer completion
-4. **Search and Filtering** - User experience improvement
+1. **RiskMap Engine** - Risk propagation system
+2. **Service Model Implementation** - Strategic layer completion
+3. **PlayFlow Implementation** - Operational excellence
+4. **TraceLine Implementation** - Strategic traceability
+5. **AssureBoard Implementation** - Executive reporting
 
 ### Low Priority (Could Have)
-1. **Asset Monitoring System** - Advanced asset features
-2. **Notification System** - User experience enhancement
-3. **Theme Management** - User customization
+1. **PulseDeck Implementation** - Advanced insights
+2. **Search and Filtering** - User experience improvement
+3. **Notification System** - User experience enhancement
+4. **Theme Management** - User customization
 
 ## Epic Structure
 
@@ -259,7 +277,21 @@ This backlog reflects the current state of the CapOpt Platform with the complete
 - As a facility manager, I want to manage facility information so that I can oversee operations
 - As a user, I want to see implementation status so that I know what features are fully functional
 
-### Epic 3: Strategic Layer Implementation ⏳ **PLANNED**
+### Epic 3: ControlOps Implementation ⏳ **PLANNED**
+**Epic**: Implement Critical Control Theory and operational assurance engine
+**Features**:
+- ControlOps Core Engine
+- BowtieLab Implementation
+- RiskMap Engine
+
+**User Stories**:
+- As a safety manager, I want to track critical controls so that I can ensure operational safety
+- As a risk analyst, I want to create bowtie models so that I can visualize risk scenarios
+- As an operator, I want to verify controls so that I can ensure they are working
+- As a manager, I want to see risk propagation so that I can understand strategic impacts
+- As a regulator, I want to see control effectiveness so that I can verify compliance
+
+### Epic 4: Strategic Layer Completion ⏳ **PLANNED**
 **Epic**: Complete strategic layer with operating model and value chain management
 **Features**:
 - Operating Model Canvas
@@ -272,12 +304,12 @@ This backlog reflects the current state of the CapOpt Platform with the complete
 - As a service manager, I want to design service models so that I can improve service delivery
 - As a manager, I want to see strategic-operational alignment so that I can ensure strategic execution
 
-### Epic 4: Enhanced Operational Layer ⏳ **PLANNED**
+### Epic 5: Enhanced Operational Layer ⏳ **PLANNED**
 **Epic**: Enhance operational layer with comprehensive process management
 **Features**:
 - Process Maps Implementation
 - Process Step Management Backend
-- Playbook Management
+- PlayFlow Implementation
 
 **User Stories**:
 - As a process manager, I want to create visual process maps so that I can document workflows
@@ -285,30 +317,18 @@ This backlog reflects the current state of the CapOpt Platform with the complete
 - As a trainer, I want to create playbooks so that I can standardize operations
 - As a worker, I want to follow documented procedures so that I can perform tasks correctly
 
-### Epic 5: Advanced Asset Management ⏳ **PLANNED**
-**Epic**: Implement comprehensive asset lifecycle management
-**Features**:
-- Asset Management Enhancement
-- Asset Monitoring System
-
-**User Stories**:
-- As an asset manager, I want to track asset risks so that I can ensure asset protection
-- As a maintenance manager, I want to monitor asset performance so that I can optimize maintenance
-- As an operator, I want to see asset status so that I can make operational decisions
-- As a manager, I want to optimize asset utilization so that I can maximize value
-
 ### Epic 6: Advanced Features ⏳ **PLANNED**
-**Epic**: Implement advanced user experience and system features
+**Epic**: Implement advanced traceability, reporting, and insight features
 **Features**:
-- Search and Filtering
-- Notification System
-- Theme Management
+- TraceLine Implementation
+- AssureBoard Implementation
+- PulseDeck Implementation
 
 **User Stories**:
-- As a user, I want to search across the platform so that I can find information quickly
-- As a user, I want to receive notifications so that I can stay informed of important events
-- As a user, I want to customize the interface so that I can work more efficiently
-- As a manager, I want to filter data so that I can focus on relevant information
+- As a manager, I want to trace strategic impacts so that I can understand dependencies
+- As an executive, I want to see assurance reports so that I can verify operational health
+- As an operator, I want to see operational insights so that I can make better decisions
+- As a regulator, I want to export compliance reports so that I can verify regulatory compliance
 
 ## Success Metrics
 
@@ -321,16 +341,19 @@ This backlog reflects the current state of the CapOpt Platform with the complete
 - Enterprise Dashboard Enhancement ✅
 
 ### Phase 2 Target: **75% (9/12 features)**
+- ControlOps Core Engine ⏳
+- BowtieLab Implementation ⏳
 - Operating Model Canvas ⏳
-- Value Chain Management ⏳
-- Process Maps Implementation ⏳
 
 ### Phase 3 Target: **100% (12/12 features)**
+- RiskMap Engine ⏳
+- Value Chain Management ⏳
+- Process Maps Implementation ⏳
 - Service Model Implementation ⏳
-- Asset Management Enhancement ⏳
-- Search and Filtering ⏳
-- Notification System ⏳
-- Theme Management ⏳
+- PlayFlow Implementation ⏳
+- TraceLine Implementation ⏳
+- AssureBoard Implementation ⏳
+- PulseDeck Implementation ⏳
 
 ## Implementation Status Summary
 
@@ -346,11 +369,16 @@ This backlog reflects the current state of the CapOpt Platform with the complete
 - All planned features are either completed or not started
 
 ### ⏳ **Planned Features (6/12)**
-1. **Operating Model Canvas** - Strategic layer completion
-2. **Value Chain Management** - Strategic-operational alignment
-3. **Process Maps Implementation** - Operational layer enhancement
-4. **Service Model Implementation** - Strategic layer completion
-5. **Asset Management Enhancement** - Asset layer completion
-6. **Advanced Features** - Search, notifications, themes
+1. **ControlOps Core Engine** - Critical Control Theory implementation
+2. **BowtieLab Implementation** - Interactive risk modelling
+3. **RiskMap Engine** - Risk propagation system
+4. **Operating Model Canvas** - Strategic layer completion
+5. **Value Chain Management** - Strategic-operational alignment
+6. **Process Maps Implementation** - Operational layer enhancement
+7. **Service Model Implementation** - Strategic layer completion
+8. **PlayFlow Implementation** - Operational excellence
+9. **TraceLine Implementation** - Strategic traceability
+10. **AssureBoard Implementation** - Executive reporting
+11. **PulseDeck Implementation** - Advanced insights
 
-The platform has achieved 50% completion with a solid foundation of enterprise information system and strategic navigation flow. The next phase focuses on completing the strategic layer and enhancing the operational layer. 
+The platform has achieved 50% completion with a solid foundation of enterprise information system and strategic navigation flow. The next phase focuses on implementing ControlOps as the core operational assurance engine, followed by completing the strategic layer and enhancing the operational layer. 

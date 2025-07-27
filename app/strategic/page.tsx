@@ -1,3 +1,20 @@
+/**
+ * Strategic Dashboard Page - Strategic Layer Overview
+ * 
+ * Provides strategic planning and alignment capabilities for the CapOpt Platform:
+ * - Strategic metrics and alignment scores
+ * - Business canvas integration and visualization
+ * - Value chain and operating model alignment
+ * - Strategic objective tracking and progress monitoring
+ * - Service model alignment assessment
+ * - Strategic navigation and context awareness
+ * - Implementation status tracking for strategic features
+ * - Mock data indicators for features not yet implemented
+ * 
+ * This page serves as the strategic layer interface for aligning
+ * business objectives with operational capabilities.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'

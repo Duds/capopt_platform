@@ -1,3 +1,21 @@
+/**
+ * Control Detail View Component - Comprehensive Control Information
+ * 
+ * Provides detailed view and management for individual critical controls:
+ * - Complete control information and metadata
+ * - Compliance status and effectiveness tracking
+ * - Risk assessment and mitigation details
+ * - Control ownership and assignment
+ * - Assessment history and scheduling
+ * - Related processes and assets
+ * - Performance metrics and trends
+ * - Documentation and audit trail
+ * - Edit and update capabilities
+ * 
+ * This component enables deep control analysis and management
+ * within the critical controls framework.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'

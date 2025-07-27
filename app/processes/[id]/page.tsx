@@ -1,3 +1,20 @@
+/**
+ * Process Detail Page - Individual Process Management
+ * 
+ * Provides detailed view and management for individual operational processes:
+ * - Complete process information and metadata
+ * - Process steps management (add, edit, delete, reorder)
+ * - Associated controls and risk management
+ * - Input/output definitions and metrics
+ * - Process visualization and mapping
+ * - Version control and status management
+ * - Audit trail and change history
+ * - Role-based editing permissions
+ * 
+ * This page enables deep process optimization and control integration
+ * within the operational capability framework.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'

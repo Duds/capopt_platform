@@ -1,3 +1,18 @@
+/**
+ * Protected Route Component - Authentication and Authorization Wrapper
+ * 
+ * Provides route protection and access control for the CapOpt Platform:
+ * - Authentication verification and redirect handling
+ * - Role-based access control with required roles
+ * - Loading states during authentication checks
+ * - Fallback content for unauthorized access
+ * - Automatic redirect to login for unauthenticated users
+ * - Access denied messaging for insufficient permissions
+ * 
+ * This component wraps pages and features that require authentication
+ * and specific role permissions within the platform.
+ */
+
 'use client'
 
 import { useAuth } from '@/hooks/use-auth'

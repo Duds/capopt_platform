@@ -1,3 +1,20 @@
+/**
+ * User Management Page - System Administration Interface
+ * 
+ * Provides comprehensive user management capabilities for the CapOpt Platform:
+ * - List and search all system users
+ * - Filter users by role and status
+ * - User role assignment and management
+ * - User status monitoring (active/inactive)
+ * - Last login tracking and user activity
+ * - Role-based access control administration
+ * - User creation and account management
+ * - Integration with authentication system
+ * 
+ * This page serves as the administrative interface for managing
+ * user access and permissions across the platform.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'

@@ -1,3 +1,20 @@
+/**
+ * Critical Controls Management Page - Risk Control Overview
+ * 
+ * Provides comprehensive critical control management for the CapOpt Platform:
+ * - List and search all critical controls
+ * - Create, edit, and delete controls
+ * - Filter controls by status, priority, and category
+ * - Control effectiveness and compliance monitoring
+ * - Risk category and control type management
+ * - Integration with control detail views
+ * - Real-time compliance metrics and dashboards
+ * - Role-based access control for control management
+ * 
+ * This page serves as the central hub for managing critical controls
+ * that protect against identified risks in high-risk industries.
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'
