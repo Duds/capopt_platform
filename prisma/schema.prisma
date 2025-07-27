@@ -39,6 +39,10 @@ model User {
   auditLogs          AuditLog[]
   verificationLogs    VerificationLog[] @relation("VerificationUser")
   riskAlerts         RiskAlert[] @relation("AlertAssignee")
+  createdCanvasVersions CanvasVersion[] @relation("CanvasVersionCreator")
+  createdCanvasCollaborators CanvasCollaborator[] @relation("CanvasCollaborator")
+  createdCanvasExports CanvasExport[] @relation("CanvasExportCreator")
+  createdCanvasTemplates CanvasTemplate[] @relation("TemplateCreator")
 
   @@map("users")
 }
@@ -84,6 +88,7 @@ model Enterprise {
   processes   Process[]
   assets      Asset[]
   bowtieModels BowtieModel[]
+  businessCanvases BusinessCanvas[] @relation("EnterpriseBusinessCanvases")
 
   @@map("enterprises")
 }
@@ -129,6 +134,7 @@ model Facility {
   businessUnits BusinessUnit[]
   assets       Asset[]
   processes    Process[]
+  businessCanvases BusinessCanvas[] @relation("FacilityBusinessCanvases")
 
   @@map("facilities")
 }
@@ -154,6 +160,7 @@ model BusinessUnit {
   departments  Department[]
   assets       Asset[]
   processes    Process[]
+  businessCanvases BusinessCanvas[] @relation("BusinessUnitBusinessCanvases")
 
   @@map("business_units")
 }
@@ -266,10 +273,24 @@ model BusinessCanvas {
   description String?
   version     String   @default("1.0")
   isActive    Boolean  @default(true)
+  status      CanvasStatus @default(DRAFT)
+  editMode    EditMode @default(SINGLE_USER)
+  autoSave    Boolean  @default(true)
+  lastSaved   DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Enterprise context
+  enterpriseId String?
+  facilityId   String?
+  businessUnitId String?
+
   // Relationships
+  enterprise   Enterprise? @relation("EnterpriseBusinessCanvases", fields: [enterpriseId], references: [id])
+  facility     Facility? @relation("FacilityBusinessCanvases", fields: [facilityId], references: [id])
+  businessUnit BusinessUnit? @relation("BusinessUnitBusinessCanvases", fields: [businessUnitId], references: [id])
+  
+  // Canvas content
   valuePropositions ValueProposition[]
   customerSegments  CustomerSegment[]
   revenueStreams    RevenueStream[]
@@ -279,7 +300,111 @@ model BusinessCanvas {
   costStructures    CostStructure[]
   channels          Channel[]
 
+  // Version control and collaboration
+  versions          CanvasVersion[]
+  collaborators     CanvasCollaborator[]
+  sharingSettings   CanvasSharingSetting[]
+  exportHistory     CanvasExport[]
+  templateSource    CanvasTemplate? @relation("TemplateSource", fields: [templateId], references: [id])
+  templateId        String?
+
   @@map("business_canvases")
+}
+
+// Version control for canvases
+model CanvasVersion {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  versionNumber   String
+  description     String?
+  changes         Json? // Store detailed change information
+  createdById     String
+  createdAt       DateTime       @default(now())
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  createdBy       User           @relation("CanvasVersionCreator", fields: [createdById], references: [id])
+
+  @@unique([businessCanvasId, versionNumber])
+  @@map("canvas_versions")
+}
+
+// Collaboration support
+model CanvasCollaborator {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  userId          String
+  role            CollaboratorRole @default(VIEWER)
+  permissions     Json? // Store specific permissions
+  lastActivity    DateTime?
+  isActive        Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  user            User           @relation("CanvasCollaborator", fields: [userId], references: [id])
+
+  @@unique([businessCanvasId, userId])
+  @@map("canvas_collaborators")
+}
+
+// Sharing settings
+model CanvasSharingSetting {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  type            SharingType
+  value           String // URL, email, or other sharing identifier
+  permissions     Json? // Store sharing permissions
+  expiresAt       DateTime?
+  isActive        Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+
+  @@map("canvas_sharing_settings")
+}
+
+// Export history
+model CanvasExport {
+  id              String         @id @default(cuid())
+  businessCanvasId String
+  format          ExportFormat
+  fileName        String
+  fileSize        Int?
+  exportedById    String
+  metadata        Json? // Store export metadata
+  createdAt       DateTime       @default(now())
+
+  // Relationships
+  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  exportedBy      User           @relation("CanvasExportCreator", fields: [exportedById], references: [id])
+
+  @@map("canvas_exports")
+}
+
+// Canvas templates
+model CanvasTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    TemplateCategory
+  tags        String[] // Array of tags
+  thumbnail   String? // URL to thumbnail image
+  canvas      Json     // Store the template canvas structure
+  usageCount  Int      @default(0)
+  rating      Float    @default(0)
+  isPublic    Boolean  @default(false)
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  createdBy   User     @relation("TemplateCreator", fields: [createdById], references: [id])
+  derivedCanvases BusinessCanvas[] @relation("TemplateSource")
+
+  @@map("canvas_templates")
 }
 
 model ValueProposition {
@@ -1448,4 +1573,48 @@ enum RiskImpact {
   MEDIUM
   HIGH
   CRITICAL
+}
+
+// Enums for enhanced BMC functionality
+enum CanvasStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EditMode {
+  SINGLE_USER
+  MULTI_USER
+  READ_ONLY
+}
+
+enum CollaboratorRole {
+  OWNER
+  EDITOR
+  REVIEWER
+  VIEWER
+}
+
+enum SharingType {
+  PUBLIC_LINK
+  EMAIL_INVITE
+  TEAM_ACCESS
+  ENTERPRISE_ACCESS
+}
+
+enum ExportFormat {
+  PDF
+  PNG
+  SVG
+  JSON
+  CSV
+  EXCEL
+}
+
+enum TemplateCategory {
+  INDUSTRY
+  BUSINESS_TYPE
+  CUSTOM
+  ENTERPRISE
 }

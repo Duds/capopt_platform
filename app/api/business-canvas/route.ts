@@ -7,46 +7,134 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const isActive = searchParams.get('isActive')
     const include = searchParams.get('include')?.split(',') || []
+    const enterpriseId = searchParams.get('enterpriseId')
+    const facilityId = searchParams.get('facilityId')
+    const businessUnitId = searchParams.get('businessUnitId')
 
     // Build where clause
     const where: any = {}
     if (isActive !== null) {
       where.isActive = isActive === 'true'
     }
+    if (enterpriseId) {
+      where.enterpriseId = enterpriseId
+    }
+    if (facilityId) {
+      where.facilityId = facilityId
+    }
+    if (businessUnitId) {
+      where.businessUnitId = businessUnitId
+    }
 
-    // Build include clause
+    // Build include clause with enhanced relationships
     const includeClause: any = {}
 
+    // Canvas content relationships
     if (include.includes('valuePropositions')) {
       includeClause.valuePropositions = true
     }
-
     if (include.includes('customerSegments')) {
       includeClause.customerSegments = true
     }
-
     if (include.includes('revenueStreams')) {
       includeClause.revenueStreams = true
     }
-
     if (include.includes('partnerships')) {
       includeClause.partnerships = true
     }
-
     if (include.includes('resources')) {
       includeClause.resources = true
     }
-
     if (include.includes('activities')) {
       includeClause.activities = true
     }
-
     if (include.includes('costStructures')) {
       includeClause.costStructures = true
     }
-
     if (include.includes('channels')) {
       includeClause.channels = true
+    }
+
+    // Enterprise context relationships
+    if (include.includes('enterprise')) {
+      includeClause.enterprise = true
+    }
+    if (include.includes('facility')) {
+      includeClause.facility = true
+    }
+    if (include.includes('businessUnit')) {
+      includeClause.businessUnit = true
+    }
+
+    // Version control and collaboration relationships
+    if (include.includes('versions')) {
+      includeClause.versions = {
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }
+    }
+    if (include.includes('collaborators')) {
+      includeClause.collaborators = {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
+        },
+        where: {
+          isActive: true
+        }
+      }
+    }
+    if (include.includes('sharingSettings')) {
+      includeClause.sharingSettings = {
+        where: {
+          isActive: true
+        }
+      }
+    }
+    if (include.includes('exportHistory')) {
+      includeClause.exportHistory = {
+        include: {
+          exportedBy: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        take: 10 // Limit to last 10 exports
+      }
+    }
+    if (include.includes('templateSource')) {
+      includeClause.templateSource = {
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
+        }
+      }
     }
 
     const businessCanvases = await prisma.businessCanvas.findMany({
@@ -54,6 +142,7 @@ export async function GET(request: NextRequest) {
       include: includeClause,
       orderBy: [
         { isActive: 'desc' },
+        { updatedAt: 'desc' },
         { name: 'asc' }
       ]
     })
@@ -66,10 +155,10 @@ export async function GET(request: NextRequest) {
     response.headers.set('Last-Modified', new Date().toUTCString())
     
     return response
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching business canvases:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch business canvases', details: error.message },
+      { error: 'Failed to fetch business canvases', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
@@ -80,7 +169,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = businessCanvasSchema.parse(body)
     
-    // Build data object with only defined values
+    // Build data object with enhanced fields
     const data: any = {
       name: validatedData.name
     }
@@ -88,6 +177,13 @@ export async function POST(request: NextRequest) {
     if (validatedData.description !== undefined) data.description = validatedData.description
     if (validatedData.version !== undefined) data.version = validatedData.version
     if (validatedData.isActive !== undefined) data.isActive = validatedData.isActive
+    if (validatedData.status !== undefined) data.status = validatedData.status
+    if (validatedData.editMode !== undefined) data.editMode = validatedData.editMode
+    if (validatedData.autoSave !== undefined) data.autoSave = validatedData.autoSave
+    if (validatedData.enterpriseId !== undefined) data.enterpriseId = validatedData.enterpriseId
+    if (validatedData.facilityId !== undefined) data.facilityId = validatedData.facilityId
+    if (validatedData.businessUnitId !== undefined) data.businessUnitId = validatedData.businessUnitId
+    if (validatedData.templateId !== undefined) data.templateId = validatedData.templateId
 
     // Handle nested relationships
     if (validatedData.valuePropositions) {
@@ -153,18 +249,10 @@ export async function POST(request: NextRequest) {
     })
     
     return NextResponse.json(businessCanvas, { status: 201 })
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error creating business canvas:', error)
-    
-    if (error.name === 'ZodError') {
-      return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
-      )
-    }
-    
     return NextResponse.json(
-      { error: 'Failed to create business canvas', details: error.message },
+      { error: 'Failed to create business canvas', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
