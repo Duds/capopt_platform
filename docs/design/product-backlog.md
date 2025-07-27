@@ -30,64 +30,82 @@ This backlog reflects the current state of the CapOpt Platform with the complete
 - **Cost Structures**: Cost model management
 - **Channels**: Distribution channel management
 
-## Sprint 2: Core Functionality Implementation ⏳ **PLANNED**
+## Sprint 2: Strategic Layer Foundation ⏳ **PLANNED**
 
-### ⏳ Real Dashboard Implementation
+### ⏳ Business Model Canvas Finalisation
 - **Priority**: HIGH
-- **Effort**: 2-3 weeks
-- **Description**: Replace mock data with real database queries and functional metrics
+- **Effort**: 1-2 weeks
+- **Description**: Complete and polish the Business Model Canvas implementation
 - **Acceptance Criteria**:
-  - Real-time database queries for all metrics
-  - Functional KPI calculations from actual data
-  - Live enterprise context display
-  - Real strategic alignment metrics
-  - Functional navigation between sections
-  - Database-driven progress indicators
+  - Enhanced user experience and interface polish
+  - Advanced canvas features and interactions
+  - Improved data validation and error handling
+  - Export and sharing capabilities
+  - Integration with strategic navigation flow
+  - Performance optimization
 
-### ⏳ Critical Controls UI Implementation
-- **Priority**: HIGH
-- **Effort**: 3-4 weeks
-- **Description**: Implement actual control management interface with real functionality
-- **Acceptance Criteria**:
-  - Functional CRUD operations for controls
-  - Real control status tracking
-  - Control effectiveness monitoring
-  - Risk category management
-  - Control type classification
-  - Control verification workflows
-  - Real-time control health indicators
-
-### ⏳ Process Management UI Implementation
-- **Priority**: HIGH
-- **Effort**: 3-4 weeks
-- **Description**: Implement actual process management interface with real functionality
-- **Acceptance Criteria**:
-  - Functional CRUD operations for processes
-  - Real process status tracking
-  - Process step management
-  - Process filtering and search
-  - Process optimization tools
-  - Process visualization
-  - Real-time process health indicators
-
-### ⏳ Strategic Navigation Implementation
-- **Priority**: MEDIUM
-- **Effort**: 2-3 weeks
-- **Description**: Implement functional navigation between strategic and operational layers
-- **Acceptance Criteria**:
-  - Functional enterprise context display
-  - Real strategic alignment metrics
-  - Working navigation breadcrumbs
-  - Layer navigation functionality
-  - Strategic dashboard with real data
-  - Context-aware navigation
-
-## Sprint 3: Advanced Features Implementation ⏳ **PLANNED**
-
-### ⏳ CCT Implementation
+### ⏳ Operating Model Canvas Development
 - **Priority**: HIGH
 - **Effort**: 4-5 weeks
-- **Description**: Build UI for Critical Control Theory with verification workflows
+- **Description**: Implement operating model canvas for operational strategy
+- **Acceptance Criteria**:
+  - Interactive operating model canvas
+  - Value chain visualization
+  - Service model mapping
+  - Experience model design
+  - Capability model assessment
+  - Integration with strategic navigation flow
+  - Real-time data persistence
+  - Database schema for operating model entities
+  - API endpoints for operating model management
+
+### ⏳ Value Chain Management Development
+- **Priority**: HIGH
+- **Effort**: 3-4 weeks
+- **Description**: Implement value chain management and visualization
+- **Acceptance Criteria**:
+  - Value chain mapping and visualization
+  - Value stream analysis
+  - Value chain optimization tools
+  - Integration with operational processes
+  - Strategic navigation flow integration
+  - Database schema for value chain entities
+  - API endpoints for value chain management
+
+## Sprint 3: Operational Layer Foundation ⏳ **PLANNED**
+
+### ⏳ Process Maps Implementation
+- **Priority**: HIGH
+- **Effort**: 4-5 weeks
+- **Description**: Implement comprehensive process mapping functionality
+- **Acceptance Criteria**:
+  - Visual process mapping interface
+  - Process flow diagrams
+  - Process step management
+  - Process optimization tools
+  - Integration with strategic navigation
+  - Database schema for process maps
+  - Real-time collaboration features
+  - Process health monitoring
+
+### ⏳ Playbooks Implementation
+- **Priority**: HIGH
+- **Effort**: 3-4 weeks
+- **Description**: Implement playbook orchestration and management
+- **Acceptance Criteria**:
+  - Playbook creation interface
+  - Procedure management
+  - Training material integration
+  - Best practice sharing
+  - Version control and approval workflows
+  - Database schema for playbooks
+  - Integration with strategic navigation
+  - Playbook health monitoring
+
+### ⏳ ControlOps Implementation
+- **Priority**: HIGH
+- **Effort**: 4-5 weeks
+- **Description**: Implement Critical Control Theory with verification workflows
 - **Acceptance Criteria**:
   - Control verification interface
   - Attestation workflows
@@ -96,6 +114,9 @@ This backlog reflects the current state of the CapOpt Platform with the complete
   - Control failure escalation
   - Real-time control monitoring
   - Control health dashboards
+  - Integration with process maps and playbooks
+
+## Sprint 4: Tactical Layer Implementation ⏳ **PLANNED**
 
 ### ⏳ BowtieLab UI Implementation
 - **Priority**: HIGH
@@ -109,6 +130,7 @@ This backlog reflects the current state of the CapOpt Platform with the complete
   - Regulatory compliance reporting
   - Bowtie status management
   - Visual risk modelling
+  - Integration with ControlOps
 
 ### ⏳ RiskMap UI Implementation
 - **Priority**: MEDIUM
@@ -122,33 +144,35 @@ This backlog reflects the current state of the CapOpt Platform with the complete
   - Risk insight narratives
   - Real-time risk monitoring
   - Risk heatmaps
+  - Integration with strategic layers
 
-### ⏳ Operating Model Canvas
-- **Priority**: HIGH
-- **Effort**: 4-5 weeks
-- **Description**: Implement operating model canvas for operational strategy
-- **Acceptance Criteria**:
-  - Interactive operating model canvas
-  - Value chain visualization
-  - Service model mapping
-  - Experience model design
-  - Capability model assessment
-  - Integration with strategic navigation flow
-  - Real-time data persistence
-
-## Sprint 4: Strategic Layer Completion ⏳ **PLANNED**
-
-### ⏳ Value Chain Management
+### ⏳ CCT UI Implementation
 - **Priority**: HIGH
 - **Effort**: 3-4 weeks
-- **Description**: Implement value chain management and visualization
+- **Description**: Build UI for Critical Control Theory with verification workflows
 - **Acceptance Criteria**:
-  - Value chain mapping and visualization
-  - Value stream analysis
-  - Value chain optimization tools
-  - Integration with operational processes
-  - Strategic navigation flow integration
-  - Database schema and API endpoints
+  - Control verification interface
+  - Attestation workflows
+  - Control effectiveness tracking
+  - Verification status management
+  - Control failure escalation
+  - Real-time control monitoring
+  - Control health dashboards
+  - Integration with BowtieLab and RiskMap
+
+## Sprint 5: Strategic Navigation & Service Model ⏳ **PLANNED**
+
+### ⏳ Strategic Navigation Implementation
+- **Priority**: MEDIUM
+- **Effort**: 2-3 weeks
+- **Description**: Implement functional navigation between strategic and operational layers
+- **Acceptance Criteria**:
+  - Functional enterprise context display
+  - Real strategic alignment metrics
+  - Working navigation breadcrumbs
+  - Layer navigation functionality
+  - Strategic dashboard with real data
+  - Context-aware navigation
 
 ### ⏳ Service Model Implementation
 - **Priority**: MEDIUM
@@ -162,35 +186,35 @@ This backlog reflects the current state of the CapOpt Platform with the complete
   - Strategic navigation flow integration
   - Database schema and API endpoints
 
-## Sprint 5: Enhanced Operational Layer ⏳ **PLANNED**
+## Sprint 6: Real Dashboard & Actionable Features ⏳ **PLANNED**
 
-### ⏳ Process Maps Enhancement
-- **Priority**: HIGH
-- **Effort**: 4-5 weeks
-- **Description**: Enhance process mapping with visual diagrams and advanced features
-- **Acceptance Criteria**:
-  - Visual process mapping interface
-  - Process flow diagrams
-  - Process step management
-  - Process optimization tools
-  - Integration with strategic navigation
-  - Real-time collaboration features
-  - Process health monitoring
-
-### ⏳ PlayFlow Implementation
+### ⏳ Real Dashboard Implementation
 - **Priority**: MEDIUM
 - **Effort**: 3-4 weeks
-- **Description**: Implement playbook orchestration and management
+- **Description**: Replace mock data with real database queries and functional metrics
 - **Acceptance Criteria**:
-  - Playbook creation interface
-  - Procedure management
-  - Training material integration
-  - Best practice sharing
-  - Version control and approval workflows
-  - Database schema for playbooks
-  - Integration with strategic navigation
+  - Real-time database queries for all metrics
+  - Functional KPI calculations from actual data
+  - Live enterprise context display
+  - Real strategic alignment metrics
+  - Functional navigation between sections
+  - Database-driven progress indicators
+  - Integration with all functional systems
 
-## Sprint 6: Advanced Features ⏳ **PLANNED**
+### ⏳ Actionable Functionality Implementation
+- **Priority**: MEDIUM
+- **Effort**: 4-5 weeks
+- **Description**: Implement actionable features for operational effectiveness
+- **Acceptance Criteria**:
+  - Task assignment and management
+  - Calendar scheduling for periodic reviews
+  - Assignment tracking and notifications
+  - Review scheduling and reminders
+  - Data update workflows
+  - User responsibility management
+  - Integration with all operational systems
+
+## Sprint 7: Advanced Features ⏳ **PLANNED**
 
 ### ⏳ TraceLine Implementation
 - **Priority**: MEDIUM
@@ -229,31 +253,66 @@ This backlog reflects the current state of the CapOpt Platform with the complete
   - Database schema for insights
   - API endpoints for insights
 
+## Sprint 8: External Integrations ⏳ **FUTURE VISION**
+
+### ⏳ External API Integrations
+- **Priority**: LOW
+- **Effort**: 4-6 weeks
+- **Description**: Implement APIs for external system integrations
+- **Acceptance Criteria**:
+  - Reliability maintenance planning APIs
+  - ERP system integration
+  - Project planning integration
+  - Condition monitoring APIs
+  - Data synchronization
+  - Real-time data feeds
+  - Error handling and retry logic
+
+### ⏳ Advanced Analytics
+- **Priority**: LOW
+- **Effort**: 4-6 weeks
+- **Description**: Implement predictive analytics and machine learning
+- **Acceptance Criteria**:
+  - Predictive maintenance models
+  - Risk prediction algorithms
+  - Performance optimization recommendations
+  - Anomaly detection
+  - Machine learning model training
+  - Data pipeline for analytics
+  - Real-time analytics dashboards
+
 ## Updated Priority Matrix
 
-### High Priority (Must Have)
-1. **Real Dashboard Implementation** - Replace mock data with real functionality
-2. **Critical Controls UI Implementation** - Build actual control management
-3. **Process Management UI Implementation** - Build actual process management
-4. **CCT Implementation** - Critical Control Theory UI
-5. **BowtieLab UI Implementation** - Interactive risk modelling
-6. **Operating Model Canvas** - Strategic layer completion
+### High Priority (Must Have) - Strategic Layer Foundation
+1. **Business Model Canvas Finalisation** - Complete BMC implementation and polish
+2. **Operating Model Canvas Development** - Strategic layer foundation
+3. **Value Chain Management Development** - Strategic-operational alignment foundation
 
-### Medium Priority (Should Have)
-1. **Strategic Navigation Implementation** - Functional navigation
-2. **RiskMap UI Implementation** - Risk propagation visualization
-3. **Value Chain Management** - Strategic-operational alignment
-4. **Service Model Implementation** - Strategic layer completion
-5. **Process Maps Enhancement** - Visual process mapping
-6. **PlayFlow Implementation** - Operational excellence
+### High Priority (Must Have) - Operational Layer Foundation
+4. **Process Maps Implementation** - Operational layer foundation
+5. **Playbooks Implementation** - Operational excellence foundation
+6. **ControlOps Implementation** - Critical Control Theory foundation
 
-### Low Priority (Could Have)
-1. **TraceLine Implementation** - Strategic traceability
-2. **AssureBoard Implementation** - Executive reporting
-3. **PulseDeck Implementation** - Advanced insights
-4. **Search and Filtering** - User experience improvement
-5. **Notification System** - User experience enhancement
-6. **Theme Management** - User customization
+### Medium Priority (Should Have) - Tactical Layer
+7. **BowtieLab UI Implementation** - Interactive risk modelling
+8. **RiskMap UI Implementation** - Risk propagation visualization
+9. **CCT UI Implementation** - Critical Control Theory UI
+10. **Strategic Navigation Implementation** - Functional navigation between layers
+11. **Service Model Implementation** - Strategic layer completion
+
+### Medium Priority (Should Have) - Dashboard & Actionable Features
+12. **Real Dashboard Implementation** - Replace mock data with real functionality
+13. **Actionable Functionality Implementation** - Task assignments, calendar scheduling, periodic reviews
+
+### Low Priority (Could Have) - Advanced Features
+14. **TraceLine Implementation** - Strategic traceability
+15. **AssureBoard Implementation** - Executive reporting
+16. **PulseDeck Implementation** - Advanced insights
+
+### Low Priority (Could Have) - External Integrations
+17. **External API Integrations** - Reliability maintenance planning, ERP, Project Planning
+18. **Advanced Analytics** - Predictive analytics and machine learning
+19. **Condition Monitoring** - Real-time monitoring and alerting
 
 ## Epic Structure
 
@@ -269,55 +328,59 @@ This backlog reflects the current state of the CapOpt Platform with the complete
 - As a user, I want to authenticate securely so that I can access the platform safely
 - As a system administrator, I want to manage enterprise data so that I can configure multi-facility operations
 
-### Epic 2: Core Functionality Implementation ⏳ **PLANNED**
-**Epic**: Implement core functionality with real data and functionality
+### Epic 2: Strategic Layer Foundation ⏳ **PLANNED**
+**Epic**: Complete the strategic layer with Business Model Canvas, Operating Model Canvas, and Value Chain Management
 **Features**:
-- Real Dashboard Implementation
-- Critical Controls UI Implementation
-- Process Management UI Implementation
-- Strategic Navigation Implementation
+- Business Model Canvas Finalisation
+- Operating Model Canvas Development
+- Value Chain Management Development
 
 **User Stories**:
-- As a manager, I want to see real metrics so that I can make informed decisions
-- As a risk manager, I want to manage critical controls so that I can ensure operational safety
-- As a process manager, I want to manage processes so that I can document operational procedures
-- As a user, I want to navigate between layers so that I can access different functionality
-
-### Epic 3: Advanced Features Implementation ⏳ **PLANNED**
-**Epic**: Implement advanced features with real functionality
-**Features**:
-- CCT Implementation
-- BowtieLab UI Implementation
-- RiskMap UI Implementation
-- Operating Model Canvas
-
-**User Stories**:
-- As a safety manager, I want to track critical controls so that I can ensure operational safety
-- As a risk analyst, I want to create bowtie models so that I can visualize risk scenarios
-- As an operator, I want to verify controls so that I can ensure they are working
+- As a business analyst, I want to finalize the business model canvas so that I can have a complete strategic view
 - As a strategic planner, I want to create operating models so that I can design operational strategy
-
-### Epic 4: Strategic Layer Completion ⏳ **PLANNED**
-**Epic**: Complete strategic layer with value chain and service model
-**Features**:
-- Value Chain Management
-- Service Model Implementation
-
-**User Stories**:
 - As a business analyst, I want to map value chains so that I can optimize value creation
-- As a service manager, I want to design service models so that I can improve service delivery
 - As a manager, I want to see strategic-operational alignment so that I can ensure strategic execution
 
-### Epic 5: Enhanced Operational Layer ⏳ **PLANNED**
-**Epic**: Enhance operational layer with visual process mapping and playbooks
+### Epic 3: Operational Layer Foundation ⏳ **PLANNED**
+**Epic**: Establish operational layer with process maps, playbooks, and control operations
 **Features**:
-- Process Maps Enhancement
-- PlayFlow Implementation
+- Process Maps Implementation
+- Playbooks Implementation
+- ControlOps Implementation
 
 **User Stories**:
 - As a process manager, I want to create visual process maps so that I can document workflows
 - As a trainer, I want to create playbooks so that I can standardize operations
+- As a safety manager, I want to track critical controls so that I can ensure operational safety
 - As a worker, I want to follow documented procedures so that I can perform tasks correctly
+
+### Epic 4: Tactical Layer Implementation ⏳ **PLANNED**
+**Epic**: Implement tactical layer with risk modelling and control verification
+**Features**:
+- BowtieLab UI Implementation
+- RiskMap UI Implementation
+- CCT UI Implementation
+- Strategic Navigation Implementation
+- Service Model Implementation
+
+**User Stories**:
+- As a risk analyst, I want to create bowtie models so that I can visualize risk scenarios
+- As an operator, I want to verify controls so that I can ensure they are working
+- As a manager, I want to see risk propagation so that I can understand strategic impacts
+- As a service manager, I want to design service models so that I can improve service delivery
+- As a user, I want to navigate between layers so that I can access different functionality
+
+### Epic 5: Dashboard & Actionable Features ⏳ **PLANNED**
+**Epic**: Implement real dashboard and actionable functionality for operational effectiveness
+**Features**:
+- Real Dashboard Implementation
+- Actionable Functionality Implementation
+
+**User Stories**:
+- As a manager, I want to see real metrics so that I can make informed decisions
+- As a team leader, I want to assign tasks so that I can manage responsibilities
+- As a manager, I want to schedule periodic reviews so that I can keep data current
+- As a user, I want to track assignments so that I can manage my responsibilities
 
 ### Epic 6: Advanced Features ⏳ **PLANNED**
 **Epic**: Implement advanced traceability, reporting, and insight features
@@ -332,30 +395,51 @@ This backlog reflects the current state of the CapOpt Platform with the complete
 - As an operator, I want to see operational insights so that I can make better decisions
 - As a regulator, I want to export compliance reports so that I can verify regulatory compliance
 
+### Epic 7: External Integrations ⏳ **FUTURE VISION**
+**Epic**: Implement external system integrations and advanced analytics
+**Features**:
+- External API Integrations
+- Advanced Analytics
+- Condition Monitoring
+
+**User Stories**:
+- As a maintenance manager, I want to integrate with reliability systems so that I can plan maintenance
+- As a project manager, I want to integrate with project planning tools so that I can align activities
+- As an operator, I want real-time condition monitoring so that I can prevent failures
+- As a manager, I want predictive analytics so that I can optimize performance
+
 ## Success Metrics
 
 ### Phase 1 Completion: ✅ **17% (2/12 features)**
 - Application Framework ✅
 - Business Model Canvas ✅
 
-### Phase 2 Target: **50% (6/12 features)**
-- Real Dashboard Implementation ⏳
-- Critical Controls UI Implementation ⏳
-- Process Management UI Implementation ⏳
-- Strategic Navigation Implementation ⏳
+### Phase 2 Target: **42% (5/12 features)**
+- Business Model Canvas Finalisation ⏳
+- Operating Model Canvas Development ⏳
+- Value Chain Management Development ⏳
 
-### Phase 3 Target: **100% (12/12 features)**
-- CCT Implementation ⏳
+### Phase 3 Target: **75% (9/12 features)**
+- Process Maps Implementation ⏳
+- Playbooks Implementation ⏳
+- ControlOps Implementation ⏳
+
+### Phase 4 Target: **100% (12/12 features)**
 - BowtieLab UI Implementation ⏳
 - RiskMap UI Implementation ⏳
-- Operating Model Canvas ⏳
-- Value Chain Management ⏳
-- Process Maps Enhancement ⏳
+- CCT UI Implementation ⏳
+- Strategic Navigation Implementation ⏳
 - Service Model Implementation ⏳
-- PlayFlow Implementation ⏳
+- Real Dashboard Implementation ⏳
+- Actionable Functionality Implementation ⏳
 - TraceLine Implementation ⏳
 - AssureBoard Implementation ⏳
 - PulseDeck Implementation ⏳
+
+### Future Vision (Beyond Core Platform)
+- External API Integrations ⏳
+- Advanced Analytics ⏳
+- Condition Monitoring ⏳
 
 ## Implementation Status Summary
 
@@ -367,23 +451,24 @@ This backlog reflects the current state of the CapOpt Platform with the complete
 - All planned features are either completed or not started
 
 ### ⏳ **Planned Features (10/12)**
-1. **Real Dashboard Implementation** - Replace mock data with real functionality
-2. **Critical Controls UI Implementation** - Build actual control management
-3. **Process Management UI Implementation** - Build actual process management
-4. **Strategic Navigation Implementation** - Functional navigation between layers
-5. **CCT Implementation** - Critical Control Theory UI
-6. **BowtieLab UI Implementation** - Interactive risk modelling
-7. **RiskMap UI Implementation** - Risk propagation visualization
-8. **Operating Model Canvas** - Strategic layer completion
-9. **Value Chain Management** - Strategic-operational alignment
-10. **Process Maps Enhancement** - Visual process mapping
+1. **Business Model Canvas Finalisation** - Complete BMC implementation and polish
+2. **Operating Model Canvas Development** - Strategic layer foundation
+3. **Value Chain Management Development** - Strategic-operational alignment foundation
+4. **Process Maps Implementation** - Operational layer foundation
+5. **Playbooks Implementation** - Operational excellence foundation
+6. **ControlOps Implementation** - Critical Control Theory foundation
+7. **BowtieLab UI Implementation** - Interactive risk modelling
+8. **RiskMap UI Implementation** - Risk propagation visualization
+9. **CCT UI Implementation** - Critical Control Theory UI
+10. **Strategic Navigation Implementation** - Functional navigation between layers
 11. **Service Model Implementation** - Strategic layer completion
-12. **PlayFlow Implementation** - Operational excellence
-13. **TraceLine Implementation** - Strategic traceability
-14. **AssureBoard Implementation** - Executive reporting
-15. **PulseDeck Implementation** - Advanced insights
+12. **Real Dashboard Implementation** - Replace mock data with real functionality
+13. **Actionable Functionality Implementation** - Task assignments, calendar scheduling, periodic reviews
+14. **TraceLine Implementation** - Strategic traceability
+15. **AssureBoard Implementation** - Executive reporting
+16. **PulseDeck Implementation** - Advanced insights
 
-The platform has achieved 17% completion with a solid foundation of application framework and Business Model Canvas. The next phase focuses on implementing core functionality with real data and functionality, followed by advanced features and strategic layer completion.
+The platform has achieved 17% completion with a solid foundation of application framework and Business Model Canvas. The next phase focuses on completing the strategic layer foundation, followed by operational layer foundation, tactical layer implementation, and finally dashboard and actionable features when we have functional systems and data.
 
 ## Current Reality Check
 
@@ -411,4 +496,12 @@ The platform has achieved 17% completion with a solid foundation of application 
 - ⏳ **Value Chain Management**: Not implemented
 - ⏳ **Service Model**: Not implemented
 - ⏳ **Playbooks**: Not implemented
-- ⏳ **Advanced Features**: Not implemented 
+- ⏳ **Advanced Features**: Not implemented
+
+### **New Development Sequence**
+1. **Strategic Layer Foundation** - BMC Finalisation → OM Development → Value Chain Development
+2. **Operational Layer Foundation** - Process Maps → Playbooks → ControlOps
+3. **Tactical Layer Implementation** - BowtieLab → RiskMap → CCT UI
+4. **Dashboard & Actionable Features** - Real Dashboard → Task Assignments → Calendar Scheduling
+5. **Advanced Features** - TraceLine → AssureBoard → PulseDeck
+6. **External Integrations** - APIs → Analytics → Condition Monitoring 

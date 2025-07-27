@@ -188,22 +188,29 @@ CapOpt Platform is now positioned as **CapOps** - a comprehensive operational ca
 ## Next Steps
 
 ### **Immediate Priorities (Sprint 1)**
-1. **Real Dashboard Implementation**: Replace mock data with real database queries
-2. **Critical Controls UI**: Implement actual control management interface
-3. **Process Management UI**: Implement actual process management interface
-4. **Strategic Navigation**: Implement functional navigation between layers
+1. **Finalise Business Model Canvas** - Complete BMC implementation and polish
+2. **Develop Operating Model Canvas** - Strategic layer foundation
+3. **Develop Value Chain Management** - Strategic-operational alignment foundation
 
 ### **Short-term Goals (Sprint 2)**
-1. **CCT Implementation**: Build UI for Critical Control Theory
-2. **BowtieLab UI**: Implement interactive bowtie diagram builder
-3. **RiskMap UI**: Implement risk propagation visualization
-4. **Operating Model Canvas**: Start strategic layer implementation
+1. **Process Maps Implementation** - Operational layer foundation
+2. **Playbooks Implementation** - Operational excellence foundation
+3. **ControlOps Implementation** - Critical Control Theory foundation
 
-### **Medium-term Goals (Sprint 3-4)**
-1. **Value Chain Management**: Strategic-operational alignment
-2. **Process Maps Enhancement**: Complete operational layer
-3. **Service Model Implementation**: Strategic layer completion
-4. **PlayFlow Implementation**: Operational excellence
+### **Medium-term Goals (Sprint 3)**
+1. **Tactical Layer Implementation** - BowtieLab, RiskMap, CCT UI
+2. **Strategic Navigation** - Functional navigation between layers
+3. **Service Model Implementation** - Strategic layer completion
+
+### **Long-term Goals (Sprint 4)**
+1. **Real Dashboard Implementation** - Replace mock data with real database queries
+2. **Actionable Functionality** - Task assignments, calendar scheduling, periodic reviews
+3. **Advanced Features** - TraceLine, AssureBoard, PulseDeck
+
+### **Future Vision (Sprint 5+)**
+1. **External Integrations** - APIs for reliability maintenance planning, ERP, Project Planning
+2. **Condition Monitoring** - Real-time monitoring and alerting
+3. **Advanced Analytics** - Predictive analytics and machine learning
 
 ## Success Metrics
 
