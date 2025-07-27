@@ -123,6 +123,7 @@ export function SidebarNav({
             variant={activeLayer === "process-maps" ? "default" : "ghost"}
             className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
             onClick={() => onLayerChange("process-maps")}
+            disabled
           >
             <Map className="h-4 w-4" />
             {!sidebarCollapsed && <span className="ml-2">Process Maps</span>}
@@ -140,6 +141,7 @@ export function SidebarNav({
             variant={activeLayer === "controlops" ? "default" : "ghost"}
             className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
             onClick={() => onLayerChange("controlops")}
+            disabled
           >
             <Shield className="h-4 w-4" />
             {!sidebarCollapsed && <span className="ml-2">ControlOps</span>}
@@ -153,6 +155,7 @@ export function SidebarNav({
             variant={activeLayer === "bowtielab" ? "default" : "ghost"}
             className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
             onClick={() => onLayerChange("bowtielab")}
+            disabled
           >
             <Activity className="h-4 w-4" />
             {!sidebarCollapsed && <span className="ml-2">BowtieLab</span>}
@@ -161,6 +164,7 @@ export function SidebarNav({
             variant={activeLayer === "riskmap" ? "default" : "ghost"}
             className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
             onClick={() => onLayerChange("riskmap")}
+            disabled
           >
             <TrendingUp className="h-4 w-4" />
             {!sidebarCollapsed && <span className="ml-2">RiskMap</span>}
