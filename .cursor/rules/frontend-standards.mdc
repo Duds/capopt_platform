@@ -184,7 +184,7 @@ alwaysApply: false
 // Navigation button in operating model view
 <Button 
   variant="outline" 
-  onClick={() => router.push(`/business-canvas/${operatingModel.businessCanvasId}`)}
+  onClick={() => router.push(`/strategic`)}
   className="flex items-center gap-2"
 >
   <BusinessCanvasIcon className="h-4 w-4" />

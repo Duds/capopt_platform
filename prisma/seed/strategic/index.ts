@@ -294,7 +294,6 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
       description: 'Integrated copper processing and refining business model',
       commodity: 'Copper',
       valueProps: [
-        'High-grade copper concentrates (25-30% Cu, 8-12 g/t Au, 30-50 g/t Ag)',
         'LME Grade A electrolytic copper cathodes (99.9999% Cu)',
         'Advanced Outotec processing and refining technology',
         'Radiological impurity removal (Pb-210) via ion exchange',
@@ -308,7 +307,7 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
         { name: 'International Traders', size: 20, priority: 'MEDIUM' as const }
       ],
       revenues: [
-        { type: 'Copper Cathode Sales (99.9999%)', value: 2500000000, frequency: 'Monthly' }
+        { type: 'LME Grade A Copper Cathode Sales (99.9999% Cu)', value: 2500000000, frequency: 'Monthly' }
       ]
     },
     {

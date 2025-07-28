@@ -285,10 +285,15 @@ model BusinessCanvas {
   facilityId   String?
   businessUnitId String?
 
+  // Canvas hierarchy (for parent-child relationships between canvases)
+  parentCanvasId String?
+
   // Relationships
   enterprise   Enterprise? @relation("EnterpriseBusinessCanvases", fields: [enterpriseId], references: [id])
   facility     Facility? @relation("FacilityBusinessCanvases", fields: [facilityId], references: [id])
   businessUnit BusinessUnit? @relation("BusinessUnitBusinessCanvases", fields: [businessUnitId], references: [id])
+  parentCanvas BusinessCanvas? @relation("CanvasHierarchy", fields: [parentCanvasId], references: [id])
+  childCanvases BusinessCanvas[] @relation("CanvasHierarchy")
   
   // Canvas content
   valuePropositions ValueProposition[]

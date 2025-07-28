@@ -19,6 +19,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -35,15 +36,21 @@ import {
   Layers,
   Map,
   Network,
-  BookOpen
+  BookOpen,
+  FileText,
+  CheckCircle,
+  Clock,
+  Archive
 } from 'lucide-react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useBusinessCanvas } from '@/hooks/use-business-canvas'
 
 interface BreadcrumbItem {
   label: string
   href?: string
   icon?: React.ReactNode
-  type: 'enterprise' | 'facility' | 'business-unit' | 'department' | 'page' | 'strategic'
+  type: 'enterprise' | 'facility' | 'business-unit' | 'department' | 'page' | 'strategic' | 'business-canvas'
+  status?: 'DRAFT' | 'REVIEW' | 'PUBLISHED' | 'ARCHIVED'
 }
 
 interface StrategicBreadcrumbsProps {
@@ -55,8 +62,44 @@ interface StrategicBreadcrumbsProps {
 export function StrategicBreadcrumbs({ className = '', showStrategic = false, activeLayer }: StrategicBreadcrumbsProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const { businessCanvases } = useBusinessCanvas()
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
+
+
+  // Helper function to get status icon
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'PUBLISHED':
+        return <CheckCircle className="h-3 w-3 text-green-500" />
+      case 'REVIEW':
+        return <Clock className="h-3 w-3 text-yellow-500" />
+      case 'DRAFT':
+        return <FileText className="h-3 w-3 text-blue-500" />
+      case 'ARCHIVED':
+        return <Archive className="h-3 w-3 text-gray-500" />
+      default:
+        return <FileText className="h-3 w-3 text-gray-500" />
+    }
+  }
+
+  // Helper function to get status color
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'PUBLISHED':
+        return 'bg-green-100 text-green-800 border-green-200'
+      case 'REVIEW':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'DRAFT':
+        return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'ARCHIVED':
+        return 'bg-gray-100 text-gray-600 border-gray-200'
+      default:
+        return 'bg-gray-100 text-gray-600 border-gray-200'
+    }
+  }
 
   useEffect(() => {
     const generateBreadcrumbs = () => {
@@ -113,6 +156,37 @@ export function StrategicBreadcrumbs({ className = '', showStrategic = false, ac
           label: 'Business Canvas',
           type: 'page'
         })
+        
+        // Add selected canvas hierarchy path
+        const canvasId = searchParams.get('canvasId')
+        
+        if (canvasId) {
+          // Build the full hierarchy path for the selected canvas
+          const buildCanvasPath = (targetCanvasId: string): any[] => {
+            const path: any[] = []
+            let currentCanvasId = targetCanvasId
+            
+            // Build path from root to target
+            while (currentCanvasId) {
+              const canvas = businessCanvases.find(c => c.id === currentCanvasId)
+              if (canvas) {
+                path.unshift({
+                  label: canvas.name,
+                  type: 'business-canvas' as const,
+                  status: canvas.status
+                })
+                currentCanvasId = canvas.parentCanvasId || ''
+              } else {
+                break
+              }
+            }
+            
+            return path
+          }
+          
+          const canvasPath = buildCanvasPath(canvasId)
+          items.push(...canvasPath)
+        }
       } else if (activeLayer === 'critical-controls') {
         items.push({
           label: 'Critical Controls',
@@ -150,9 +224,9 @@ export function StrategicBreadcrumbs({ className = '', showStrategic = false, ac
           label: 'Users',
           type: 'page'
         })
-      } else if (pathname.includes('/business-canvas')) {
+      } else if (pathname.includes('/strategic')) {
         items.push({
-          label: 'Business Canvas',
+          label: 'Strategic',
           type: 'page'
         })
       }
@@ -172,7 +246,7 @@ export function StrategicBreadcrumbs({ className = '', showStrategic = false, ac
     }
 
     generateBreadcrumbs()
-  }, [pathname, showStrategic, activeLayer])
+  }, [pathname, searchParams, showStrategic, activeLayer, businessCanvases])
 
   const handleBreadcrumbClick = (item: BreadcrumbItem) => {
     if (item.href) {
@@ -183,7 +257,7 @@ export function StrategicBreadcrumbs({ className = '', showStrategic = false, ac
   const getStrategicNavigationItems = () => [
     {
       label: 'Business Canvas',
-      href: '/strategic/business-canvas',
+      href: '/strategic',
       icon: <Layers className="h-4 w-4" />
     },
     {
@@ -228,11 +302,29 @@ export function StrategicBreadcrumbs({ className = '', showStrategic = false, ac
             >
               {item.icon && <span className="mr-1">{item.icon}</span>}
               {item.label}
+              {item.type === 'business-canvas' && item.status && (
+                <Badge 
+                  variant="outline" 
+                  className={`ml-2 text-xs ${getStatusColor(item.status)}`}
+                >
+                  {getStatusIcon(item.status)}
+                  <span className="ml-1">{item.status}</span>
+                </Badge>
+              )}
             </Button>
           ) : (
             <span className="flex items-center text-xs text-muted-foreground">
               {item.icon && <span className="mr-1">{item.icon}</span>}
               {item.label}
+              {item.type === 'business-canvas' && item.status && (
+                <Badge 
+                  variant="outline" 
+                  className={`ml-2 text-xs ${getStatusColor(item.status)}`}
+                >
+                  {getStatusIcon(item.status)}
+                  <span className="ml-1">{item.status}</span>
+                </Badge>
+              )}
             </span>
           )}
 

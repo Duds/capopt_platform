@@ -196,7 +196,7 @@ export default function StrategicDashboard() {
     <div className="space-y-6">
       {/* Strategic Navigation Breadcrumbs */}
       <div className="border-b bg-white px-6 py-3">
-        <StrategicBreadcrumbs showStrategic={true} />
+        <StrategicBreadcrumbs showStrategic={true} activeLayer="business-canvas" />
       </div>
 
       {/* Strategic Navigation Components */}

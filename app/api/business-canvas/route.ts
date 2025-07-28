@@ -68,6 +68,12 @@ export async function GET(request: NextRequest) {
       ]
     })
     
+    // Debug logging to check hierarchy data
+    console.log('🔍 API DEBUG - Business Canvases fetched:', businessCanvases.length)
+    businessCanvases.forEach(canvas => {
+      console.log(`  - ${canvas.name}: parentCanvasId = ${canvas.parentCanvasId || 'ROOT'}`)
+    })
+    
     // Add cache-busting headers to prevent browser caching
     const response = NextResponse.json(businessCanvases)
     response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
@@ -174,6 +180,141 @@ export async function POST(request: NextRequest) {
     console.error('Error creating business canvas:', error)
     return NextResponse.json(
       { error: 'Failed to create business canvas', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { action, canvasId } = body
+
+    if (action === 'clone' && canvasId) {
+      // Find the canvas to clone
+      const sourceCanvas = await prisma.businessCanvas.findUnique({
+        where: { id: canvasId },
+        include: {
+          valuePropositions: true,
+          customerSegments: true,
+          revenueStreams: true,
+          partnerships: true,
+          resources: true,
+          activities: true,
+          costStructures: true,
+          channels: true
+        }
+      })
+
+      if (!sourceCanvas) {
+        return NextResponse.json(
+          { error: 'Source canvas not found' },
+          { status: 404 }
+        )
+      }
+
+      // Create a new canvas with cloned data
+      const clonedCanvas = await prisma.businessCanvas.create({
+        data: {
+          name: `${sourceCanvas.name} (Copy)`,
+          description: sourceCanvas.description,
+          version: '1.0',
+          isActive: true,
+          status: 'DRAFT',
+          editMode: 'SINGLE_USER',
+          autoSave: true,
+          enterpriseId: sourceCanvas.enterpriseId,
+          facilityId: sourceCanvas.facilityId,
+          businessUnitId: sourceCanvas.businessUnitId,
+          parentCanvasId: sourceCanvas.parentCanvasId,
+          // Clone all related data
+          valuePropositions: {
+            create: sourceCanvas.valuePropositions.map(vp => ({
+              description: vp.description,
+              priority: vp.priority
+            }))
+          },
+          customerSegments: {
+            create: sourceCanvas.customerSegments.map(cs => ({
+              name: cs.name,
+              description: cs.description,
+              size: cs.size,
+              priority: cs.priority
+            }))
+          },
+          revenueStreams: {
+            create: sourceCanvas.revenueStreams.map(rs => ({
+              type: rs.type,
+              description: rs.description,
+              estimatedValue: rs.estimatedValue,
+              frequency: rs.frequency
+            }))
+          },
+          partnerships: {
+            create: sourceCanvas.partnerships.map(p => ({
+              name: p.name,
+              type: p.type,
+              description: p.description,
+              value: p.value
+            }))
+          },
+          resources: {
+            create: sourceCanvas.resources.map(r => ({
+              name: r.name,
+              type: r.type,
+              description: r.description,
+              availability: r.availability,
+              cost: r.cost
+            }))
+          },
+          activities: {
+            create: sourceCanvas.activities.map(a => ({
+              name: a.name,
+              description: a.description,
+              priority: a.priority,
+              cost: a.cost
+            }))
+          },
+          costStructures: {
+            create: sourceCanvas.costStructures.map(cs => ({
+              description: cs.description,
+              category: cs.category,
+              amount: cs.amount,
+              frequency: cs.frequency
+            }))
+          },
+          channels: {
+            create: sourceCanvas.channels.map(c => ({
+              type: c.type,
+              description: c.description,
+              effectiveness: c.effectiveness,
+              cost: c.cost
+            }))
+          }
+        },
+        include: {
+          valuePropositions: true,
+          customerSegments: true,
+          revenueStreams: true,
+          partnerships: true,
+          resources: true,
+          activities: true,
+          costStructures: true,
+          channels: true
+        }
+      })
+
+      return NextResponse.json(clonedCanvas, { status: 201 })
+    }
+
+    return NextResponse.json(
+      { error: 'Invalid action' },
+      { status: 400 }
+    )
+  } catch (error) {
+    console.error('Error cloning business canvas:', error)
+    return NextResponse.json(
+      { error: 'Failed to clone business canvas', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

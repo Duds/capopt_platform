@@ -21,6 +21,9 @@ export interface BusinessCanvas {
   facility?: FacilityInfo
   businessUnit?: BusinessUnitInfo
   
+  // Canvas hierarchy (for parent-child relationships between canvases)
+  parentCanvasId?: string
+  
   // Canvas content
   valuePropositions: ValueProposition[]
   customerSegments: CustomerSegment[]
@@ -227,6 +230,7 @@ export function useBusinessCanvas() {
   // Fetch business canvases with enhanced data
   const fetchBusinessCanvases = useCallback(async () => {
     try {
+      console.log('🟡 FETCH BUSINESS CANVASES START')
       setLoading(true)
       setError(null)
       
@@ -245,6 +249,26 @@ export function useBusinessCanvas() {
       }
       
       const data = await response.json()
+      console.log('🟡 API RESPONSE - Raw data:', data)
+      console.log('🟡 API RESPONSE - Canvas count:', data.length)
+      console.log('🟡 API RESPONSE - Canvas details:', data.map((c: BusinessCanvas) => ({ 
+        id: c.id, 
+        name: c.name, 
+        parentCanvasId: c.parentCanvasId 
+      })))
+      
+      // Debug: Check if parentCanvasId is present in the response
+      const missingParentIds = data.filter((c: BusinessCanvas) => c.parentCanvasId === undefined)
+      if (missingParentIds.length > 0) {
+        console.warn('⚠️ WARNING: Some canvases missing parentCanvasId:', missingParentIds.map((c: BusinessCanvas) => c.name))
+      }
+      
+      // Debug: Log the actual hierarchy structure
+      console.log('🟡 HIERARCHY STRUCTURE:')
+      const rootCanvases = data.filter((c: BusinessCanvas) => !c.parentCanvasId)
+      const childCanvases = data.filter((c: BusinessCanvas) => c.parentCanvasId)
+      console.log('  Root canvases:', rootCanvases.map((c: BusinessCanvas) => c.name))
+      console.log('  Child canvases:', childCanvases.map((c: BusinessCanvas) => `${c.name} → ${data.find((p: BusinessCanvas) => p.id === c.parentCanvasId)?.name || 'UNKNOWN'}`))
       
       // Deduplicate data
       const uniqueCanvases = data.reduce((acc: BusinessCanvas[], canvas: BusinessCanvas) => {
@@ -255,9 +279,17 @@ export function useBusinessCanvas() {
         return acc
       }, [])
       
+      console.log('🟡 AFTER DEDUPLICATION - Canvas count:', uniqueCanvases.length)
+      console.log('🟡 AFTER DEDUPLICATION - Canvas details:', uniqueCanvases.map((c: BusinessCanvas) => ({ 
+        id: c.id, 
+        name: c.name, 
+        parentCanvasId: c.parentCanvasId 
+      })))
+      
       setBusinessCanvases(uniqueCanvases)
+      console.log('🟢 FETCH BUSINESS CANVASES COMPLETED')
     } catch (err) {
-      console.error('Error fetching business canvases:', err)
+      console.error('🔴 FETCH BUSINESS CANVASES ERROR:', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch business canvases')
     } finally {
       setLoading(false)
@@ -346,6 +378,115 @@ export function useBusinessCanvas() {
       throw err
     }
   }, [])
+
+  // Clone canvas
+  const cloneCanvas = useCallback(async (canvasId: string) => {
+    try {
+      setError(null)
+      
+      const response = await fetch('/api/business-canvas', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'clone',
+          canvasId: canvasId
+        }),
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to clone canvas: ${response.statusText}`)
+      }
+      
+      const clonedCanvas = await response.json()
+      
+      // Update local state
+      setBusinessCanvases(prev => [...prev, clonedCanvas])
+      
+      // Show success message
+      console.log('Canvas cloned successfully:', clonedCanvas.name)
+      
+      return clonedCanvas
+    } catch (err) {
+      console.error('Error cloning canvas:', err)
+      setError(err instanceof Error ? err.message : 'Failed to clone canvas')
+      throw err
+    }
+  }, [])
+
+  // Delete canvas
+  const deleteCanvas = useCallback(async (canvasId: string) => {
+    try {
+      setError(null)
+      
+      const response = await fetch(`/api/business-canvas/${canvasId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to delete canvas: ${response.statusText}`)
+      }
+      
+      // Update local state by removing the deleted canvas
+      setBusinessCanvases(prev => prev.filter(canvas => canvas.id !== canvasId))
+      
+      // If the current canvas was deleted, clear it
+      if (currentCanvas?.id === canvasId) {
+        setCurrentCanvas(null)
+      }
+      
+      console.log('Canvas deleted successfully')
+      
+      return true
+    } catch (err) {
+      console.error('Error deleting canvas:', err)
+      setError(err instanceof Error ? err.message : 'Failed to delete canvas')
+      throw err
+    }
+  }, [currentCanvas])
+
+  // Archive canvas
+  const archiveCanvas = useCallback(async (canvasId: string) => {
+    try {
+      setError(null)
+      
+      const response = await fetch(`/api/business-canvas/${canvasId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'ARCHIVED' }),
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to archive canvas: ${response.statusText}`)
+      }
+      
+      // Update the canvas status in the local state
+      setBusinessCanvases(prev => prev.map(canvas => 
+        canvas.id === canvasId 
+          ? { ...canvas, status: 'ARCHIVED' as const }
+          : canvas
+      ))
+      
+      // If the current canvas is being archived, clear it
+      if (currentCanvas?.id === canvasId) {
+        setCurrentCanvas(null)
+      }
+      
+      console.log('Canvas archived successfully')
+      
+      return true
+    } catch (err) {
+      console.error('Error archiving canvas:', err)
+      setError(err instanceof Error ? err.message : 'Failed to archive canvas')
+      throw err
+    }
+  }, [currentCanvas])
 
   // Export canvas
   const exportCanvas = useCallback(async (canvasId: string, format: string) => {
@@ -542,10 +683,14 @@ export function useBusinessCanvas() {
     // Actions
     setCurrentCanvas,
     setHasUnsavedChanges,
+    setBusinessCanvases,
     getCanvasById,
     getCanvasByName,
     saveCanvas,
     createCanvas,
+    cloneCanvas,
+    deleteCanvas,
+    archiveCanvas,
     exportCanvas,
     shareCanvas,
     loadTemplate,

@@ -113,7 +113,7 @@ export function StrategicNavigationFlow({
       icon: <Layers className="h-5 w-5" />,
       status: 'inactive',
       alignment: 85,
-      route: '/strategic/business-canvas',
+      route: '/strategic',
       implemented: true // ✅ Implemented in database
     }
   ]

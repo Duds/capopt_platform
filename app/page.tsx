@@ -64,7 +64,8 @@ import {
   Copy,
   Edit,
   Download,
-  Share
+  Share,
+  GitBranch
 } from 'lucide-react'
 import { controlsApi, processesApi, assetsApi, formatDate, getStatusColor, getPriorityColor } from '@/lib/api'
 import { CanvasVisualization } from '@/components/business-canvas/canvas-visualization'
@@ -512,20 +513,44 @@ export default function CapOptPlatform() {
                     {/* Quick Actions */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       <Card
-                        className="cursor-pointer hover:shadow-md transition-shadow"
+                        className="cursor-pointer hover:shadow-md transition-shadow bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200"
                         onClick={() => setActiveLayer("business-canvas")}
                       >
                         <CardHeader>
                           <CardTitle className="flex items-center">
                             <Target className="h-5 w-5 mr-2 text-blue-600" />
-                            Strategic Planning
-                            <Badge variant="secondary" className="ml-auto text-xs">✓</Badge>
+                            Business Canvas Management
+                            <Badge variant="secondary" className="ml-auto text-xs bg-blue-100 text-blue-800">✓</Badge>
                           </CardTitle>
-                          <CardDescription>Define and visualize your business model across 9 key components</CardDescription>
+                          <CardDescription className="text-blue-700">
+                            Create, organize, and manage business model canvases across your enterprise
+                          </CardDescription>
                         </CardHeader>
-                        <CardContent>
-                          <Button variant="outline" className="w-full bg-transparent">
-                            Access Business Canvas <ArrowRight className="h-4 w-4 ml-2" />
+                        <CardContent className="space-y-4">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-blue-600 font-medium">Canvas Actions:</span>
+                            <Badge variant="outline" className="text-xs">Enhanced</Badge>
+                          </div>
+                          <div className="space-y-2 text-xs text-blue-600">
+                            <div className="flex items-center gap-2">
+                              <Plus className="h-3 w-3" />
+                              <span>Create New Canvas</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Layers className="h-3 w-3" />
+                              <span>Add Child Canvas</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Copy className="h-3 w-3" />
+                              <span>Clone from Template</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Users className="h-3 w-3" />
+                              <span>Manage Canvas Hierarchy</span>
+                            </div>
+                          </div>
+                          <Button variant="outline" className="w-full bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
+                            Manage Canvases <ArrowRight className="h-4 w-4 ml-2" />
                           </Button>
                         </CardContent>
                       </Card>

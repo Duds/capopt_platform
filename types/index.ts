@@ -214,9 +214,22 @@ export interface BusinessCanvas {
   id: string
   name: string
   description?: string
+  version?: string
   isActive: boolean
+  status?: 'DRAFT' | 'ACTIVE' | 'DEPRECATED' | 'ARCHIVED'
+  editMode?: 'SINGLE_USER' | 'MULTI_USER' | 'REVIEW_ONLY'
+  autoSave?: boolean
+  lastSaved?: Date
   createdAt: Date
   updatedAt: Date
+  
+  // Enterprise context
+  enterpriseId?: string
+  facilityId?: string
+  businessUnitId?: string
+  
+  // Canvas hierarchy (for parent-child relationships between canvases)
+  parentCanvasId?: string
   
   // Relations
   valuePropositions?: ValueProposition[]
@@ -227,6 +240,10 @@ export interface BusinessCanvas {
   activities?: Activity[]
   costStructure?: CostStructure[]
   channels?: Channel[]
+  
+  // Hierarchy relations
+  parentCanvas?: BusinessCanvas
+  childCanvases?: BusinessCanvas[]
 }
 
 export interface ValueProposition {
