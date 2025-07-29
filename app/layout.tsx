@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   title: 'CapOpt Platform',
   description: 'Operational capability optimisation system for high-risk industries',
   generator: 'CapOpt Platform',
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({
