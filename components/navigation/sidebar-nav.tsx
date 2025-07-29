@@ -2,7 +2,6 @@
  * Sidebar Navigation Component - CapOps Platform Navigation
  * 
  * Provides sidebar navigation for the CapOps Platform:
- * - Progress indicator with current implementation status
  * - Strategic layer navigation (Business Canvas, Operating Model, Value Chain)
  * - Operational layer navigation (Process Maps, Playbooks, ControlOps)
  * - Tactical layer navigation (BowtieLab, RiskMap)
@@ -16,9 +15,7 @@
 
 "use client"
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { 
   Shield, 
   TrendingUp, 
@@ -58,22 +55,6 @@ export function SidebarNav({
         </span>
       </Button>
 
-      {/* Progress Indicator */}
-      {!sidebarCollapsed && (
-        <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-blue-900">CapOps Progress</span>
-            <Badge variant="secondary" className="text-xs">9/12</Badge>
-          </div>
-          <div className="w-full bg-blue-200 rounded-full h-2">
-            <div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }}></div>
-          </div>
-          <p className="text-xs text-blue-700 mt-1">75% Complete</p>
-          <p className="text-xs text-blue-600 mt-1">✓ CCT, Bowtie, RiskMap implemented</p>
-          <p className="text-xs text-gray-500 mt-1">Strategic layer remaining</p>
-        </div>
-      )}
-      
       <div className="space-y-2">
         {/* Dashboard */}
         <Button
