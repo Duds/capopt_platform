@@ -17,7 +17,7 @@
 
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -78,6 +78,7 @@ export function CanvasVisualization({
   const [editingItem, setEditingItem] = useState<{ section: keyof BusinessModel; item: CanvasItem } | null>(null)
   const [newItem, setNewItem] = useState<{ section: keyof BusinessModel } | null>(null)
   const [selectedCanvas, setSelectedCanvas] = useState<string>('')
+  const selectedCanvasRef = useRef<string>('')
   const [showTreeView, setShowTreeView] = useState(true)
   const [showNewCanvasForm, setShowNewCanvasForm] = useState(false)
   const [isCreatingRootCanvas, setIsCreatingRootCanvas] = useState(false)
@@ -85,14 +86,27 @@ export function CanvasVisualization({
     isOpen: boolean
     canvasId: string | null
     canvasName: string | null
+    hasChildren?: boolean
+    childCount?: number
   }>({
     isOpen: false,
     canvasId: null,
     canvasName: null
   })
+  // Group selection state
+  const [selectedCanvasIds, setSelectedCanvasIds] = useState<Set<string>>(new Set())
+  const [bulkDeleteConfirmation, setBulkDeleteConfirmation] = useState<{
+    isOpen: boolean
+    canvasIds: string[]
+    canvasNames: string[]
+  }>({
+    isOpen: false,
+    canvasIds: [],
+    canvasNames: []
+  })
   
   // Fetch business canvas data from database
-  const { businessCanvases, loading, error, refreshCanvases, setBusinessCanvases, cloneCanvas, deleteCanvas, archiveCanvas } = useBusinessCanvas()
+  const { businessCanvases, loading, error, refreshCanvases, setBusinessCanvases, cloneCanvas, deleteCanvas, archiveCanvas, createCanvas } = useBusinessCanvas()
   const { toast } = useToast()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -112,13 +126,42 @@ export function CanvasVisualization({
   // Sync selectedCanvas with URL parameter
   useEffect(() => {
     const canvasIdFromUrl = searchParams.get('canvasId')
-    if (canvasIdFromUrl && canvasIdFromUrl !== selectedCanvas) {
-      setSelectedCanvas(canvasIdFromUrl)
+    
+    // If there's a canvasId in the URL
+    if (canvasIdFromUrl) {
+      // Check if the canvas from URL exists in the current list
+      const canvasExists = businessCanvases.some(c => c.id === canvasIdFromUrl)
+      
+      if (canvasExists) {
+        // If it exists and is different from current selected state, update selectedCanvas
+        if (canvasIdFromUrl !== selectedCanvasRef.current) {
+          setSelectedCanvas(canvasIdFromUrl)
+          selectedCanvasRef.current = canvasIdFromUrl
+        }
+      } else {
+        // If canvas from URL doesn't exist, clear the URL parameter
+        console.log('⚠️ Canvas from URL no longer exists, clearing URL parameter:', canvasIdFromUrl)
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete('canvasId')
+        router.replace(`?${params.toString()}`, { scroll: false })
+        // Do NOT call setSelectedCanvas('') here. Let the next render cycle,
+        // where canvasIdFromUrl will be null, handle clearing selectedCanvas.
+      }
+    } 
+    // If there's NO canvasId in the URL, but selectedCanvas is set, clear selectedCanvas
+    else if (selectedCanvasRef.current !== '') {
+      setSelectedCanvas('')
+      selectedCanvasRef.current = ''
     }
-  }, [searchParams, selectedCanvas])
+  }, [searchParams, businessCanvases, router]) // Removed selectedCanvas from dependencies
+
+  // Keep ref in sync with selectedCanvas state
+  useEffect(() => {
+    selectedCanvasRef.current = selectedCanvas
+  }, [selectedCanvas])
 
   // Determine canvas type based on relationships and content
-  const determineCanvasType = (canvas: any): 'ENTERPRISE' | 'BUSINESS_UNIT' | 'OPERATIONAL' | 'SPECIALIZED' => {
+  const determineCanvasType = useCallback((canvas: any): 'ENTERPRISE' | 'BUSINESS_UNIT' | 'OPERATIONAL' | 'SPECIALIZED' => {
     // If this canvas has children, it's likely an enterprise or business unit
     const hasChildren = businessCanvases.some(c => c.parentCanvasId === canvas.id)
     
@@ -144,10 +187,10 @@ export function CanvasVisualization({
     
     // Default to business unit if no clear indicators
     return 'BUSINESS_UNIT'
-  }
+  }, [businessCanvases])
 
   // Determine canvas level based on hierarchy depth
-  const determineCanvasLevel = (canvas: any, allCanvases: any[]): 'PARENT' | 'CHILD' | 'GRANDCHILD' => {
+  const determineCanvasLevel = useCallback((canvas: any, allCanvases: any[]): 'PARENT' | 'CHILD' | 'GRANDCHILD' => {
     // If this canvas has a parent (parentCanvasId points to another canvas), it's a child
     if (canvas.parentCanvasId) {
       // Check if the parent also has a parent (making this a grandchild)
@@ -166,10 +209,10 @@ export function CanvasVisualization({
     
     // Default to parent if no clear indicators
     return 'PARENT'
-  }
+  }, [])
 
   // Convert database business canvases to tree structure
-  const convertBusinessCanvasesToTree = (canvases: DBBusinessCanvas[]): any[] => {
+  const convertBusinessCanvasesToTree = useCallback((canvases: DBBusinessCanvas[]): any[] => {
     console.log('🟡 CONVERT TO TREE START:', { 
       inputCount: canvases.length,
       inputCanvases: canvases.map(c => ({ id: c.id, name: c.name, parentCanvasId: c.parentCanvasId }))
@@ -228,7 +271,7 @@ export function CanvasVisualization({
     console.log('🟢 CONVERT TO TREE COMPLETED')
 
     return rootNodes
-  }
+  }, [determineCanvasType, determineCanvasLevel])
 
   // Generate canvas options from database data (ensure uniqueness)
   const canvasOptions = useMemo(() => {
@@ -304,7 +347,7 @@ export function CanvasVisualization({
   }, [businessCanvases, selectedCanvas])
 
   // Get current selected canvas data
-  const currentCanvas = businessCanvases.find(canvas => canvas.id === selectedCanvas)
+  const currentCanvas = selectedCanvas ? businessCanvases.find(canvas => canvas.id === selectedCanvas) : null
 
   // Convert database canvas to business model format
   const convertCanvasToBusinessModel = (canvas: DBBusinessCanvas): BusinessModel => {
@@ -457,10 +500,73 @@ export function CanvasVisualization({
   }
 
   // Handle new canvas creation
-  const handleCreateNewCanvas = (businessInfo: any) => {
-    console.log('Creating new canvas with business info:', businessInfo)
-    // TODO: Implement canvas creation logic
-    setShowNewCanvasForm(false)
+  const handleCreateNewCanvas = async (businessInfo: any) => {
+    console.log('🔍 CLIENT DEBUG - Creating new canvas with business info:', businessInfo)
+    
+    try {
+      // Prepare basic canvas data for database
+      const canvasData = {
+        name: businessInfo.name,
+        description: businessInfo.strategicObjective || businessInfo.valueProposition || '',
+        version: '1.0.0',
+        isActive: true,
+        status: 'DRAFT' as const,
+        editMode: 'SINGLE_USER' as const,
+        autoSave: true,
+        enterpriseId: businessInfo.enterpriseId,
+        facilityId: businessInfo.facilityId,
+        businessUnitId: businessInfo.businessUnitId,
+        parentCanvasId: businessInfo.parentCanvasId && businessInfo.parentCanvasId.trim() !== '' ? businessInfo.parentCanvasId : null
+      }
+      
+      console.log('🔍 CLIENT DEBUG - Canvas data to send:', canvasData)
+      console.log('🔍 CLIENT DEBUG - parentCanvasId value:', businessInfo.parentCanvasId, 'type:', typeof businessInfo.parentCanvasId)
+      console.log('🔍 CLIENT DEBUG - Final parentCanvasId:', canvasData.parentCanvasId, 'type:', typeof canvasData.parentCanvasId)
+      
+      // Additional validation to ensure parentCanvasId is never an empty string
+      if (canvasData.parentCanvasId === '' || (typeof canvasData.parentCanvasId === 'string' && canvasData.parentCanvasId.trim() === '')) {
+        console.warn('⚠️ WARNING: parentCanvasId is empty/whitespace string, converting to null')
+        canvasData.parentCanvasId = null
+      }
+      
+      // Create the canvas using the hook
+      const newCanvas = await createCanvas(canvasData)
+      
+      console.log('🔍 CLIENT DEBUG - Canvas created successfully:', newCanvas)
+      
+      // Show success message
+      toast({
+        title: "Canvas Created",
+        description: `"${newCanvas.name}" has been created successfully.`,
+        variant: "default",
+      })
+      
+      // Close the modal
+      setShowNewCanvasForm(false)
+      
+      // Refresh the canvas list to show the new canvas
+      await refreshCanvases()
+      
+      // Select the newly created canvas
+      if (newCanvas.id) {
+        handleSelectCanvas(newCanvas.id)
+      }
+      
+    } catch (error) {
+      console.error('❌ CLIENT DEBUG - Error creating canvas:', error)
+      
+      // Check if it's a duplicate name error
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create canvas'
+      const isDuplicateName = errorMessage.includes('already exists') || errorMessage.includes('Canvas name already exists')
+      
+      toast({
+        title: isDuplicateName ? "Duplicate Canvas Name" : "Creation Failed",
+        description: isDuplicateName 
+          ? errorMessage 
+          : "Failed to create canvas. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   // Handle canvas tree actions
@@ -474,8 +580,17 @@ export function CanvasVisualization({
   }
 
   const handleAddChild = (parentId: string) => {
-    console.log('Adding child canvas to parent:', parentId)
+    console.log('🔍 ADD CHILD DEBUG - Adding child canvas to parent:', parentId)
+    console.log('🔍 ADD CHILD DEBUG - Current selectedCanvas:', selectedCanvas)
+    console.log('🔍 ADD CHILD DEBUG - Current isCreatingRootCanvas:', isCreatingRootCanvas)
+    console.log('🔍 ADD CHILD DEBUG - Available canvas IDs:', businessCanvases.map(c => c.id))
+    console.log('🔍 ADD CHILD DEBUG - Is parentId valid?', businessCanvases.some(c => c.id === parentId))
+    
+    setSelectedCanvas(parentId)
+    setIsCreatingRootCanvas(false) // Ensure we're not creating a root canvas
     setShowNewCanvasForm(true)
+    console.log('🔍 ADD CHILD DEBUG - After setting - selectedCanvas will be:', parentId)
+    console.log('🔍 ADD CHILD DEBUG - After setting - isCreatingRootCanvas will be: false')
   }
 
   const handleCloneCanvas = async (canvasId: string) => {
@@ -517,10 +632,16 @@ export function CanvasVisualization({
     console.log('Requesting delete confirmation for canvas:', canvasId)
     const canvasToDelete = businessCanvases.find(c => c.id === canvasId)
     if (canvasToDelete) {
+      // Check if this canvas has children (will trigger cascade delete)
+      const hasChildren = businessCanvases.some(c => c.parentCanvasId === canvasId)
+      const childCount = businessCanvases.filter(c => c.parentCanvasId === canvasId).length
+      
       setDeleteConfirmation({
         isOpen: true,
         canvasId: canvasId,
-        canvasName: canvasToDelete.name
+        canvasName: canvasToDelete.name,
+        hasChildren,
+        childCount
       })
     }
   }
@@ -531,14 +652,45 @@ export function CanvasVisualization({
     if (!canvasToArchive) return
     
     try {
-      await archiveCanvas(canvasId)
-      toast({
-        title: "Canvas Archived",
-        description: `"${canvasToArchive.name}" has been archived.`,
-        variant: "default",
-      })
+      const result = await archiveCanvas(canvasId)
+      
+      // Check if this was a cascade archive
+      if (result && typeof result === 'object' && 'cascadeInfo' in result) {
+        const cascadeInfo = result.cascadeInfo as any
+        toast({
+          title: "Cascade Archive Complete",
+          description: `"${canvasToArchive.name}" and ${cascadeInfo.descendantCount} descendant canvas${cascadeInfo.descendantCount !== 1 ? 'es' : ''} have been archived.`,
+          variant: "default",
+        })
+      } else {
+        toast({
+          title: "Canvas Archived",
+          description: `"${canvasToArchive.name}" has been archived.`,
+          variant: "default",
+        })
+      }
+      
+      // No need to manually clear selectedCanvas or URL here.
+      // The useEffect for URL sync will handle it after refreshCanvases() updates businessCanvases.
+      // The `useBusinessCanvas` hook already clears `currentCanvas` if the archived one was selected.
+      
       // Refresh the canvas list
       await refreshCanvases()
+
+      // Clear the business model if the archived canvas was selected.
+      if (selectedCanvas === canvasId) {
+        onUpdate?.({
+          keyPartners: [],
+          keyActivities: [],
+          keyResources: [],
+          valuePropositions: [],
+          customerRelationships: [],
+          channels: [],
+          customerSegments: [],
+          costStructure: [],
+          revenueStreams: []
+        });
+      }
     } catch (error) {
       console.error('Error archiving canvas:', error)
       toast({
@@ -552,15 +704,50 @@ export function CanvasVisualization({
   const confirmDeleteCanvas = async () => {
     if (!deleteConfirmation.canvasId) return
     
+    const deletedCanvasId = deleteConfirmation.canvasId
+    
     try {
-      await deleteCanvas(deleteConfirmation.canvasId)
-      toast({
-        title: "Canvas Deleted",
-        description: `"${deleteConfirmation.canvasName}" has been permanently deleted.`,
-        variant: "default",
-      })
-      // Refresh the canvas list
+      const result = await deleteCanvas(deletedCanvasId)
+      
+      // Check if this was a cascade delete
+      if (result && typeof result === 'object' && 'deletedCount' in result) {
+        const cascadeInfo = result as any
+        toast({
+          title: "Cascade Delete Complete",
+          description: `"${deleteConfirmation.canvasName}" and ${cascadeInfo.descendantCount} descendant canvas${cascadeInfo.descendantCount !== 1 ? 'es' : ''} have been permanently deleted.`,
+          variant: "default",
+        })
+      } else {
+        toast({
+          title: "Canvas Deleted",
+          description: `"${deleteConfirmation.canvasName}" has been permanently deleted.`,
+          variant: "default",
+        })
+      }
+      
+      // No need to manually clear selectedCanvas or URL here.
+      // The useEffect for URL sync will handle it after refreshCanvases() updates businessCanvases.
+      // The `useBusinessCanvas` hook already clears `currentCanvas` if the deleted one was selected.
+      // The `useEffect` in CanvasVisualization will then react to the URL change.
+      
+      // Refresh the canvas list (this is crucial for the useEffect to react)
       await refreshCanvases()
+      
+      // Clear the business model if the deleted canvas was selected.
+      // This should happen regardless of URL sync, as the canvas content is gone.
+      if (selectedCanvas === deletedCanvasId) {
+        onUpdate?.({
+          keyPartners: [],
+          keyActivities: [],
+          keyResources: [],
+          valuePropositions: [],
+          customerRelationships: [],
+          channels: [],
+          customerSegments: [],
+          costStructure: [],
+          revenueStreams: []
+        });
+      }
     } catch (error) {
       console.error('Error deleting canvas:', error)
       toast({
@@ -572,7 +759,9 @@ export function CanvasVisualization({
       setDeleteConfirmation({
         isOpen: false,
         canvasId: null,
-        canvasName: null
+        canvasName: null,
+        hasChildren: undefined,
+        childCount: undefined
       })
     }
   }
@@ -581,7 +770,142 @@ export function CanvasVisualization({
     setDeleteConfirmation({
       isOpen: false,
       canvasId: null,
-      canvasName: null
+      canvasName: null,
+      hasChildren: undefined,
+      childCount: undefined
+    })
+  }
+
+  // Group selection handlers
+  const handleToggleCanvasSelection = (canvasId: string) => {
+    setSelectedCanvasIds(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(canvasId)) {
+        newSet.delete(canvasId)
+      } else {
+        newSet.add(canvasId)
+      }
+      return newSet
+    })
+  }
+
+  const handleBulkDelete = (canvasIds: string[]) => {
+    const canvasNames = canvasIds.map(id => {
+      const canvas = businessCanvases.find(c => c.id === id)
+      return canvas?.name || 'Unknown Canvas'
+    })
+    
+    setBulkDeleteConfirmation({
+      isOpen: true,
+      canvasIds,
+      canvasNames
+    })
+  }
+
+  const handleBulkArchive = async (canvasIds: string[]) => {
+    try {
+      let totalArchived = 0
+      let cascadeCount = 0
+      
+      // Archive each canvas
+      for (const canvasId of canvasIds) {
+        const result = await archiveCanvas(canvasId)
+        
+        // Count cascade operations
+        if (result && typeof result === 'object' && 'cascadeInfo' in result) {
+          const cascadeInfo = result.cascadeInfo as any
+          totalArchived += cascadeInfo.archivedCount
+          cascadeCount++
+        } else {
+          totalArchived++
+        }
+      }
+      
+      // Show appropriate message based on cascade operations
+      if (cascadeCount > 0) {
+        toast({
+          title: "Bulk Archive Complete",
+          description: `Successfully archived ${totalArchived} canvas${totalArchived !== 1 ? 'es' : ''} (including ${cascadeCount} cascade operation${cascadeCount !== 1 ? 's' : ''}).`,
+          variant: "default",
+        })
+      } else {
+        toast({
+          title: "Bulk Archive Complete",
+          description: `Successfully archived ${canvasIds.length} canvas${canvasIds.length !== 1 ? 'es' : ''}.`,
+          variant: "default",
+        })
+      }
+      
+      // Clear selection and refresh
+      setSelectedCanvasIds(new Set())
+      await refreshCanvases()
+    } catch (error) {
+      console.error('Error bulk archiving canvases:', error)
+      toast({
+        title: "Bulk Archive Failed",
+        description: "Failed to archive some canvases. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const confirmBulkDelete = async () => {
+    try {
+      let totalDeleted = 0
+      let cascadeCount = 0
+      
+      // Delete each canvas
+      for (const canvasId of bulkDeleteConfirmation.canvasIds) {
+        const result = await deleteCanvas(canvasId)
+        
+        // Count cascade operations
+        if (result && typeof result === 'object' && 'deletedCount' in result) {
+          totalDeleted += result.deletedCount
+          cascadeCount++
+        } else {
+          totalDeleted++
+        }
+      }
+      
+      // Show appropriate message based on cascade operations
+      if (cascadeCount > 0) {
+        toast({
+          title: "Bulk Delete Complete",
+          description: `Successfully deleted ${totalDeleted} canvas${totalDeleted !== 1 ? 'es' : ''} (including ${cascadeCount} cascade operation${cascadeCount !== 1 ? 's' : ''}).`,
+          variant: "default",
+        })
+      } else {
+        toast({
+          title: "Bulk Delete Complete",
+          description: `Successfully deleted ${bulkDeleteConfirmation.canvasIds.length} canvas${bulkDeleteConfirmation.canvasIds.length !== 1 ? 'es' : ''}.`,
+          variant: "default",
+        })
+      }
+      
+      // Clear selection and refresh
+      setSelectedCanvasIds(new Set())
+      await refreshCanvases()
+    } catch (error) {
+      console.error('Error bulk deleting canvases:', error)
+      toast({
+        title: "Bulk Delete Failed",
+        description: "Failed to delete some canvases. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setBulkDeleteConfirmation({
+        isOpen: false,
+        canvasIds: [],
+        canvasNames: []
+      })
+    }
+  }
+
+  const cancelBulkDelete = () => {
+    setBulkDeleteConfirmation({
+      isOpen: false,
+      canvasIds: [],
+      canvasNames: []
     })
   }
 
@@ -1030,16 +1354,24 @@ export function CanvasVisualization({
             setShowNewCanvasForm(true)
           }}
           selectedCanvasId={selectedCanvas}
+          selectedCanvasIds={selectedCanvasIds}
+          onToggleCanvasSelection={handleToggleCanvasSelection}
+          onBulkDelete={handleBulkDelete}
+          onBulkArchive={handleBulkArchive}
         />
       )}
 
       {/* New Canvas Form */}
       <NewCanvasForm
         onCreateCanvas={handleCreateNewCanvas}
-        parentCanvasId={isCreatingRootCanvas ? undefined : selectedCanvas}
+        parentCanvasId={isCreatingRootCanvas ? undefined : (selectedCanvas && selectedCanvas.trim() !== '' ? selectedCanvas : undefined)}
         enterpriseContext={null}
         isOpen={showNewCanvasForm}
         onOpenChange={(open) => {
+          console.log('🔍 CANVAS DEBUG - Form open state:', open)
+          console.log('🔍 CANVAS DEBUG - isCreatingRootCanvas:', isCreatingRootCanvas)
+          console.log('🔍 CANVAS DEBUG - selectedCanvas:', selectedCanvas)
+          console.log('🔍 CANVAS DEBUG - parentCanvasId being passed:', isCreatingRootCanvas ? undefined : (selectedCanvas && selectedCanvas.trim() !== '' ? selectedCanvas : undefined))
           setShowNewCanvasForm(open)
           if (!open) {
             setIsCreatingRootCanvas(false)
@@ -1063,7 +1395,7 @@ export function CanvasVisualization({
         <div className="flex items-center space-x-3">
           {/* View Mode Toggle */}
           <div className="flex items-center border rounded-lg p-1 bg-gray-50">
-            <Button
+          <Button
               variant={viewMode === 'canvas' ? "default" : "ghost"}
               size="sm"
               onClick={() => onViewModeChange?.('canvas')}
@@ -1090,19 +1422,19 @@ export function CanvasVisualization({
               size="sm"
               onClick={() => onEditingChange?.(true)}
               className="px-3"
-            >
+          >
               <Edit className="h-4 w-4 mr-1" />
-              Edit
-            </Button>
-            <Button
+            Edit
+          </Button>
+          <Button
               variant={!isEditing ? "default" : "ghost"}
               size="sm"
-              onClick={() => onEditingChange?.(false)}
+            onClick={() => onEditingChange?.(false)}
               className="px-3"
-            >
+          >
               <Eye className="h-4 w-4 mr-1" />
-              View
-            </Button>
+            View
+          </Button>
           </div>
           
           <Button variant="outline" className="px-6 bg-transparent">
@@ -1122,22 +1454,22 @@ export function CanvasVisualization({
 
       {/* Canvas Content */}
       {viewMode === 'canvas' ? (
-        <div className="grid grid-cols-5 gap-6 min-h-[800px]">
-          {/* Row 1 - Top sections */}
-          <div className="col-span-1 row-span-2">{renderCanvasSection("keyPartners")}</div>
-          <div className="col-span-1">{renderCanvasSection("keyActivities")}</div>
-          <div className="col-span-1 row-span-2">{renderCanvasSection("valuePropositions")}</div>
-          <div className="col-span-1">{renderCanvasSection("customerRelationships")}</div>
-          <div className="col-span-1 row-span-2">{renderCanvasSection("customerSegments")}</div>
+      <div className="grid grid-cols-5 gap-6 min-h-[800px]">
+        {/* Row 1 - Top sections */}
+        <div className="col-span-1 row-span-2">{renderCanvasSection("keyPartners")}</div>
+        <div className="col-span-1">{renderCanvasSection("keyActivities")}</div>
+        <div className="col-span-1 row-span-2">{renderCanvasSection("valuePropositions")}</div>
+        <div className="col-span-1">{renderCanvasSection("customerRelationships")}</div>
+        <div className="col-span-1 row-span-2">{renderCanvasSection("customerSegments")}</div>
 
-          {/* Row 2 - Middle sections */}
-          <div className="col-span-1">{renderCanvasSection("keyResources")}</div>
-          <div className="col-span-1">{renderCanvasSection("channels")}</div>
+        {/* Row 2 - Middle sections */}
+        <div className="col-span-1">{renderCanvasSection("keyResources")}</div>
+        <div className="col-span-1">{renderCanvasSection("channels")}</div>
 
-          {/* Row 3 - Bottom sections */}
-          <div className="col-span-2">{renderCanvasSection("costStructure")}</div>
-          <div className="col-span-3">{renderCanvasSection("revenueStreams")}</div>
-        </div>
+        {/* Row 3 - Bottom sections */}
+        <div className="col-span-2">{renderCanvasSection("costStructure")}</div>
+        <div className="col-span-3">{renderCanvasSection("revenueStreams")}</div>
+      </div>
       ) : (
         renderListView()
       )}
@@ -1330,7 +1662,13 @@ export function CanvasVisualization({
                     Warning: Irreversible Action
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    You are about to delete <strong>"{deleteConfirmation.canvasName}"</strong> and all its:
+                    You are about to delete <strong>"{deleteConfirmation.canvasName}"</strong>
+                    {deleteConfirmation.hasChildren && (
+                      <span className="text-destructive font-medium">
+                        {' '}and {deleteConfirmation.childCount} descendant canvas{deleteConfirmation.childCount !== 1 ? 'es' : ''}
+                      </span>
+                    )}
+                    {' '}and all its:
                   </p>
                   <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 ml-2">
                     <li>Value propositions</li>
@@ -1370,6 +1708,81 @@ export function CanvasVisualization({
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Delete Permanently
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <Dialog open={bulkDeleteConfirmation.isOpen} onOpenChange={cancelBulkDelete}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <Trash2 className="h-5 w-5" />
+              Bulk Delete Business Canvases
+            </DialogTitle>
+            <DialogDescription className="text-left">
+              This action cannot be undone. This will permanently delete {bulkDeleteConfirmation.canvasIds.length} business canvas{bulkDeleteConfirmation.canvasIds.length !== 1 ? 'es' : ''} and all associated data.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+                <div className="space-y-2">
+                  <p className="font-medium text-destructive">
+                    Warning: Irreversible Action
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    You are about to delete the following canvas{bulkDeleteConfirmation.canvasIds.length !== 1 ? 'es' : ''}:
+                  </p>
+                  <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 ml-2 max-h-32 overflow-y-auto">
+                    {bulkDeleteConfirmation.canvasNames.map((name, index) => (
+                      <li key={index} className="truncate">{name}</li>
+                    ))}
+                  </ul>
+                  <p className="text-sm text-muted-foreground">
+                    Each canvas will lose all its:
+                  </p>
+                  <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 ml-2">
+                    <li>Value propositions</li>
+                    <li>Customer segments</li>
+                    <li>Revenue streams</li>
+                    <li>Partnerships</li>
+                    <li>Resources and activities</li>
+                    <li>Cost structures</li>
+                    <li>Channel information</li>
+                  </ul>
+                  <p className="text-sm font-medium text-destructive">
+                    This data cannot be recovered once deleted.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-3 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                <strong>Alternative:</strong> Consider archiving the canvases instead of deleting them to preserve the data for future reference.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button 
+              variant="outline" 
+              onClick={cancelBulkDelete}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmBulkDelete}
+              className="w-full sm:w-auto"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete All Permanently
             </Button>
           </DialogFooter>
         </DialogContent>

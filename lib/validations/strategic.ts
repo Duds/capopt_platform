@@ -68,6 +68,7 @@ export const businessCanvasSchema = z.object({
   enterpriseId: z.string().optional(),
   facilityId: z.string().optional(),
   businessUnitId: z.string().optional(),
+  parentCanvasId: z.string().nullable().optional().transform(val => val === '' || (typeof val === 'string' && val.trim() === '') ? null : val),
   templateId: z.string().optional(),
   valuePropositions: z.array(valuePropositionSchema).optional(),
   customerSegments: z.array(customerSegmentSchema).optional(),

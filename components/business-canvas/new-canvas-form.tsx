@@ -12,7 +12,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,6 +21,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
+import { LocationInput } from '@/components/ui/location-input'
 import {
   Dialog,
   DialogContent,
@@ -76,6 +77,7 @@ interface BusinessInformation {
   
   // Geographic Information
   primaryLocation: string
+  primaryLocationValidation?: any
   operatingRegions: string[]
   timeZone: string
   
@@ -217,12 +219,13 @@ export function NewCanvasForm({
     budget: 0,
     currency: 'AUD',
     primaryLocation: '',
+    primaryLocationValidation: null,
     operatingRegions: [],
     timeZone: 'Australia/Sydney',
     technologyStack: [],
     digitalMaturity: 'INTERMEDIATE',
     automationLevel: 'SEMI_AUTOMATED',
-    parentCanvasId,
+    parentCanvasId: parentCanvasId && parentCanvasId.trim() !== '' ? parentCanvasId : undefined,
     enterpriseId: enterpriseContext?.enterprise?.id,
     facilityId: enterpriseContext?.facility?.id,
     businessUnitId: enterpriseContext?.businessUnit?.id
@@ -230,6 +233,15 @@ export function NewCanvasForm({
 
   const [currentStep, setCurrentStep] = useState(1)
   const totalSteps = 4
+
+  // Update parentCanvasId when prop changes
+  useEffect(() => {
+    console.log('🔍 FORM DEBUG - parentCanvasId prop changed:', parentCanvasId)
+    setFormData(prev => ({
+      ...prev,
+      parentCanvasId: parentCanvasId && parentCanvasId.trim() !== '' ? parentCanvasId : undefined
+    }))
+  }, [parentCanvasId])
 
   const handleInputChange = (field: keyof BusinessInformation, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -245,6 +257,9 @@ export function NewCanvasForm({
   }
 
   const handleSubmit = () => {
+    console.log('🔍 FORM DEBUG - Submitting form data:', formData)
+    console.log('🔍 FORM DEBUG - parentCanvasId prop:', parentCanvasId)
+    console.log('🔍 FORM DEBUG - formData.parentCanvasId:', formData.parentCanvasId)
     onCreateCanvas(formData)
     onOpenChange(false)
     setFormData({
@@ -269,12 +284,13 @@ export function NewCanvasForm({
       budget: 0,
       currency: 'AUD',
       primaryLocation: '',
+      primaryLocationValidation: null,
       operatingRegions: [],
       timeZone: 'Australia/Sydney',
       technologyStack: [],
       digitalMaturity: 'INTERMEDIATE',
       automationLevel: 'SEMI_AUTOMATED',
-      parentCanvasId,
+      parentCanvasId: parentCanvasId && parentCanvasId.trim() !== '' ? parentCanvasId : undefined,
       enterpriseId: enterpriseContext?.enterprise?.id,
       facilityId: enterpriseContext?.facility?.id,
       businessUnitId: enterpriseContext?.businessUnit?.id
@@ -412,12 +428,13 @@ export function NewCanvasForm({
       </div>
 
       <div>
-        <Label htmlFor="primaryLocation">Primary Location</Label>
-        <Input
-          id="primaryLocation"
+        <LocationInput
           value={formData.primaryLocation}
-          onChange={(e) => handleInputChange('primaryLocation', e.target.value)}
-          placeholder="City, State, Country"
+          onChange={(value) => handleInputChange('primaryLocation', value)}
+          onValidationChange={(validation) => handleInputChange('primaryLocationValidation', validation)}
+          label="Primary Location"
+          placeholder="Enter city, state, country..."
+          required={false}
         />
       </div>
     </div>

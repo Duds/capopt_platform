@@ -94,7 +94,29 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log('🔍 API DEBUG - Creating canvas with data:', JSON.stringify(body, null, 2))
+    
     const validatedData = businessCanvasSchema.parse(body)
+    console.log('🔍 API DEBUG - Validated data:', JSON.stringify(validatedData, null, 2))
+    
+    // Check for duplicate canvas name
+    const existingCanvas = await prisma.businessCanvas.findFirst({
+      where: {
+        name: validatedData.name,
+        isActive: true
+      }
+    })
+    
+    if (existingCanvas) {
+      return NextResponse.json(
+        { 
+          error: 'Canvas name already exists', 
+          details: `A canvas with the name "${validatedData.name}" already exists. Please choose a different name.`,
+          code: 'DUPLICATE_NAME'
+        },
+        { status: 409 }
+      )
+    }
     
     // Build data object with enhanced fields
     const data: any = {
@@ -110,6 +132,17 @@ export async function POST(request: NextRequest) {
     if (validatedData.enterpriseId !== undefined) data.enterpriseId = validatedData.enterpriseId
     if (validatedData.facilityId !== undefined) data.facilityId = validatedData.facilityId
     if (validatedData.businessUnitId !== undefined) data.businessUnitId = validatedData.businessUnitId
+    if (validatedData.parentCanvasId !== undefined) {
+      console.log('🔍 API DEBUG - parentCanvasId received:', validatedData.parentCanvasId, 'type:', typeof validatedData.parentCanvasId)
+      
+      // Convert empty string to null to prevent foreign key constraint violation
+      if (validatedData.parentCanvasId === '' || (typeof validatedData.parentCanvasId === 'string' && validatedData.parentCanvasId.trim() === '')) {
+        console.log('🔍 API DEBUG - Converting empty/whitespace string parentCanvasId to null')
+        data.parentCanvasId = null
+      } else {
+        data.parentCanvasId = validatedData.parentCanvasId
+      }
+    }
     if (validatedData.templateId !== undefined) data.templateId = validatedData.templateId
 
     // Handle nested relationships
@@ -161,6 +194,8 @@ export async function POST(request: NextRequest) {
       }
     }
     
+    console.log('🔍 API DEBUG - Final data for Prisma:', JSON.stringify(data, null, 2))
+    
     const businessCanvas = await prisma.businessCanvas.create({
       data,
       include: {
@@ -175,9 +210,11 @@ export async function POST(request: NextRequest) {
       }
     })
     
+    console.log('🔍 API DEBUG - Canvas created successfully:', businessCanvas.id)
     return NextResponse.json(businessCanvas, { status: 201 })
   } catch (error) {
-    console.error('Error creating business canvas:', error)
+    console.error('❌ Error creating business canvas:', error)
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace')
     return NextResponse.json(
       { error: 'Failed to create business canvas', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

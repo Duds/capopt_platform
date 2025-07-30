@@ -42,7 +42,7 @@ export function SidebarNav({
   onSidebarToggle
 }: SidebarNavProps) {
   return (
-    <nav className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white border-r border-gray-200 min-h-screen p-4 flex-shrink-0 transition-all duration-300 relative`}>
+    <nav className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-gray-100 border-r border-gray-200 min-h-screen p-4 flex-shrink-0 flex-grow-0 transition-all duration-300 relative`}>
       {/* Toggle Button */}
       <Button
         variant="ghost"
@@ -100,6 +100,14 @@ export function SidebarNav({
         {/* Operational Layer */}
         <div className="pt-4">
           {!sidebarCollapsed && <h3 className="text-sm font-medium text-gray-500 mb-2">OPERATIONAL LAYER</h3>}
+          <Button
+            variant={activeLayer === "processes" ? "default" : "ghost"}
+            className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
+            onClick={() => onLayerChange("processes")}
+          >
+            <Workflow className="h-4 w-4" />
+            {!sidebarCollapsed && <span className="ml-2">Processes</span>}
+          </Button>
           <Button
             variant={activeLayer === "process-maps" ? "default" : "ghost"}
             className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}

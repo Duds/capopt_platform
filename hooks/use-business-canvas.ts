@@ -349,9 +349,24 @@ export function useBusinessCanvas() {
   }, [])
 
   // Create new canvas
-  const createCanvas = useCallback(async (canvasData: Partial<BusinessCanvas>) => {
+  const createCanvas = useCallback(async (canvasData: {
+    name: string
+    description?: string
+    version?: string
+    isActive?: boolean
+    status?: 'DRAFT' | 'REVIEW' | 'PUBLISHED' | 'ARCHIVED'
+    editMode?: 'SINGLE_USER' | 'MULTI_USER' | 'READ_ONLY'
+    autoSave?: boolean
+    enterpriseId?: string
+    facilityId?: string
+    businessUnitId?: string
+    parentCanvasId?: string | null
+    templateId?: string
+  }) => {
     try {
       setError(null)
+      
+      console.log('🔍 HOOK DEBUG - Creating canvas with data:', canvasData)
       
       const response = await fetch('/api/business-canvas', {
         method: 'POST',
@@ -362,10 +377,19 @@ export function useBusinessCanvas() {
       })
       
       if (!response.ok) {
+        const errorData = await response.json()
+        console.error('❌ HOOK DEBUG - Server response error:', JSON.stringify(errorData, null, 2))
+        
+        // Handle specific error types
+        if (response.status === 409 && errorData.code === 'DUPLICATE_NAME') {
+          throw new Error(errorData.details || 'Canvas name already exists')
+        }
+        
         throw new Error(`Failed to create canvas: ${response.statusText}`)
       }
       
       const newCanvas = await response.json()
+      console.log('🔍 HOOK DEBUG - Canvas created successfully:', newCanvas)
       
       // Update local state
       setBusinessCanvases(prev => [...prev, newCanvas])
@@ -373,7 +397,7 @@ export function useBusinessCanvas() {
       
       return newCanvas
     } catch (err) {
-      console.error('Error creating canvas:', err)
+      console.error('❌ HOOK DEBUG - Error creating canvas:', err)
       setError(err instanceof Error ? err.message : 'Failed to create canvas')
       throw err
     }
@@ -431,17 +455,36 @@ export function useBusinessCanvas() {
         throw new Error(`Failed to delete canvas: ${response.statusText}`)
       }
       
-      // Update local state by removing the deleted canvas
-      setBusinessCanvases(prev => prev.filter(canvas => canvas.id !== canvasId))
+      const result = await response.json()
+      
+      // Update local state by removing the deleted canvas and its descendants
+      setBusinessCanvases(prev => {
+        const deletedIds = new Set([canvasId])
+        
+        // If this was a cascade delete, also remove descendants
+        if (result.deletedCount > 1) {
+          // Find and remove all descendant canvases
+          const removeDescendants = (parentId: string) => {
+            const children = prev.filter(canvas => canvas.parentCanvasId === parentId)
+            children.forEach(child => {
+              deletedIds.add(child.id)
+              removeDescendants(child.id)
+            })
+          }
+          removeDescendants(canvasId)
+        }
+        
+        return prev.filter(canvas => !deletedIds.has(canvas.id))
+      })
       
       // If the current canvas was deleted, clear it
       if (currentCanvas?.id === canvasId) {
         setCurrentCanvas(null)
       }
       
-      console.log('Canvas deleted successfully')
+      console.log('Canvas deleted successfully', result)
       
-      return true
+      return result
     } catch (err) {
       console.error('Error deleting canvas:', err)
       setError(err instanceof Error ? err.message : 'Failed to delete canvas')
@@ -466,21 +509,52 @@ export function useBusinessCanvas() {
         throw new Error(`Failed to archive canvas: ${response.statusText}`)
       }
       
+      const result = await response.json()
+      
       // Update the canvas status in the local state
-      setBusinessCanvases(prev => prev.map(canvas => 
-        canvas.id === canvasId 
-          ? { ...canvas, status: 'ARCHIVED' as const }
-          : canvas
-      ))
+      setBusinessCanvases(prev => {
+        const updatedCanvases = [...prev]
+        
+        // If this was a cascade archive, update all descendants
+        if (result.cascadeInfo) {
+          const cascadeInfo = result.cascadeInfo
+          const archivedIds = new Set([canvasId])
+          
+          // Find and update all descendant canvases
+          const updateDescendants = (parentId: string) => {
+            const children = updatedCanvases.filter(canvas => canvas.parentCanvasId === parentId)
+            children.forEach(child => {
+              archivedIds.add(child.id)
+              child.status = 'ARCHIVED'
+              updateDescendants(child.id)
+            })
+          }
+          updateDescendants(canvasId)
+          
+          // Update the parent canvas
+          const parentIndex = updatedCanvases.findIndex(canvas => canvas.id === canvasId)
+          if (parentIndex !== -1) {
+            updatedCanvases[parentIndex] = { ...updatedCanvases[parentIndex], status: 'ARCHIVED' as const }
+          }
+        } else {
+          // Regular archive - just update the single canvas
+          const canvasIndex = updatedCanvases.findIndex(canvas => canvas.id === canvasId)
+          if (canvasIndex !== -1) {
+            updatedCanvases[canvasIndex] = { ...updatedCanvases[canvasIndex], status: 'ARCHIVED' as const }
+          }
+        }
+        
+        return updatedCanvases
+      })
       
       // If the current canvas is being archived, clear it
       if (currentCanvas?.id === canvasId) {
         setCurrentCanvas(null)
       }
       
-      console.log('Canvas archived successfully')
+      console.log('Canvas archived successfully', result)
       
-      return true
+      return result
     } catch (err) {
       console.error('Error archiving canvas:', err)
       setError(err instanceof Error ? err.message : 'Failed to archive canvas')

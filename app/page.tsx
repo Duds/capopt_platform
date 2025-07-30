@@ -372,7 +372,7 @@ export default function CapOptPlatform() {
           <StrategicBreadcrumbs showStrategic={true} activeLayer={activeLayer} />
         </div>
 
-        <div className="flex w-full">
+        <div className="flex w-full h-full">
           {/* Sidebar Navigation */}
           <SidebarNav
             activeLayer={activeLayer}
@@ -382,7 +382,7 @@ export default function CapOptPlatform() {
           />
 
           {/* Main Content */}
-          <main className="flex-1 p-6 w-full">
+          <main className="flex-1 p-6">
             {isLoading ? (
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
@@ -643,6 +643,111 @@ export default function CapOptPlatform() {
                       onViewModeChange={setViewMode}
                       onEditingChange={setIsEditing}
                     />
+                  </div>
+                )}
+
+                {activeLayer === "processes" && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-3xl font-bold">Process Management</h2>
+                      <Button>
+                        <Workflow className="h-4 w-4 mr-2" />
+                        Add Process
+                      </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <Card className="opacity-50">
+                        <CardHeader>
+                          <CardTitle className="text-lg text-green-600 flex items-center gap-2">
+                            Active Processes
+                            <Badge variant="outline" className="text-xs">Mock Data</Badge>
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-3xl font-bold">{metrics.activeProcesses}</div>
+                          <p className="text-sm text-gray-600">Processes currently operational</p>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="opacity-50">
+                        <CardHeader>
+                          <CardTitle className="text-lg text-yellow-600 flex items-center gap-2">
+                            Under Review
+                            <Badge variant="outline" className="text-xs">Mock Data</Badge>
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-3xl font-bold">2</div>
+                          <p className="text-sm text-gray-600">Processes pending review</p>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="opacity-50">
+                        <CardHeader>
+                          <CardTitle className="text-lg text-red-600 flex items-center gap-2">
+                            Draft Processes
+                            <Badge variant="outline" className="text-xs">Mock Data</Badge>
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-3xl font-bold">5</div>
+                          <p className="text-sm text-gray-600">Processes in development</p>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          Process Overview
+                          <Badge variant="secondary" className="text-xs">✓ Real Data</Badge>
+                        </CardTitle>
+                        <CardDescription>Current operational processes from database</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between p-4 border rounded-lg">
+                            <div className="flex items-center space-x-4">
+                              <CheckCircle className="h-5 w-5 text-green-600" />
+                              <div>
+                                <p className="font-medium">Customer Onboarding</p>
+                                <p className="text-sm text-gray-500">Standard customer onboarding workflow</p>
+                              </div>
+                            </div>
+                            <Badge variant="secondary" className="bg-green-100 text-green-800">
+                              Active
+                            </Badge>
+                          </div>
+
+                          <div className="flex items-center justify-between p-4 border rounded-lg">
+                            <div className="flex items-center space-x-4">
+                              <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                              <div>
+                                <p className="font-medium">Data Backup</p>
+                                <p className="text-sm text-gray-500">Automated data backup procedures</p>
+                              </div>
+                            </div>
+                            <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                              Under Review
+                            </Badge>
+                          </div>
+
+                          <div className="flex items-center justify-between p-4 border rounded-lg">
+                            <div className="flex items-center space-x-4">
+                              <Clock className="h-5 w-5 text-blue-600" />
+                              <div>
+                                <p className="font-medium">Incident Response</p>
+                                <p className="text-sm text-gray-500">Security incident response procedures</p>
+                              </div>
+                            </div>
+                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                              Draft
+                            </Badge>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 )}
 

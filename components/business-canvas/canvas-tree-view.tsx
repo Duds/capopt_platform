@@ -42,7 +42,9 @@ import {
   Maximize2,
   Minimize2,
   ChevronsDown,
-  ChevronsUp
+  ChevronsUp,
+  CheckSquare,
+  Square
 } from 'lucide-react'
 
 // Canvas Node Interface
@@ -69,6 +71,11 @@ interface CanvasTreeViewProps {
   onMoveCanvas: (canvasId: string, newParentId: string | null) => void
   onAddRootCanvas?: () => void
   selectedCanvasId?: string
+  // Group selection props
+  selectedCanvasIds?: Set<string>
+  onToggleCanvasSelection?: (canvasId: string) => void
+  onBulkDelete?: (canvasIds: string[]) => void
+  onBulkArchive?: (canvasIds: string[]) => void
 }
 
 // Helper functions for icons and styling
@@ -115,7 +122,10 @@ function TreeNode({
   expandedNodes,
   onToggleNode,
   draggedCanvasId,
-  setDraggedCanvasId
+  setDraggedCanvasId,
+  // Group selection props
+  selectedCanvasIds,
+  onToggleCanvasSelection
 }: {
   node: CanvasNode
   depth?: number
@@ -131,6 +141,9 @@ function TreeNode({
   onToggleNode: (nodeId: string) => void
   draggedCanvasId: string | null
   setDraggedCanvasId: (id: string | null) => void
+  // Group selection props
+  selectedCanvasIds?: Set<string>
+  onToggleCanvasSelection?: (canvasId: string) => void
 }) {
   const nodeRef = useRef<HTMLDivElement>(null)
   const [isDragOver, setIsDragOver] = useState(false)
@@ -139,6 +152,7 @@ function TreeNode({
   const isSelected = selectedCanvasId === node.id
   const isExpanded = expandedNodes.has(node.id)
   const hasChildren = node.children && node.children.length > 0
+  const isGroupSelected = selectedCanvasIds?.has(node.id) || false
 
   // Native Drag and Drop handlers
   const handleDragStart = useCallback((e: React.DragEvent) => {
@@ -279,6 +293,11 @@ function TreeNode({
     onSelectCanvas(node.id)
   }
 
+  const handleCheckboxToggle = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onToggleCanvasSelection?.(node.id)
+  }
+
   return (
     <div 
       className={`tree-node ${isDragging ? 'dragging' : ''}`}
@@ -303,6 +322,20 @@ function TreeNode({
         <div className="cursor-grab active:cursor-grabbing p-1.5 rounded-md transition-all duration-200 hover:bg-muted hover:scale-105">
           <GripVertical className="h-4 w-4 text-muted-foreground/60" />
         </div>
+
+        {/* Selection Checkbox */}
+        {onToggleCanvasSelection && (
+          <button
+            onClick={handleCheckboxToggle}
+            className="flex items-center justify-center w-5 h-5 rounded border-2 border-muted-foreground/30 hover:border-primary transition-colors duration-200"
+          >
+            {isGroupSelected ? (
+              <CheckSquare className="h-4 w-4 text-primary" />
+            ) : (
+              <Square className="h-4 w-4 text-muted-foreground/60" />
+            )}
+          </button>
+        )}
 
         {/* Indentation */}
         <div style={{ width: depth * 24 }} />
@@ -414,6 +447,8 @@ function TreeNode({
             depth={depth + 1}
             draggedCanvasId={draggedCanvasId}
             setDraggedCanvasId={setDraggedCanvasId}
+            selectedCanvasIds={selectedCanvasIds}
+            onToggleCanvasSelection={onToggleCanvasSelection}
           />
         </div>
       )}
@@ -436,7 +471,10 @@ function TreeList({
   onToggleNode,
   depth = 0,
   draggedCanvasId,
-  setDraggedCanvasId
+  setDraggedCanvasId,
+  // Group selection props
+  selectedCanvasIds,
+  onToggleCanvasSelection
 }: {
   nodes: CanvasNode[]
   onSelectCanvas: (canvasId: string) => void
@@ -452,6 +490,9 @@ function TreeList({
   depth?: number
   draggedCanvasId: string | null
   setDraggedCanvasId: (id: string | null) => void
+  // Group selection props
+  selectedCanvasIds?: Set<string>
+  onToggleCanvasSelection?: (canvasId: string) => void
 }) {
   return (
     <div className="space-y-1">
@@ -472,6 +513,8 @@ function TreeList({
           onToggleNode={onToggleNode}
           draggedCanvasId={draggedCanvasId}
           setDraggedCanvasId={setDraggedCanvasId}
+          selectedCanvasIds={selectedCanvasIds}
+          onToggleCanvasSelection={onToggleCanvasSelection}
         />
       ))}
     </div>
@@ -489,7 +532,12 @@ export function CanvasTreeView({
   onArchiveCanvas,
   onMoveCanvas,
   onAddRootCanvas,
-  selectedCanvasId
+  selectedCanvasId,
+  // Group selection props
+  selectedCanvasIds,
+  onToggleCanvasSelection,
+  onBulkDelete,
+  onBulkArchive
 }: CanvasTreeViewProps) {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set())
   const [draggedCanvasId, setDraggedCanvasId] = useState<string | null>(null)
@@ -711,6 +759,35 @@ export function CanvasTreeView({
           </div>
         </div>
 
+        {/* Bulk Actions */}
+        {selectedCanvasIds && selectedCanvasIds.size > 0 && (
+          <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg border border-muted-foreground/20">
+            <div className="flex-1 text-sm text-muted-foreground">
+              {selectedCanvasIds.size} canvas{selectedCanvasIds.size !== 1 ? 'es' : ''} selected
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onBulkArchive?.(Array.from(selectedCanvasIds))}
+                className="h-8 px-3"
+              >
+                <Archive className="h-4 w-4 mr-2" />
+                Archive All
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => onBulkDelete?.(Array.from(selectedCanvasIds))}
+                className="h-8 px-3"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete All
+              </Button>
+            </div>
+          </div>
+        )}
+
         <TreeList
           nodes={canvases}
           onSelectCanvas={onSelectCanvas}
@@ -725,6 +802,8 @@ export function CanvasTreeView({
           onToggleNode={toggleNode}
           draggedCanvasId={draggedCanvasId}
           setDraggedCanvasId={setDraggedCanvasId}
+          selectedCanvasIds={selectedCanvasIds}
+          onToggleCanvasSelection={onToggleCanvasSelection}
         />
       </CardContent>
       )}

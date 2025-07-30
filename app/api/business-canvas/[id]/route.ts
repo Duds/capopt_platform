@@ -142,25 +142,101 @@ export async function PATCH(
     // Update lastSaved timestamp
     updateData.lastSaved = new Date()
 
-    const updatedCanvas = await prisma.businessCanvas.update({
-      where: { id },
-      data: updateData,
-      include: {
-        valuePropositions: true,
-        customerSegments: true,
-        revenueStreams: true,
-        partnerships: true,
-        resources: true,
-        activities: true,
-        costStructures: true,
-        channels: true,
-        enterprise: true,
-        facility: true,
-        businessUnit: true
+    // If this is an archive operation, cascade to all descendants
+    if (body.status === 'ARCHIVED') {
+      // Recursive function to get all descendant canvas IDs
+      const getAllDescendantIds = async (canvasId: string): Promise<string[]> => {
+        const descendants: string[] = []
+        
+        const getDescendants = async (parentId: string) => {
+          const children = await prisma.businessCanvas.findMany({
+            where: { parentCanvasId: parentId },
+            select: { id: true }
+          })
+          
+          for (const child of children) {
+            descendants.push(child.id)
+            await getDescendants(child.id) // Recursively get grandchildren
+          }
+        }
+        
+        await getDescendants(canvasId)
+        return descendants
       }
-    })
 
-    return NextResponse.json(updatedCanvas)
+      // Get all descendant canvas IDs
+      const descendantIds = await getAllDescendantIds(id)
+      const allCanvasIdsToArchive = [id, ...descendantIds]
+      
+      console.log('📦 CASCADE ARCHIVE - Canvas to archive:', {
+        parentId: id,
+        parentName: existingCanvas.name,
+        descendantCount: descendantIds.length,
+        descendantIds,
+        totalToArchive: allCanvasIdsToArchive.length
+      })
+
+      // Archive all canvases in a transaction
+      await prisma.$transaction(async (tx) => {
+        for (const canvasId of allCanvasIdsToArchive) {
+          await tx.businessCanvas.update({
+            where: { id: canvasId },
+            data: { 
+              status: 'ARCHIVED',
+              lastSaved: new Date()
+            }
+          })
+        }
+      })
+
+      // Return the updated parent canvas with cascade info
+      const updatedCanvas = await prisma.businessCanvas.findUnique({
+        where: { id },
+        include: {
+          valuePropositions: true,
+          customerSegments: true,
+          revenueStreams: true,
+          partnerships: true,
+          resources: true,
+          activities: true,
+          costStructures: true,
+          channels: true,
+          enterprise: true,
+          facility: true,
+          businessUnit: true
+        }
+      })
+
+      return NextResponse.json({
+        ...updatedCanvas,
+        cascadeInfo: {
+          archivedCount: allCanvasIdsToArchive.length,
+          parentCanvas: existingCanvas.name,
+          descendantCount: descendantIds.length
+        }
+      })
+    } else {
+      // Regular update (non-archive)
+      const updatedCanvas = await prisma.businessCanvas.update({
+        where: { id },
+        data: updateData,
+        include: {
+          valuePropositions: true,
+          customerSegments: true,
+          revenueStreams: true,
+          partnerships: true,
+          resources: true,
+          activities: true,
+          costStructures: true,
+          channels: true,
+          enterprise: true,
+          facility: true,
+          businessUnit: true
+        }
+      })
+
+      return NextResponse.json(updatedCanvas)
+    }
   } catch (error) {
     console.error('Error updating business canvas:', error)
     return NextResponse.json(
@@ -189,13 +265,54 @@ export async function DELETE(
       )
     }
 
-    // Delete the canvas and all related data
-    await prisma.businessCanvas.delete({
-      where: { id }
+    // Recursive function to get all descendant canvas IDs
+    const getAllDescendantIds = async (canvasId: string): Promise<string[]> => {
+      const descendants: string[] = []
+      
+      const getDescendants = async (parentId: string) => {
+        const children = await prisma.businessCanvas.findMany({
+          where: { parentCanvasId: parentId },
+          select: { id: true }
+        })
+        
+        for (const child of children) {
+          descendants.push(child.id)
+          await getDescendants(child.id) // Recursively get grandchildren
+        }
+      }
+      
+      await getDescendants(canvasId)
+      return descendants
+    }
+
+    // Get all descendant canvas IDs
+    const descendantIds = await getAllDescendantIds(id)
+    const allCanvasIdsToDelete = [id, ...descendantIds]
+    
+    console.log('🗑️  CASCADE DELETE - Canvas to delete:', {
+      parentId: id,
+      parentName: existingCanvas.name,
+      descendantCount: descendantIds.length,
+      descendantIds,
+      totalToDelete: allCanvasIdsToDelete.length
+    })
+
+    // Delete all canvases in a transaction
+    await prisma.$transaction(async (tx) => {
+      for (const canvasId of allCanvasIdsToDelete) {
+        await tx.businessCanvas.delete({
+          where: { id: canvasId }
+        })
+      }
     })
 
     return NextResponse.json(
-      { message: 'Business canvas deleted successfully' },
+      { 
+        message: 'Business canvas and descendants deleted successfully',
+        deletedCount: allCanvasIdsToDelete.length,
+        parentCanvas: existingCanvas.name,
+        descendantCount: descendantIds.length
+      },
       { status: 200 }
     )
   } catch (error) {
