@@ -46,6 +46,7 @@ import {
   CheckSquare,
   Square
 } from 'lucide-react'
+import { EditCanvasForm } from './edit-canvas-form'
 
 // Canvas Node Interface
 interface CanvasNode {
@@ -76,6 +77,9 @@ interface CanvasTreeViewProps {
   onToggleCanvasSelection?: (canvasId: string) => void
   onBulkDelete?: (canvasIds: string[]) => void
   onBulkArchive?: (canvasIds: string[]) => void
+  // Edit canvas props
+  onUpdateCanvas?: (canvasId: string, businessInfo: any) => void
+  enterpriseContext?: any
 }
 
 // Helper functions for icons and styling
@@ -411,7 +415,7 @@ function TreeNode({
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onEditCanvas(node.id)}>
                 <Edit className="h-4 w-4 mr-2" />
-                Edit
+                Edit Metadata
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onArchiveCanvas(node.id)}>
                 <Archive className="h-4 w-4 mr-2" />
@@ -537,12 +541,18 @@ export function CanvasTreeView({
   selectedCanvasIds,
   onToggleCanvasSelection,
   onBulkDelete,
-  onBulkArchive
+  onBulkArchive,
+  // Edit canvas props
+  onUpdateCanvas,
+  enterpriseContext
 }: CanvasTreeViewProps) {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set())
   const [draggedCanvasId, setDraggedCanvasId] = useState<string | null>(null)
   const [isRootDragOver, setIsRootDragOver] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null)
+  const [editingCanvasData, setEditingCanvasData] = useState<any>(null)
   
   // Load expanded nodes from localStorage on mount
   useEffect(() => {
@@ -631,6 +641,62 @@ export function CanvasTreeView({
   const collapseAllNodes = () => {
     setExpandedNodes(new Set())
     console.log('🟡 COLLAPSED ALL NODES')
+  }
+
+  // Handle edit canvas
+  const handleEditCanvas = async (canvasId: string) => {
+    try {
+      // Fetch canvas data for editing
+      const response = await fetch(`/api/business-canvas/${canvasId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch canvas data')
+      }
+      const canvasData = await response.json()
+      
+      setEditingCanvasId(canvasId)
+      setEditingCanvasData(canvasData)
+      setIsEditModalOpen(true)
+    } catch (error) {
+      console.error('Error fetching canvas data for editing:', error)
+      // Fallback to original edit handler
+      onEditCanvas(canvasId)
+    }
+  }
+
+  // Handle update canvas
+  const handleUpdateCanvas = async (canvasId: string, businessInfo: any) => {
+    try {
+      // Update canvas metadata
+      const response = await fetch(`/api/business-canvas/${canvasId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: businessInfo.name,
+          description: businessInfo.strategicObjective,
+          // Add other fields as needed
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update canvas')
+      }
+
+      const updatedCanvas = await response.json()
+      console.log('✅ Canvas updated successfully:', updatedCanvas)
+      
+      // Call the parent update handler if provided
+      onUpdateCanvas?.(canvasId, businessInfo)
+      
+      // Close modal and reset state
+      setIsEditModalOpen(false)
+      setEditingCanvasId(null)
+      setEditingCanvasData(null)
+    } catch (error) {
+      console.error('Error updating canvas:', error)
+      // You might want to show an error toast here
+    }
   }
 
   return (
@@ -793,7 +859,7 @@ export function CanvasTreeView({
           onSelectCanvas={onSelectCanvas}
           onAddChild={onAddChild}
           onCloneCanvas={onCloneCanvas}
-          onEditCanvas={onEditCanvas}
+          onEditCanvas={handleEditCanvas}
           onDeleteCanvas={onDeleteCanvas}
           onArchiveCanvas={onArchiveCanvas}
           onMoveCanvas={onMoveCanvas}
@@ -807,6 +873,16 @@ export function CanvasTreeView({
         />
       </CardContent>
       )}
+
+      {/* Edit Canvas Modal */}
+      <EditCanvasForm
+        onUpdateCanvas={handleUpdateCanvas}
+        canvasId={editingCanvasId || ''}
+        canvasData={editingCanvasData}
+        enterpriseContext={enterpriseContext}
+        isOpen={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+      />
     </Card>
   )
 } 

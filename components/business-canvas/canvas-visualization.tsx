@@ -41,7 +41,6 @@ import {
   Trash2,
   Download,
   Share,
-  Save,
   Eye,
   Copy,
   Users,
@@ -59,7 +58,11 @@ import {
   Layers,
   AlertTriangle,
   Grid3X3,
-  List
+  List,
+  Printer,
+  Mail,
+  Link,
+  FileText
 } from 'lucide-react'
 import { CanvasVisualizationProps, BusinessModel, CanvasItem } from './types'
 import { canvasSections, getPriorityColor } from './utils'
@@ -105,8 +108,28 @@ export function CanvasVisualization({
     canvasNames: []
   })
   
+  // Export and Share state
+  const [exportDialog, setExportDialog] = useState<{
+    isOpen: boolean
+    format: 'PDF' | 'PNG' | 'SVG' | 'JSON' | 'CSV' | 'EXCEL'
+  }>({
+    isOpen: false,
+    format: 'PDF'
+  })
+  
+  const [shareDialog, setShareDialog] = useState<{
+    isOpen: boolean
+    type: 'EMAIL_INVITE' | 'PUBLIC_LINK' | 'TEAM_ACCESS'
+    email?: string
+    permissions: 'VIEW' | 'EDIT' | 'REVIEW'
+  }>({
+    isOpen: false,
+    type: 'EMAIL_INVITE',
+    permissions: 'VIEW'
+  })
+  
   // Fetch business canvas data from database
-  const { businessCanvases, loading, error, refreshCanvases, setBusinessCanvases, cloneCanvas, deleteCanvas, archiveCanvas, createCanvas } = useBusinessCanvas()
+  const { businessCanvases, loading, error, refreshCanvases, setBusinessCanvases, cloneCanvas, deleteCanvas, archiveCanvas, createCanvas, setCurrentCanvas } = useBusinessCanvas()
   const { toast } = useToast()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -153,7 +176,7 @@ export function CanvasVisualization({
       setSelectedCanvas('')
       selectedCanvasRef.current = ''
     }
-  }, [searchParams, businessCanvases, router]) // Removed selectedCanvas from dependencies
+  }, [searchParams, businessCanvases]) // Removed router from dependencies to prevent infinite loops
 
   // Keep ref in sync with selectedCanvas state
   useEffect(() => {
@@ -352,25 +375,34 @@ export function CanvasVisualization({
   // Convert database canvas to business model format
   const convertCanvasToBusinessModel = (canvas: DBBusinessCanvas): BusinessModel => {
     return {
-      keyPartners: canvas.partnerships.map(p => ({
+      partnerships: canvas.partnerships.map(p => ({
         id: p.id,
         title: p.name,
+        name: p.name,
         description: p.description || '',
         priority: p.type === 'Strategic' ? 'high' : 'medium',
+        type: p.type || undefined,
+        value: p.value || undefined,
         isImplemented: true
       })),
-      keyActivities: canvas.activities.map(a => ({
+      activities: canvas.activities.map(a => ({
         id: a.id,
         title: a.name,
+        name: a.name,
         description: a.description || '',
         priority: a.priority.toLowerCase() as 'low' | 'medium' | 'high',
+        cost: a.cost || undefined,
         isImplemented: true
       })),
-      keyResources: canvas.resources.map(r => ({
+      resources: canvas.resources.map(r => ({
         id: r.id,
         title: r.name,
+        name: r.name,
         description: r.description || '',
         priority: r.type === 'PHYSICAL' ? 'high' : 'medium',
+        type: r.type,
+        availability: r.availability || undefined,
+        cost: r.cost || undefined,
         isImplemented: true
       })),
       valuePropositions: canvas.valuePropositions.map(vp => ({
@@ -380,32 +412,33 @@ export function CanvasVisualization({
         priority: vp.priority.toLowerCase() as 'low' | 'medium' | 'high',
         isImplemented: true
       })),
-      customerRelationships: canvas.customerSegments.map(cs => ({
-        id: cs.id,
-        title: cs.name,
-        description: cs.description || '',
-        priority: cs.priority.toLowerCase() as 'low' | 'medium' | 'high',
-        isImplemented: true
-      })),
       channels: canvas.channels.map(c => ({
         id: c.id,
         title: c.type,
         description: c.description || '',
         priority: c.effectiveness === 'High' ? 'high' : 'medium',
+        type: c.type,
+        effectiveness: c.effectiveness || undefined,
+        cost: c.cost || undefined,
         isImplemented: true
       })),
       customerSegments: canvas.customerSegments.map(cs => ({
         id: cs.id,
         title: cs.name,
+        name: cs.name,
         description: cs.description || '',
         priority: cs.priority.toLowerCase() as 'low' | 'medium' | 'high',
+        size: cs.size || undefined,
         isImplemented: true
       })),
-      costStructure: canvas.costStructures.map(cs => ({
+      costStructures: canvas.costStructures.map(cs => ({
         id: cs.id,
         title: cs.description,
         description: cs.description,
         priority: cs.category === 'Operations' ? 'high' : 'medium',
+        category: cs.category || undefined,
+        amount: cs.amount || undefined,
+        frequency: cs.frequency || undefined,
         isImplemented: true
       })),
       revenueStreams: canvas.revenueStreams.map(rs => ({
@@ -413,6 +446,9 @@ export function CanvasVisualization({
         title: rs.type,
         description: rs.description || '',
         priority: rs.estimatedValue && rs.estimatedValue > 1000000 ? 'high' : 'medium',
+        type: rs.type,
+        estimatedValue: rs.estimatedValue || undefined,
+        frequency: rs.frequency || undefined,
         isImplemented: true
       }))
     }
@@ -422,19 +458,19 @@ export function CanvasVisualization({
   const currentBusinessModel = currentCanvas ? convertCanvasToBusinessModel(currentCanvas) : businessModel
 
   const sectionConfig = {
-    keyPartners: {
+    partnerships: {
       title: "Key Partners",
       icon: Handshake,
       color: "bg-blue-50 border-blue-200",
       description: "Who are our key partners and suppliers?",
     },
-    keyActivities: {
+    activities: {
       title: "Key Activities",
       icon: Activity,
       color: "bg-green-50 border-green-200",
       description: "What key activities does our value proposition require?",
     },
-    keyResources: {
+    resources: {
       title: "Key Resources",
       icon: Package,
       color: "bg-purple-50 border-purple-200",
@@ -445,12 +481,6 @@ export function CanvasVisualization({
       icon: Heart,
       color: "bg-red-50 border-red-200",
       description: "What value do we deliver to customers?",
-    },
-    customerRelationships: {
-      title: "Customer Relationships",
-      icon: Users,
-      color: "bg-orange-50 border-orange-200",
-      description: "What type of relationship does each customer segment expect?",
     },
     channels: {
       title: "Channels",
@@ -464,7 +494,7 @@ export function CanvasVisualization({
       color: "bg-indigo-50 border-indigo-200",
       description: "For whom are we creating value?",
     },
-    costStructure: {
+    costStructures: {
       title: "Cost Structure",
       icon: TrendingDown,
       color: "bg-gray-50 border-gray-200",
@@ -478,25 +508,262 @@ export function CanvasVisualization({
     },
   }
 
-  const addItem = (section: keyof BusinessModel, item: Omit<CanvasItem, "id">) => {
-    const newId = Date.now().toString()
-    const updatedModel = { ...businessModel }
-    updatedModel[section] = [...updatedModel[section], { ...item, id: newId }]
-    onUpdate(updatedModel)
+  const addItem = async (section: keyof BusinessModel, item: Omit<CanvasItem, "id">) => {
+    if (!selectedCanvas) {
+      console.warn('No canvas selected, cannot add item')
+      return
+    }
+
+    try {
+      // Import the service dynamically to avoid circular dependencies
+      const { canvasContentService } = await import('@/lib/canvas-content-service')
+      
+      let newItem: any
+      
+      switch (section) {
+        case 'valuePropositions':
+          newItem = await canvasContentService.createValueProposition(selectedCanvas, {
+            description: item.description || '',
+            priority: item.priority || 'MEDIUM'
+          })
+          break
+        case 'customerSegments':
+          newItem = await canvasContentService.createCustomerSegment(selectedCanvas, {
+            name: item.name || '',
+            description: item.description || '',
+            size: item.size,
+            priority: item.priority || 'MEDIUM'
+          })
+          break
+        case 'revenueStreams':
+          newItem = await canvasContentService.createRevenueStream(selectedCanvas, {
+            type: item.type || '',
+            description: item.description,
+            estimatedValue: item.estimatedValue,
+            frequency: item.frequency
+          })
+          break
+        case 'partnerships':
+          newItem = await canvasContentService.createPartnership(selectedCanvas, {
+            name: item.name || '',
+            type: item.type,
+            description: item.description,
+            value: item.value
+          })
+          break
+        case 'resources':
+          newItem = await canvasContentService.createResource(selectedCanvas, {
+            name: item.name || '',
+            type: item.type || 'PHYSICAL',
+            description: item.description,
+            availability: item.availability,
+            cost: item.cost
+          })
+          break
+        case 'activities':
+          newItem = await canvasContentService.createActivity(selectedCanvas, {
+            name: item.name || '',
+            description: item.description,
+            priority: item.priority || 'MEDIUM',
+            cost: item.cost
+          })
+          break
+        case 'costStructures':
+          newItem = await canvasContentService.createCostStructure(selectedCanvas, {
+            description: item.description || '',
+            category: item.category,
+            amount: item.amount,
+            frequency: item.frequency
+          })
+          break
+        case 'channels':
+          newItem = await canvasContentService.createChannel(selectedCanvas, {
+            type: item.type || '',
+            description: item.description,
+            effectiveness: item.effectiveness,
+            cost: item.cost
+          })
+          break
+        default:
+          throw new Error(`Unsupported section: ${section}`)
+      }
+
+      // Update local state
+      const updatedModel = { ...businessModel }
+      updatedModel[section] = [...updatedModel[section], newItem]
+      onUpdate(updatedModel)
+
+      toast({
+        title: "Item Added",
+        description: `New ${section.replace(/([A-Z])/g, ' $1').toLowerCase()} added successfully`,
+      })
+    } catch (error) {
+      console.error('Error adding item:', error)
+      toast({
+        title: "Error",
+        description: `Failed to add ${section.replace(/([A-Z])/g, ' $1').toLowerCase()}`,
+        variant: "destructive",
+      })
+    }
   }
 
-  const updateItem = (section: keyof BusinessModel, itemId: string, updates: Partial<CanvasItem>) => {
-    const updatedModel = { ...businessModel }
-    updatedModel[section] = updatedModel[section].map((item) => 
-      item.id === itemId ? { ...item, ...updates } : item
-    )
-    onUpdate(updatedModel)
+  const updateItem = async (section: keyof BusinessModel, itemId: string, updates: Partial<CanvasItem>) => {
+    if (!selectedCanvas) {
+      console.warn('No canvas selected, cannot update item')
+      return
+    }
+
+    try {
+      // Import the service dynamically to avoid circular dependencies
+      const { canvasContentService } = await import('@/lib/canvas-content-service')
+      
+      let updatedItem: any
+      
+      switch (section) {
+        case 'valuePropositions':
+          updatedItem = await canvasContentService.updateValueProposition(selectedCanvas, itemId, {
+            description: updates.description,
+            priority: updates.priority
+          })
+          break
+        case 'customerSegments':
+          updatedItem = await canvasContentService.updateCustomerSegment(selectedCanvas, itemId, {
+            name: updates.name,
+            description: updates.description,
+            size: updates.size,
+            priority: updates.priority
+          })
+          break
+        case 'revenueStreams':
+          updatedItem = await canvasContentService.updateRevenueStream(selectedCanvas, itemId, {
+            type: updates.type,
+            description: updates.description,
+            estimatedValue: updates.estimatedValue,
+            frequency: updates.frequency
+          })
+          break
+        case 'partnerships':
+          updatedItem = await canvasContentService.updatePartnership(selectedCanvas, itemId, {
+            name: updates.name,
+            type: updates.type,
+            description: updates.description,
+            value: updates.value
+          })
+          break
+        case 'resources':
+          updatedItem = await canvasContentService.updateResource(selectedCanvas, itemId, {
+            name: updates.name,
+            type: updates.type,
+            description: updates.description,
+            availability: updates.availability,
+            cost: updates.cost
+          })
+          break
+        case 'activities':
+          updatedItem = await canvasContentService.updateActivity(selectedCanvas, itemId, {
+            name: updates.name,
+            description: updates.description,
+            priority: updates.priority,
+            cost: updates.cost
+          })
+          break
+        case 'costStructures':
+          updatedItem = await canvasContentService.updateCostStructure(selectedCanvas, itemId, {
+            description: updates.description,
+            category: updates.category,
+            amount: updates.amount,
+            frequency: updates.frequency
+          })
+          break
+        case 'channels':
+          updatedItem = await canvasContentService.updateChannel(selectedCanvas, itemId, {
+            type: updates.type,
+            description: updates.description,
+            effectiveness: updates.effectiveness,
+            cost: updates.cost
+          })
+          break
+        default:
+          throw new Error(`Unsupported section: ${section}`)
+      }
+
+      // Update local state
+      const updatedModel = { ...businessModel }
+      updatedModel[section] = updatedModel[section].map((item) => 
+        item.id === itemId ? { ...item, ...updatedItem } : item
+      )
+      onUpdate(updatedModel)
+
+      toast({
+        title: "Item Updated",
+        description: `${section.replace(/([A-Z])/g, ' $1').toLowerCase()} updated successfully`,
+      })
+    } catch (error) {
+      console.error('Error updating item:', error)
+      toast({
+        title: "Error",
+        description: `Failed to update ${section.replace(/([A-Z])/g, ' $1').toLowerCase()}`,
+        variant: "destructive",
+      })
+    }
   }
 
-  const deleteItem = (section: keyof BusinessModel, itemId: string) => {
-    const updatedModel = { ...businessModel }
-    updatedModel[section] = updatedModel[section].filter((item) => item.id !== itemId)
-    onUpdate(updatedModel)
+  const deleteItem = async (section: keyof BusinessModel, itemId: string) => {
+    if (!selectedCanvas) {
+      console.warn('No canvas selected, cannot delete item')
+      return
+    }
+
+    try {
+      // Import the service dynamically to avoid circular dependencies
+      const { canvasContentService } = await import('@/lib/canvas-content-service')
+      
+      switch (section) {
+        case 'valuePropositions':
+          await canvasContentService.deleteValueProposition(selectedCanvas, itemId)
+          break
+        case 'customerSegments':
+          await canvasContentService.deleteCustomerSegment(selectedCanvas, itemId)
+          break
+        case 'revenueStreams':
+          await canvasContentService.deleteRevenueStream(selectedCanvas, itemId)
+          break
+        case 'partnerships':
+          await canvasContentService.deletePartnership(selectedCanvas, itemId)
+          break
+        case 'resources':
+          await canvasContentService.deleteResource(selectedCanvas, itemId)
+          break
+        case 'activities':
+          await canvasContentService.deleteActivity(selectedCanvas, itemId)
+          break
+        case 'costStructures':
+          await canvasContentService.deleteCostStructure(selectedCanvas, itemId)
+          break
+        case 'channels':
+          await canvasContentService.deleteChannel(selectedCanvas, itemId)
+          break
+        default:
+          throw new Error(`Unsupported section: ${section}`)
+      }
+
+      // Update local state
+      const updatedModel = { ...businessModel }
+      updatedModel[section] = updatedModel[section].filter((item) => item.id !== itemId)
+      onUpdate(updatedModel)
+
+      toast({
+        title: "Item Deleted",
+        description: `${section.replace(/([A-Z])/g, ' $1').toLowerCase()} deleted successfully`,
+      })
+    } catch (error) {
+      console.error('Error deleting item:', error)
+      toast({
+        title: "Error",
+        description: `Failed to delete ${section.replace(/([A-Z])/g, ' $1').toLowerCase()}`,
+        variant: "destructive",
+      })
+    }
   }
 
   // Handle new canvas creation
@@ -680,14 +947,13 @@ export function CanvasVisualization({
       // Clear the business model if the archived canvas was selected.
       if (selectedCanvas === canvasId) {
         onUpdate?.({
-          keyPartners: [],
-          keyActivities: [],
-          keyResources: [],
+          partnerships: [],
+          activities: [],
+          resources: [],
           valuePropositions: [],
-          customerRelationships: [],
           channels: [],
           customerSegments: [],
-          costStructure: [],
+          costStructures: [],
           revenueStreams: []
         });
       }
@@ -696,6 +962,52 @@ export function CanvasVisualization({
       toast({
         title: "Archive Failed",
         description: "Failed to archive canvas. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleUpdateCanvas = async (canvasId: string, businessInfo: any) => {
+    try {
+      console.log('✏️ UPDATE CANVAS - Starting update process:', canvasId, businessInfo)
+      
+      // Update canvas metadata
+      const response = await fetch(`/api/business-canvas/${canvasId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: businessInfo.name,
+          description: businessInfo.strategicObjective,
+          // Add other fields as needed
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update canvas')
+      }
+
+      const updatedCanvas = await response.json()
+      console.log('✅ UPDATE CANVAS - Canvas updated successfully:', updatedCanvas)
+      
+      toast({
+        title: "Canvas Updated",
+        description: "Canvas metadata has been updated successfully",
+      })
+
+      // Refresh the canvas list
+      await refreshCanvases()
+      
+      // If the updated canvas was selected, refresh the current canvas
+      if (selectedCanvas === canvasId) {
+        setCurrentCanvas(updatedCanvas)
+      }
+    } catch (error) {
+      console.error('Error updating canvas:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update canvas metadata",
         variant: "destructive",
       })
     }
@@ -737,14 +1049,13 @@ export function CanvasVisualization({
       // This should happen regardless of URL sync, as the canvas content is gone.
       if (selectedCanvas === deletedCanvasId) {
         onUpdate?.({
-          keyPartners: [],
-          keyActivities: [],
-          keyResources: [],
+          partnerships: [],
+          activities: [],
+          resources: [],
           valuePropositions: [],
-          customerRelationships: [],
           channels: [],
           customerSegments: [],
-          costStructure: [],
+          costStructures: [],
           revenueStreams: []
         });
       }
@@ -1108,6 +1419,114 @@ export function CanvasVisualization({
     return isCircular
   }
 
+  // Export functionality
+  const handleExport = () => {
+    if (!selectedCanvas) {
+      toast({
+        title: "No canvas selected",
+        description: "Please select a canvas to export.",
+        variant: "destructive",
+      })
+      return
+    }
+    setExportDialog({ isOpen: true, format: 'PDF' })
+  }
+
+  const handleExportCanvas = async (format: string) => {
+    if (!selectedCanvas) return
+
+    try {
+      const response = await fetch(`/api/business-canvas/${selectedCanvas}/export`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ format }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Export failed')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `business-canvas-${selectedCanvas}.${format.toLowerCase()}`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      toast({
+        title: "Export successful",
+        description: `Canvas exported as ${format.toUpperCase()}`,
+      })
+
+      setExportDialog({ isOpen: false, format: 'PDF' })
+    } catch (error) {
+      console.error('Export error:', error)
+      toast({
+        title: "Export failed",
+        description: "Failed to export canvas. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  // Share functionality
+  const handleShare = () => {
+    if (!selectedCanvas) {
+      toast({
+        title: "No canvas selected",
+        description: "Please select a canvas to share.",
+        variant: "destructive",
+      })
+      return
+    }
+    setShareDialog({ isOpen: true, type: 'EMAIL_INVITE', permissions: 'VIEW' })
+  }
+
+  const handleShareCanvas = async () => {
+    if (!selectedCanvas) return
+
+    try {
+      const response = await fetch(`/api/business-canvas/${selectedCanvas}/share`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: shareDialog.type,
+          email: shareDialog.email,
+          permissions: shareDialog.permissions,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Sharing failed')
+      }
+
+      const result = await response.json()
+
+      toast({
+        title: "Share successful",
+        description: shareDialog.type === 'EMAIL_INVITE' 
+          ? `Canvas shared with ${shareDialog.email}`
+          : "Canvas shared successfully",
+      })
+
+      setShareDialog({ isOpen: false, type: 'EMAIL_INVITE', permissions: 'VIEW' })
+    } catch (error) {
+      console.error('Share error:', error)
+      toast({
+        title: "Share failed",
+        description: "Failed to share canvas. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
   const renderCanvasSection = (sectionKey: keyof BusinessModel) => {
     const section = sectionConfig[sectionKey]
     const items = currentBusinessModel[sectionKey] || []
@@ -1135,8 +1554,8 @@ export function CanvasVisualization({
               <div className="flex items-start justify-between mb-3">
                 <h4 className="font-medium text-base leading-tight">{item.title}</h4>
                 <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
-                  <Badge variant="secondary" className={getPriorityColor(item.priority)}>
-                    {item.priority}
+                  <Badge variant="secondary" className={getPriorityColor(item.priority || 'medium')}>
+                    {item.priority || 'medium'}
                   </Badge>
                   {isEditing && (
                     <div className="flex space-x-1">
@@ -1231,9 +1650,9 @@ export function CanvasVisualization({
                             <h4 className="font-medium">{item.title}</h4>
                             <Badge 
                               variant="outline" 
-                              className={`text-xs ${getPriorityColor(item.priority)}`}
+                              className={`text-xs ${getPriorityColor(item.priority || 'medium')}`}
                             >
-                              {item.priority}
+                              {item.priority || 'medium'}
                             </Badge>
                             {item.isImplemented && (
                               <Badge variant="secondary" className="text-xs">
@@ -1358,6 +1777,8 @@ export function CanvasVisualization({
           onToggleCanvasSelection={handleToggleCanvasSelection}
           onBulkDelete={handleBulkDelete}
           onBulkArchive={handleBulkArchive}
+          onUpdateCanvas={handleUpdateCanvas}
+          enterpriseContext={null}
         />
       )}
 
@@ -1437,15 +1858,12 @@ export function CanvasVisualization({
           </Button>
           </div>
           
-          <Button variant="outline" className="px-6 bg-transparent">
-            <Save className="h-4 w-4 mr-2" />
-            Save
-          </Button>
-          <Button variant="outline" className="px-6 bg-transparent">
+
+          <Button variant="outline" className="px-6 bg-transparent" onClick={handleShare}>
             <Share className="h-4 w-4 mr-2" />
             Share
           </Button>
-          <Button variant="outline" className="px-6 bg-transparent">
+          <Button variant="outline" className="px-6 bg-transparent" onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
@@ -1456,19 +1874,18 @@ export function CanvasVisualization({
       {viewMode === 'canvas' ? (
       <div className="grid grid-cols-5 gap-6 min-h-[800px]">
         {/* Row 1 - Top sections */}
-        <div className="col-span-1 row-span-2">{renderCanvasSection("keyPartners")}</div>
-        <div className="col-span-1">{renderCanvasSection("keyActivities")}</div>
+        <div className="col-span-1 row-span-2">{renderCanvasSection("partnerships")}</div>
+        <div className="col-span-1">{renderCanvasSection("activities")}</div>
         <div className="col-span-1 row-span-2">{renderCanvasSection("valuePropositions")}</div>
-        <div className="col-span-1">{renderCanvasSection("customerRelationships")}</div>
         <div className="col-span-1 row-span-2">{renderCanvasSection("customerSegments")}</div>
-
-        {/* Row 2 - Middle sections */}
-        <div className="col-span-1">{renderCanvasSection("keyResources")}</div>
         <div className="col-span-1">{renderCanvasSection("channels")}</div>
 
+        {/* Row 2 - Middle sections */}
+        <div className="col-span-1">{renderCanvasSection("resources")}</div>
+        <div className="col-span-1">{renderCanvasSection("revenueStreams")}</div>
+
         {/* Row 3 - Bottom sections */}
-        <div className="col-span-2">{renderCanvasSection("costStructure")}</div>
-        <div className="col-span-3">{renderCanvasSection("revenueStreams")}</div>
+        <div className="col-span-2">{renderCanvasSection("costStructures")}</div>
       </div>
       ) : (
         renderListView()
@@ -1783,6 +2200,146 @@ export function CanvasVisualization({
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Delete All Permanently
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Export Dialog */}
+      <Dialog open={exportDialog.isOpen} onOpenChange={() => setExportDialog({ isOpen: false, format: 'PDF' })}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Download className="h-5 w-5" />
+              Export Business Canvas
+            </DialogTitle>
+            <DialogDescription>
+              Choose the format to export your business canvas
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { format: 'PDF', icon: FileText, description: 'Document format' },
+                { format: 'PNG', icon: FileText, description: 'Image format' },
+                { format: 'SVG', icon: FileText, description: 'Vector format' },
+                { format: 'JSON', icon: FileText, description: 'Data format' },
+                { format: 'CSV', icon: FileText, description: 'Spreadsheet format' },
+                { format: 'EXCEL', icon: FileText, description: 'Excel format' }
+              ].map(({ format, icon: Icon, description }) => (
+                <Button
+                  key={format}
+                  variant={exportDialog.format === format ? "default" : "outline"}
+                  className="h-auto p-4 flex flex-col items-center gap-2"
+                  onClick={() => setExportDialog({ ...exportDialog, format: format as any })}
+                >
+                  <Icon className="h-6 w-6" />
+                  <div className="text-center">
+                    <div className="font-medium">{format}</div>
+                    <div className="text-xs text-muted-foreground">{description}</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setExportDialog({ isOpen: false, format: 'PDF' })}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => handleExportCanvas(exportDialog.format)}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share Dialog */}
+      <Dialog open={shareDialog.isOpen} onOpenChange={() => setShareDialog({ isOpen: false, type: 'EMAIL_INVITE', permissions: 'VIEW' })}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Share className="h-5 w-5" />
+              Share Business Canvas
+            </DialogTitle>
+            <DialogDescription>
+              Share this canvas with team members or external stakeholders
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Label>Share Type</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { type: 'EMAIL_INVITE', icon: Mail, label: 'Email' },
+                  { type: 'PUBLIC_LINK', icon: Link, label: 'Link' },
+                  { type: 'TEAM_ACCESS', icon: Users, label: 'Team' }
+                ].map(({ type, icon: Icon, label }) => (
+                  <Button
+                    key={type}
+                    variant={shareDialog.type === type ? "default" : "outline"}
+                    className="h-auto p-3 flex flex-col items-center gap-1"
+                    onClick={() => setShareDialog({ ...shareDialog, type: type as any })}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="text-xs">{label}</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {shareDialog.type === 'EMAIL_INVITE' && (
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter email address"
+                  value={shareDialog.email || ''}
+                  onChange={(e) => setShareDialog({ ...shareDialog, email: e.target.value })}
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label>Permissions</Label>
+              <Select
+                value={shareDialog.permissions}
+                onValueChange={(value) => setShareDialog({ ...shareDialog, permissions: value as any })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="VIEW">View Only</SelectItem>
+                  <SelectItem value="REVIEW">Review & Comment</SelectItem>
+                  <SelectItem value="EDIT">Edit</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShareDialog({ isOpen: false, type: 'EMAIL_INVITE', permissions: 'VIEW' })}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleShareCanvas}
+              disabled={shareDialog.type === 'EMAIL_INVITE' && !shareDialog.email}
+            >
+              <Share className="h-4 w-4 mr-2" />
+              Share
             </Button>
           </DialogFooter>
         </DialogContent>

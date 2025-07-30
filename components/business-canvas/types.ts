@@ -14,22 +14,33 @@
 
 export interface CanvasItem {
   id: string
-  title: string
-  description: string
-  priority: "high" | "medium" | "low"
+  title?: string
+  name?: string
+  description?: string
+  priority?: "high" | "medium" | "low" | "HIGH" | "MEDIUM" | "LOW" | "CRITICAL"
   color?: string
   isImplemented?: boolean
+  // Additional properties for different sections
+  type?: string
+  size?: number
+  estimatedValue?: number
+  frequency?: string
+  value?: string
+  availability?: string
+  cost?: number
+  amount?: number
+  category?: string
+  effectiveness?: string
 }
 
 export interface BusinessModel {
-  keyPartners: CanvasItem[]
-  keyActivities: CanvasItem[]
-  keyResources: CanvasItem[]
+  partnerships: CanvasItem[]
+  activities: CanvasItem[]
+  resources: CanvasItem[]
   valuePropositions: CanvasItem[]
-  customerRelationships: CanvasItem[]
   channels: CanvasItem[]
   customerSegments: CanvasItem[]
-  costStructure: CanvasItem[]
+  costStructures: CanvasItem[]
   revenueStreams: CanvasItem[]
 }
 
