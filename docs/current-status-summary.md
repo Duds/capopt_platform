@@ -1,5 +1,12 @@
 # CapOpt Platform - Current Status Summary
 
+> **Related documentation:**
+> - Purpose: @docs/design/why-statement.md
+> - Problems Solved: @docs/design/problem-statement.md
+> - Feature Requirements: @docs/design/product-backlog.md
+> - Technical Architecture: @docs/design/solution-architecture-design.md
+> - Implementation Status: @docs/implementation-status.md
+
 **Date:** 25 July 2024  
 **Phase:** Phase 1 - Functional PoC  
 **Overall Progress:** 31% Complete (4/13 epics)
@@ -190,3 +197,11 @@
 ---
 
 *This summary is updated after each major milestone. Last updated: 25 July 2024* 
+
+## Related Documentation
+
+- **Project Purpose:** @docs/design/why-statement.md
+- **Problems Solved:** @docs/design/problem-statement.md
+- **Feature Requirements:** @docs/design/product-backlog.md
+- **Technical Architecture:** @docs/design/solution-architecture-design.md
+- **Detailed Status:** @docs/implementation-status.md 

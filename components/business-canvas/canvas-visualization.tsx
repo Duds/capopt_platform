@@ -68,7 +68,7 @@ import { CanvasVisualizationProps, BusinessModel, CanvasItem } from './types'
 import { canvasSections, getPriorityColor } from './utils'
 import { useBusinessCanvas, BusinessCanvas as DBBusinessCanvas } from '@/hooks/use-business-canvas'
 import { CanvasTreeView } from './canvas-tree-view'
-import { NewCanvasForm } from './new-canvas-form'
+import { CanvasForm } from './canvas-form'
 
 export function CanvasVisualization({ 
   businessModel, 
@@ -771,6 +771,11 @@ export function CanvasVisualization({
     console.log('🔍 CLIENT DEBUG - Creating new canvas with business info:', businessInfo)
     
     try {
+      // Determine parentCanvasId based on current context
+      const parentCanvasId = isCreatingRootCanvas 
+        ? null 
+        : (selectedCanvas && selectedCanvas.trim() !== '' ? selectedCanvas : null)
+      
       // Prepare basic canvas data for database
       const canvasData = {
         name: businessInfo.name,
@@ -783,7 +788,30 @@ export function CanvasVisualization({
         enterpriseId: businessInfo.enterpriseId,
         facilityId: businessInfo.facilityId,
         businessUnitId: businessInfo.businessUnitId,
-        parentCanvasId: businessInfo.parentCanvasId && businessInfo.parentCanvasId.trim() !== '' ? businessInfo.parentCanvasId : null
+        parentCanvasId: parentCanvasId,
+        // Include all the enhanced metadata fields
+        legalName: businessInfo.legalName,
+        abn: businessInfo.abn,
+        acn: businessInfo.acn,
+        industry: businessInfo.industry,
+        sector: businessInfo.sector,
+        sectors: businessInfo.sectors,
+        sectorTypes: businessInfo.sectorTypes,
+        businessType: businessInfo.businessType,
+        regional: businessInfo.regional,
+        primaryLocation: businessInfo.primaryLocation,
+        coordinates: businessInfo.coordinates,
+        facilityType: businessInfo.facilityType,
+        operationalStreams: businessInfo.operationalStreams,
+        strategicObjective: businessInfo.strategicObjective,
+        valueProposition: businessInfo.valueProposition,
+        competitiveAdvantage: businessInfo.competitiveAdvantage,
+        annualRevenue: businessInfo.annualRevenue,
+        employeeCount: businessInfo.employeeCount,
+        riskProfile: businessInfo.riskProfile,
+        digitalMaturity: businessInfo.digitalMaturity,
+        complianceRequirements: businessInfo.complianceRequirements,
+        regulatoryFramework: businessInfo.regulatoryFramework
       }
       
       console.log('🔍 CLIENT DEBUG - Canvas data to send:', canvasData)
@@ -969,7 +997,8 @@ export function CanvasVisualization({
 
   const handleUpdateCanvas = async (canvasId: string, businessInfo: any) => {
     try {
-      console.log('✏️ UPDATE CANVAS - Starting update process:', canvasId, businessInfo)
+      console.log('✏️ UPDATE CANVAS - Starting update process:', canvasId)
+      console.log('✏️ UPDATE CANVAS - Business info:', JSON.stringify(businessInfo, null, 2))
       
       // Update canvas metadata
       const response = await fetch(`/api/business-canvas/${canvasId}`, {
@@ -977,11 +1006,7 @@ export function CanvasVisualization({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: businessInfo.name,
-          description: businessInfo.strategicObjective,
-          // Add other fields as needed
-        }),
+        body: JSON.stringify(businessInfo),
       })
 
       if (!response.ok) {
@@ -1004,12 +1029,58 @@ export function CanvasVisualization({
         setCurrentCanvas(updatedCanvas)
       }
     } catch (error) {
-      console.error('Error updating canvas:', error)
+      console.error('❌ Error updating canvas:', error)
+      console.error('❌ Error details:', error instanceof Error ? error.message : 'Unknown error')
       toast({
         title: "Error",
-        description: "Failed to update canvas metadata",
+        description: `Failed to update canvas metadata: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       })
+    }
+  }
+
+  const handleStatusChange = async (canvasId: string, newStatus: string, justification?: string) => {
+    try {
+      console.log('🟢 Changing canvas status:', canvasId, newStatus, justification)
+      
+      const response = await fetch(`/api/business-canvas/${canvasId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          // Add justification to audit log if needed
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update canvas status')
+      }
+
+      const updatedCanvas = await response.json()
+      console.log('✅ Canvas status updated successfully:', updatedCanvas)
+      
+      // Update the current canvas if it's the one being updated
+      if (currentCanvas && currentCanvas.id === canvasId) {
+        setCurrentCanvas(updatedCanvas)
+      }
+      
+      // Refresh the canvas list
+      await refreshCanvases()
+      
+      toast({
+        title: "Status Updated",
+        description: `Canvas status changed to ${newStatus}`,
+      })
+    } catch (error) {
+      console.error('Error updating canvas status:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update canvas status. Please try again.",
+        variant: "destructive",
+      })
+      throw error
     }
   }
 
@@ -1779,16 +1850,18 @@ export function CanvasVisualization({
           onBulkArchive={handleBulkArchive}
           onUpdateCanvas={handleUpdateCanvas}
           enterpriseContext={null}
+          onStatusChange={handleStatusChange}
+          userRole="MANAGER"
         />
       )}
 
-      {/* New Canvas Form */}
-      <NewCanvasForm
-        onCreateCanvas={handleCreateNewCanvas}
-        parentCanvasId={isCreatingRootCanvas ? undefined : (selectedCanvas && selectedCanvas.trim() !== '' ? selectedCanvas : undefined)}
+      {/* Canvas Form */}
+      <CanvasForm
+        mode="create"
+        onSubmit={handleCreateNewCanvas}
         enterpriseContext={null}
         isOpen={showNewCanvasForm}
-        onOpenChange={(open) => {
+        onOpenChange={(open: boolean) => {
           console.log('🔍 CANVAS DEBUG - Form open state:', open)
           console.log('🔍 CANVAS DEBUG - isCreatingRootCanvas:', isCreatingRootCanvas)
           console.log('🔍 CANVAS DEBUG - selectedCanvas:', selectedCanvas)
@@ -1878,14 +1951,14 @@ export function CanvasVisualization({
         <div className="col-span-1">{renderCanvasSection("activities")}</div>
         <div className="col-span-1 row-span-2">{renderCanvasSection("valuePropositions")}</div>
         <div className="col-span-1 row-span-2">{renderCanvasSection("customerSegments")}</div>
-        <div className="col-span-1">{renderCanvasSection("channels")}</div>
+        <div className="col-span-1 row-span-2">{renderCanvasSection("channels")}</div>
 
         {/* Row 2 - Middle sections */}
         <div className="col-span-1">{renderCanvasSection("resources")}</div>
-        <div className="col-span-1">{renderCanvasSection("revenueStreams")}</div>
 
         {/* Row 3 - Bottom sections */}
         <div className="col-span-2">{renderCanvasSection("costStructures")}</div>
+        <div className="col-span-3">{renderCanvasSection("revenueStreams")}</div>
       </div>
       ) : (
         renderListView()

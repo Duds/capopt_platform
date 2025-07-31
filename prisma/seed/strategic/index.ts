@@ -17,13 +17,14 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
     throw new Error('Enterprise not found. Please seed enterprise first.')
   }
 
-  // Create Enterprise-level Business Canvas
+  // Create Enterprise-level Business Canvas (Root)
   const enterpriseCanvas = await prisma.businessCanvas.create({
     data: {
-      name: 'Hercules Levee Enterprise Canvas',
+      name: 'Hercules Levee',
       description: 'Integrated multi-commodity mining and processing operations',
       version: '1.0',
       isActive: true,
+      industry: 'Mining & Metals',
       valuePropositions: {
         create: [
           {
@@ -268,12 +269,14 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
 
   console.log('✅ Enterprise Business Canvas created')
 
-  // Create Stream-Specific Canvases
+  // Create Stream-Specific Canvases with Hierarchy
   const streamCanvases = [
     {
-      name: 'Mining Operations Canvas',
+      name: 'Mining Operations',
       description: 'Integrated ore extraction and mining operations business model',
       commodity: 'Mining',
+      parentCanvasId: enterpriseCanvas.id,
+      industry: 'Mining & Metals',
       valueProps: [
         'Large-scale underground and open pit mining operations (50,000 tpd)',
         'Advanced mining equipment (Caterpillar, Komatsu, Sandvik)',
@@ -290,9 +293,11 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
       ]
     },
     {
-      name: 'Copper Operations Canvas',
+      name: 'Copper Operations',
       description: 'Integrated copper processing and refining business model',
       commodity: 'Copper',
+      parentCanvasId: enterpriseCanvas.id,
+      industry: 'Mining & Metals',
       valueProps: [
         'LME Grade A electrolytic copper cathodes (99.9999% Cu)',
         'Advanced Outotec processing and refining technology',
@@ -311,9 +316,11 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
       ]
     },
     {
-      name: 'Uranium Operations Canvas',
+      name: 'Uranium Operations',
       description: 'Integrated uranium processing and concentrate production business model',
       commodity: 'Uranium',
+      parentCanvasId: enterpriseCanvas.id,
+      industry: 'Mining & Metals',
       valueProps: [
         'High-purity uranium concentrate (85-90% U3O8)',
         'Nuclear fuel supply for utilities with long-term contracts',
@@ -333,9 +340,11 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
       ]
     },
     {
-      name: 'Precious Metals Operations Canvas',
+      name: 'Precious Metals Operations',
       description: 'Integrated precious metals processing and refining business model',
       commodity: 'Precious Metals',
+      parentCanvasId: null, // Will be set after Copper Operations is created
+      industry: 'Mining & Metals',
       valueProps: [
         'LBMA Good Delivery gold ingots (99.9999% Au, 400 oz)',
         'LBMA Good Delivery silver ingots (99.9999% Ag, 1000 oz)',
@@ -357,13 +366,23 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
     }
   ]
 
+  // Create canvases with proper hierarchy
+  const createdCanvases: { [key: string]: any } = {}
+  
   for (const streamCanvas of streamCanvases) {
-    await prisma.businessCanvas.create({
+    // Skip Precious Metals for now, will create it after Copper
+    if (streamCanvas.name === 'Precious Metals Operations') {
+      continue
+    }
+    
+    const canvas = await prisma.businessCanvas.create({
       data: {
         name: streamCanvas.name,
         description: streamCanvas.description,
         version: '1.0',
         isActive: true,
+        industry: streamCanvas.industry,
+        parentCanvasId: streamCanvas.parentCanvasId,
         valuePropositions: {
           create: streamCanvas.valueProps.map(vp => ({
             description: vp,
@@ -676,13 +695,197 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
         }
       }
     })
+    
+    // Store the created canvas for hierarchy reference
+    createdCanvases[streamCanvas.name] = canvas
+  }
+  
+  // Now create Precious Metals Operations as child of Copper Operations
+  const preciousMetalsCanvas = streamCanvases.find(c => c.name === 'Precious Metals Operations')
+  if (preciousMetalsCanvas && createdCanvases['Copper Operations']) {
+    await prisma.businessCanvas.create({
+      data: {
+        name: preciousMetalsCanvas.name,
+        description: preciousMetalsCanvas.description,
+        version: '1.0',
+        isActive: true,
+        industry: preciousMetalsCanvas.industry,
+        parentCanvasId: createdCanvases['Copper Operations'].id,
+        valuePropositions: {
+          create: preciousMetalsCanvas.valueProps.map(vp => ({
+            description: vp,
+            priority: 'HIGH'
+          }))
+        },
+        customerSegments: {
+          create: preciousMetalsCanvas.customers.map(cust => ({
+            name: cust.name,
+            description: `${preciousMetalsCanvas.commodity} customers`,
+            size: cust.size,
+            priority: cust.priority
+          }))
+        },
+        revenueStreams: {
+          create: preciousMetalsCanvas.revenues.map(rev => ({
+            type: rev.type,
+            description: `${preciousMetalsCanvas.commodity} revenue stream`,
+            estimatedValue: rev.value,
+            frequency: rev.frequency
+          }))
+        },
+        partnerships: {
+          create: [
+            {
+              name: 'Mining Operations',
+              type: 'Internal',
+              description: 'Internal mining operations for precious metals ore',
+              value: 'Precious metals ore supply'
+            },
+            {
+              name: 'Refinery Partners',
+              type: 'Strategic',
+              description: 'Precious metals refineries and traders',
+              value: 'Refining and distribution network'
+            },
+            {
+              name: 'Quality Assurance Partners',
+              type: 'Technical',
+              description: 'Assay laboratories and quality control',
+              value: 'Quality assurance and certification'
+            }
+          ]
+        },
+        resources: {
+          create: [
+            {
+              name: `${preciousMetalsCanvas.commodity} Reserves`,
+              type: 'PHYSICAL',
+              description: `${preciousMetalsCanvas.commodity} mineral reserves and deposits`,
+              availability: 'Long-term',
+              cost: 500000000
+            },
+            {
+              name: `${preciousMetalsCanvas.commodity} Processing Plant`,
+              type: 'PHYSICAL',
+              description: `${preciousMetalsCanvas.commodity} processing infrastructure`,
+              availability: 'Operational',
+              cost: 300000000
+            },
+            {
+              name: `${preciousMetalsCanvas.commodity} Workforce`,
+              type: 'HUMAN',
+              description: `Skilled ${preciousMetalsCanvas.commodity.toLowerCase()} operations personnel`,
+              availability: 'Ongoing',
+              cost: 25000000
+            },
+            {
+              name: `${preciousMetalsCanvas.commodity} Technology`,
+              type: 'INTELLECTUAL',
+              description: `${preciousMetalsCanvas.commodity} processing know-how and patents`,
+              availability: 'Ongoing',
+              cost: 15000000
+            }
+          ]
+        },
+        activities: {
+          create: [
+            {
+              name: 'Precious Metals Processing',
+              description: 'Underground mining (2,000 tpd), crushing, grinding, flotation',
+              priority: 'HIGH',
+              cost: 40000000
+            },
+            {
+              name: 'Doré Production',
+              description: 'Induction furnace (1,100-1,200°C), 60-70% Au, 20-30% Ag doré bars',
+              priority: 'HIGH',
+              cost: 60000000
+            },
+            {
+              name: 'Silver Electrorefining',
+              description: 'AgNO3 + HNO3 electrolyte, 200-250 A/m², 99.9999% Ag cathodes',
+              priority: 'HIGH',
+              cost: 80000000
+            },
+            {
+              name: 'Gold Electrowinning',
+              description: 'Zinc precipitation, acid digestion, 99.9999% Au cathodes',
+              priority: 'HIGH',
+              cost: 70000000
+            },
+            {
+              name: 'Ingot Casting',
+              description: '400 oz Au ingots, 1000 oz Ag ingots, LBMA Good Delivery',
+              priority: 'HIGH',
+              cost: 20000000
+            },
+            {
+              name: 'Quality Control',
+              description: 'Fire assay, ICP-MS, gamma spectrometry (Pb-210, U-238, Th-232)',
+              priority: 'HIGH',
+              cost: 25000000
+            }
+          ]
+        },
+        costStructures: {
+          create: [
+            {
+              description: `${preciousMetalsCanvas.commodity} Mining Operations`,
+              category: 'Operations',
+              amount: 80000000,
+              frequency: 'Annual'
+            },
+            {
+              description: `${preciousMetalsCanvas.commodity} Processing Operations`,
+              category: 'Operations',
+              amount: 60000000,
+              frequency: 'Annual'
+            },
+            {
+              description: `${preciousMetalsCanvas.commodity} Infrastructure & Maintenance`,
+              category: 'Capital',
+              amount: 20000000,
+              frequency: 'Annual'
+            },
+            {
+              description: `${preciousMetalsCanvas.commodity} Environmental & Compliance`,
+              category: 'Regulatory',
+              amount: 10000000,
+              frequency: 'Annual'
+            }
+          ]
+        },
+        channels: {
+          create: [
+            {
+              type: 'Direct Sales',
+              description: `Direct ${preciousMetalsCanvas.commodity.toLowerCase()} sales to customers`,
+              effectiveness: 'High',
+              cost: 2000000
+            },
+            {
+              type: 'Trading Companies',
+              description: `${preciousMetalsCanvas.commodity} sales through established traders`,
+              effectiveness: 'Medium',
+              cost: 1000000
+            },
+            {
+              type: 'Long-term Contracts',
+              description: `Multi-year ${preciousMetalsCanvas.commodity.toLowerCase()} supply agreements`,
+              effectiveness: 'High',
+              cost: 500000
+            }
+          ]
+        }
+      }
+    })
   }
 
-  console.log('✅ Stream-specific Business Canvases created')
+  console.log('✅ Stream-specific Business Canvases created with hierarchy')
 
   return {
     success: true,
-    message: 'Strategic layer seeded successfully',
+    message: 'Strategic layer seeded successfully with proper hierarchy',
     entitiesCreated: 1 + streamCanvases.length,
     entitiesUpdated: 0,
   }

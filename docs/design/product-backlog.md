@@ -1,5 +1,12 @@
 # CapOpt Platform - Product Backlog
 
+> **Related documentation:**
+> - Purpose: @docs/design/why-statement.md
+> - Problems Solved: @docs/design/problem-statement.md
+> - Solution Architecture: @docs/design/solution-architecture-design.md
+> - Implementation Status: @docs/implementation-status.md
+> - Reference Architecture: @docs/design/reference-architecture.md
+
 ## Backlog Overview
 This backlog reflects the current state of the CapOpt Platform with the completed application framework and Business Model Canvas implementation. The platform is now positioned as "CapOps" - a comprehensive operational capability optimisation system with Critical Control Theory (CCT) at its core.
 
@@ -505,3 +512,11 @@ The platform has achieved 17% completion with a solid foundation of application 
 4. **Dashboard & Actionable Features** - Real Dashboard → Task Assignments → Calendar Scheduling
 5. **Advanced Features** - TraceLine → AssureBoard → PulseDeck
 6. **External Integrations** - APIs → Analytics → Condition Monitoring 
+
+## Related Documentation
+
+- **Project Purpose:** @docs/design/why-statement.md
+- **Problems Solved:** @docs/design/problem-statement.md
+- **Solution Architecture:** @docs/design/solution-architecture-design.md
+- **Implementation Status:** @docs/implementation-status.md
+- **Reference Architecture:** @docs/design/reference-architecture.md 

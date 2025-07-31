@@ -56,7 +56,7 @@ export const getSectionPosition = (position: string) => {
 
 export const canvasSections: Omit<CanvasSection, 'icon'>[] = [
   {
-    key: 'keyPartners',
+    key: 'partnerships',
     title: 'Key Partners',
     description: 'Who are our key partners?',
     color: 'bg-blue-50 border-blue-200',
@@ -64,7 +64,7 @@ export const canvasSections: Omit<CanvasSection, 'icon'>[] = [
     isImplemented: true // ✅ Implemented in database
   },
   {
-    key: 'keyActivities',
+    key: 'activities',
     title: 'Key Activities',
     description: 'What key activities do we perform?',
     color: 'bg-green-50 border-green-200',
@@ -72,7 +72,7 @@ export const canvasSections: Omit<CanvasSection, 'icon'>[] = [
     isImplemented: true // ✅ Implemented in database
   },
   {
-    key: 'keyResources',
+    key: 'resources',
     title: 'Key Resources',
     description: 'What key resources do we have?',
     color: 'bg-purple-50 border-purple-200',
@@ -88,20 +88,12 @@ export const canvasSections: Omit<CanvasSection, 'icon'>[] = [
     isImplemented: true // ✅ Implemented in database
   },
   {
-    key: 'customerRelationships',
-    title: 'Customer Relationships',
-    description: 'How do we interact with customers?',
-    color: 'bg-yellow-50 border-yellow-200',
-    position: 'center-left',
-    isImplemented: false // ⏳ Not implemented in database
-  },
-  {
     key: 'channels',
     title: 'Channels',
     description: 'How do we reach customers?',
     color: 'bg-indigo-50 border-indigo-200',
     position: 'center-right',
-    isImplemented: false // ⏳ Not implemented in database
+    isImplemented: true // ✅ Implemented in database
   },
   {
     key: 'customerSegments',
@@ -112,12 +104,12 @@ export const canvasSections: Omit<CanvasSection, 'icon'>[] = [
     isImplemented: true // ✅ Implemented in database
   },
   {
-    key: 'costStructure',
+    key: 'costStructures',
     title: 'Cost Structure',
     description: 'What are our major costs?',
     color: 'bg-orange-50 border-orange-200',
     position: 'bottom-center',
-    isImplemented: false // ⏳ Not implemented in database
+    isImplemented: true // ✅ Implemented in database
   },
   {
     key: 'revenueStreams',
@@ -125,12 +117,12 @@ export const canvasSections: Omit<CanvasSection, 'icon'>[] = [
     description: 'How do we make money?',
     color: 'bg-emerald-50 border-emerald-200',
     position: 'bottom-right',
-    isImplemented: false // ⏳ Not implemented in database
+    isImplemented: true // ✅ Implemented in database
   }
 ]
 
 export const defaultBusinessModel: BusinessModel = {
-  keyPartners: [
+  partnerships: [
     {
       id: "1",
       title: "Mining Equipment Suppliers",
@@ -160,7 +152,7 @@ export const defaultBusinessModel: BusinessModel = {
       isImplemented: true
     }
   ],
-    keyActivities: [
+  activities: [
       {
         id: "1",
         title: "Underground Mining Operations",
@@ -197,7 +189,7 @@ export const defaultBusinessModel: BusinessModel = {
         isImplemented: true
       }
     ],
-    keyResources: [
+  resources: [
       {
         id: "1",
         title: "Mineral Reserves & Resources",
@@ -270,30 +262,7 @@ export const defaultBusinessModel: BusinessModel = {
         priority: "high",
         isImplemented: true
       }
-    ],
-  customerRelationships: [
-    {
-      id: "1",
-      title: "Strategic Partnership",
-      description: "Long-term strategic partnerships with enterprise clients for operational transformation",
-      priority: "high",
-      isImplemented: false
-    },
-    {
-      id: "2",
-      title: "Dedicated Support",
-      description: "Personal account management and dedicated support teams for enterprise clients",
-      priority: "high",
-      isImplemented: false
-    },
-    {
-      id: "3",
-      title: "Community Platform",
-      description: "Industry community for best practices sharing and continuous improvement",
-      priority: "medium",
-      isImplemented: false
-    }
-  ],
+      ],
   channels: [
     {
       id: "1",
@@ -347,7 +316,7 @@ export const defaultBusinessModel: BusinessModel = {
         isImplemented: true
       }
     ],
-    costStructure: [
+  costStructures: [
       {
         id: "1",
         title: "Mining Operations",

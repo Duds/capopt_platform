@@ -288,6 +288,42 @@ model BusinessCanvas {
   // Canvas hierarchy (for parent-child relationships between canvases)
   parentCanvasId String?
 
+  // Enhanced Metadata Fields
+  // Legal & Registration
+  legalName        String?
+  abn              String?
+  acn              String?
+
+  // Industry Classification
+  industry         String?  // MANDATORY
+  sector           String?  // Legacy single sector field
+  sectors          String[] // Multi-sector support
+  sectorTypes      String[] // Sector type classifications
+  primarySector    String?  // Primary sector code (e.g., "COAL", "PRODUCTION")
+  businessType     BusinessType?
+
+  // Geographic & Regional
+  regional         RegionalClassification?
+  primaryLocation  String?
+  coordinates      String?
+
+  // Facility & Operations
+  facilityType     FacilityType?
+  operationalStreams String[] // Array of operational streams
+
+  // Strategic & Financial
+  strategicObjective    String?
+  valueProposition      String?
+  competitiveAdvantage  String?
+  annualRevenue         Decimal?
+  employeeCount         Int?
+
+  // Risk & Compliance
+  riskProfile           RiskProfile?
+  digitalMaturity       DigitalMaturityLevel?
+  complianceRequirements String[]
+  regulatoryFramework   String[]
+
   // Relationships
   enterprise   Enterprise? @relation("EnterpriseBusinessCanvases", fields: [enterpriseId], references: [id])
   facility     Facility? @relation("FacilityBusinessCanvases", fields: [facilityId], references: [id])
@@ -314,6 +350,78 @@ model BusinessCanvas {
   templateId        String?
 
   @@map("business_canvases")
+}
+
+// ============================================================================
+// CANVAS METADATA FRAMEWORK TABLES
+// ============================================================================
+
+// Industry master table
+model Industry {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g., "MINING_METALS", "OIL_GAS"
+  name        String   // e.g., "Mining & Metals", "Oil & Gas"
+  description String?
+  category    String?  // e.g., "EXTRACTIVE", "MANUFACTURING", "SERVICES"
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  sectors     Sector[]
+
+  @@map("industries")
+}
+
+// Sector master table
+model Sector {
+  id          String   @id @default(cuid())
+  code        String   // e.g., "COPPER", "GOLD", "AEROSPACE"
+  name        String   // e.g., "Copper Mining", "Gold Mining", "Aerospace"
+  description String?
+  category    String   // e.g., "COMMODITY", "VALUE_CHAIN", "BUSINESS_MODEL", "SUPPORT_SERVICES"
+  riskProfile String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  industryId  String
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  industry    Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+
+  @@unique([industryId, code])
+  @@map("sectors")
+}
+
+// Industry Operational Streams mapping
+model IndustryOperationalStreams {
+  id                String   @id @default(cuid())
+  industry          String
+  sector            String
+  operationalStreams Json     // Array of operational streams
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([industry, sector])
+  @@map("industry_operational_streams")
+}
+
+// Industry Compliance Framework mapping
+model IndustryComplianceFramework {
+  id                    String   @id @default(cuid())
+  industry              String
+  sector                String
+  complianceRequirements Json     // Array of compliance requirements
+  regulatoryFramework   Json     // Object with Federal, State, Industry arrays
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([industry, sector])
+  @@map("industry_compliance_frameworks")
 }
 
 // Version control for canvases
@@ -1622,4 +1730,40 @@ enum TemplateCategory {
   BUSINESS_TYPE
   CUSTOM
   ENTERPRISE
+}
+
+// ============================================================================
+// CANVAS METADATA ENHANCEMENT ENUMS
+// ============================================================================
+
+enum RiskProfile {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum DigitalMaturityLevel {
+  BASIC
+  INTERMEDIATE
+  ADVANCED
+  LEADING
+}
+
+enum BusinessType {
+  CORPORATION
+  PARTNERSHIP
+  SOLE_TRADER
+  TRUST
+  JOINT_VENTURE
+  SUBSIDIARY
+}
+
+enum RegionalClassification {
+  METROPOLITAN
+  REGIONAL
+  REMOTE
+  RURAL
+  COASTAL
+  INLAND
 }

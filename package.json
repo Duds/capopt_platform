@@ -5,6 +5,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "dev:debug": "NODE_OPTIONS='--inspect' next dev",
     "lint": "next lint",
     "start": "next start",
     "db:seed": "tsx prisma/seed/index.ts",
@@ -16,7 +17,13 @@
     "db:seed:operational": "tsx prisma/seed/index.ts --modules=operational",
     "db:seed:strategic": "tsx prisma/seed/index.ts --modules=strategic",
     "db:clean": "tsx prisma/seed/utils/cleanup.ts",
-    "db:reset": "npx prisma migrate reset --force && npm run db:seed:test"
+    "db:reset": "npx prisma migrate reset --force && npm run db:seed:test",
+    "docs:validate": "node scripts/validate-docs-references.js",
+    "docs:validate:report": "node scripts/validate-docs-references.js --report",
+    "docs:validate:anchors": "node scripts/validate-docs-references.js --check-anchors",
+    "docs:validate:fix": "node scripts/validate-docs-references.js --fix",
+    "canvas:audit": "node scripts/audit-canvas-metadata.js",
+    "canvas:populate": "node scripts/populate-canvas-metadata.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -58,6 +65,7 @@
     "date-fns": "4.1.0",
     "embla-carousel-react": "8.5.1",
     "geist": "^1.3.1",
+    "glob": "^11.0.3",
     "input-otp": "1.4.1",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.454.0",

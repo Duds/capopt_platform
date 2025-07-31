@@ -29,7 +29,7 @@ export async function GET(
       )
     }
 
-    const coststructures = await prisma.CostStructure.findMany({
+    const coststructures = await prisma.costStructure.findMany({
       where: { businessCanvasId: id },
       orderBy: { createdAt: 'desc' }
     })
@@ -66,7 +66,7 @@ export async function POST(
 
     const validatedData = CostStructureSchema.parse(body)
 
-    const coststructures = await prisma.CostStructure.create({
+    const coststructures = await prisma.costStructure.create({
       data: {
         ...validatedData,
         businessCanvasId: id

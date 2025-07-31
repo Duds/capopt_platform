@@ -5,6 +5,7 @@ import { seedControls } from './controls'
 import { seedOperational } from './operational'
 import { seedStrategic } from './strategic'
 import { seedCanvasTemplates } from './templates/canvas-templates'
+import { seedIndustries } from './industries'
 
 const prisma = new PrismaClient()
 
@@ -14,6 +15,7 @@ async function main() {
   try {
     // Seed in dependency order
     await seedUsers(prisma)
+    await seedIndustries()
     await seedEnterprise(prisma)
     await seedControls(prisma)
     await seedOperational(prisma)

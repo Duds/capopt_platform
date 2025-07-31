@@ -145,6 +145,30 @@ export async function POST(request: NextRequest) {
     }
     if (validatedData.templateId !== undefined) data.templateId = validatedData.templateId
 
+    // Handle enhanced metadata fields
+    if (validatedData.legalName !== undefined) data.legalName = validatedData.legalName
+    if (validatedData.abn !== undefined) data.abn = validatedData.abn
+    if (validatedData.acn !== undefined) data.acn = validatedData.acn
+    if (validatedData.industry !== undefined) data.industry = validatedData.industry
+    if (validatedData.sector !== undefined) data.sector = validatedData.sector
+    if (validatedData.sectors !== undefined) data.sectors = validatedData.sectors
+    if (validatedData.sectorTypes !== undefined) data.sectorTypes = validatedData.sectorTypes
+    if (validatedData.businessType !== undefined) data.businessType = validatedData.businessType
+    if (validatedData.regional !== undefined) data.regional = validatedData.regional
+    if (validatedData.primaryLocation !== undefined) data.primaryLocation = validatedData.primaryLocation
+    if (validatedData.coordinates !== undefined) data.coordinates = validatedData.coordinates
+    if (validatedData.facilityType !== undefined) data.facilityType = validatedData.facilityType
+    if (validatedData.operationalStreams !== undefined) data.operationalStreams = validatedData.operationalStreams
+    if (validatedData.strategicObjective !== undefined) data.strategicObjective = validatedData.strategicObjective
+    if (validatedData.valueProposition !== undefined) data.valueProposition = validatedData.valueProposition
+    if (validatedData.competitiveAdvantage !== undefined) data.competitiveAdvantage = validatedData.competitiveAdvantage
+    if (validatedData.annualRevenue !== undefined) data.annualRevenue = validatedData.annualRevenue
+    if (validatedData.employeeCount !== undefined) data.employeeCount = validatedData.employeeCount
+    if (validatedData.riskProfile !== undefined) data.riskProfile = validatedData.riskProfile
+    if (validatedData.digitalMaturity !== undefined) data.digitalMaturity = validatedData.digitalMaturity
+    if (validatedData.complianceRequirements !== undefined) data.complianceRequirements = validatedData.complianceRequirements
+    if (validatedData.regulatoryFramework !== undefined) data.regulatoryFramework = validatedData.regulatoryFramework
+
     // Handle nested relationships
     if (validatedData.valuePropositions) {
       data.valuePropositions = {

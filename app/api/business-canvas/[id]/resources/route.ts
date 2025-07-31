@@ -30,7 +30,7 @@ export async function GET(
       )
     }
 
-    const resources = await prisma.Resource.findMany({
+    const resources = await prisma.resource.findMany({
       where: { businessCanvasId: id },
       orderBy: { createdAt: 'desc' }
     })
@@ -67,7 +67,7 @@ export async function POST(
 
     const validatedData = ResourceSchema.parse(body)
 
-    const resources = await prisma.Resource.create({
+    const resources = await prisma.resource.create({
       data: {
         ...validatedData,
         businessCanvasId: id

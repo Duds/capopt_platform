@@ -1,5 +1,12 @@
 # CapOpt Platform - Implementation Status
 
+> **Related documentation:**
+> - Purpose: @docs/design/why-statement.md
+> - Problems Solved: @docs/design/problem-statement.md
+> - Feature Requirements: @docs/design/product-backlog.md
+> - Technical Architecture: @docs/design/solution-architecture-design.md
+> - API Endpoints: @docs/api-endpoints.md
+
 ## Platform Overview
 CapOpt Platform is now positioned as **CapOps** - a comprehensive operational capability optimisation system with Critical Control Theory (CCT) at its core. The platform implements a "trickle-up" risk model where strategic risk insights are derived from frontline operational data rather than manually declared.
 
@@ -298,3 +305,11 @@ The platform has a solid foundation with the application framework and Business 
 - ⏳ **Service Model**: Not implemented
 - ⏳ **Playbooks**: Not implemented
 - ⏳ **Advanced Features**: Not implemented 
+
+## Related Documentation
+
+- **Project Purpose:** @docs/design/why-statement.md
+- **Problems Solved:** @docs/design/problem-statement.md
+- **Feature Requirements:** @docs/design/product-backlog.md
+- **Technical Architecture:** @docs/design/solution-architecture-design.md
+- **API Endpoints:** @docs/api-endpoints.md 

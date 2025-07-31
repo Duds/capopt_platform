@@ -29,7 +29,7 @@ export async function GET(
       )
     }
 
-    const channels = await prisma.Channel.findMany({
+    const channels = await prisma.channel.findMany({
       where: { businessCanvasId: id },
       orderBy: { createdAt: 'desc' }
     })
@@ -66,7 +66,7 @@ export async function POST(
 
     const validatedData = ChannelSchema.parse(body)
 
-    const channels = await prisma.Channel.create({
+    const channels = await prisma.channel.create({
       data: {
         ...validatedData,
         businessCanvasId: id

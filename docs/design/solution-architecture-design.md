@@ -1,5 +1,12 @@
 # CapOpt Platform Solution Architecture Design
 
+> **Related documentation:**
+> - Purpose: @docs/design/why-statement.md
+> - Problems Solved: @docs/design/problem-statement.md
+> - Feature Requirements: @docs/design/product-backlog.md
+> - Implementation Status: @docs/implementation-status.md
+> - Reference Architecture: @docs/design/reference-architecture.md
+
 ## Executive Summary
 The CapOpt platform is a comprehensive operational capability optimisation system designed to provide end-to-end visibility from strategic planning through operational execution, with integrated Critical Control Theory (CCT) and maturity-based improvement frameworks. The platform implements a "trickle-up" risk model where strategic risk insights are derived from frontline operational data rather than manually declared.
 
@@ -871,3 +878,13 @@ flowchart TD
 - **MES Integration**: Integrate with manufacturing execution systems
 - **IoT Integration**: Integrate with Internet of Things devices
 - **Third-party APIs**: Integrate with third-party services and APIs 
+
+---
+
+## Related Documentation
+
+- **Project Purpose:** @docs/design/why-statement.md
+- **Problems Solved:** @docs/design/problem-statement.md
+- **Feature Requirements:** @docs/design/product-backlog.md
+- **Implementation Status:** @docs/implementation-status.md
+- **Reference Architecture:** @docs/design/reference-architecture.md 

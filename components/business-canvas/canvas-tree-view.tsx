@@ -46,7 +46,8 @@ import {
   CheckSquare,
   Square
 } from 'lucide-react'
-import { EditCanvasForm } from './edit-canvas-form'
+import { CanvasForm } from './canvas-form'
+import { StatusChangeDialog } from './status-change-dialog'
 
 // Canvas Node Interface
 interface CanvasNode {
@@ -80,6 +81,9 @@ interface CanvasTreeViewProps {
   // Edit canvas props
   onUpdateCanvas?: (canvasId: string, businessInfo: any) => void
   enterpriseContext?: any
+  // Status management props
+  onStatusChange?: (canvasId: string, newStatus: string, justification?: string) => Promise<void>
+  userRole?: string
 }
 
 // Helper functions for icons and styling
@@ -129,7 +133,9 @@ function TreeNode({
   setDraggedCanvasId,
   // Group selection props
   selectedCanvasIds,
-  onToggleCanvasSelection
+  onToggleCanvasSelection,
+  // Status management props
+  onOpenStatusDialog
 }: {
   node: CanvasNode
   depth?: number
@@ -148,6 +154,8 @@ function TreeNode({
   // Group selection props
   selectedCanvasIds?: Set<string>
   onToggleCanvasSelection?: (canvasId: string) => void
+  // Status management props
+  onOpenStatusDialog?: (canvasId: string) => void
 }) {
   const nodeRef = useRef<HTMLDivElement>(null)
   const [isDragOver, setIsDragOver] = useState(false)
@@ -417,6 +425,10 @@ function TreeNode({
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Metadata
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onOpenStatusDialog?.(node.id)}>
+                <Target className="h-4 w-4 mr-2" />
+                Change Status
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onArchiveCanvas(node.id)}>
                 <Archive className="h-4 w-4 mr-2" />
                 Archive
@@ -453,6 +465,7 @@ function TreeNode({
             setDraggedCanvasId={setDraggedCanvasId}
             selectedCanvasIds={selectedCanvasIds}
             onToggleCanvasSelection={onToggleCanvasSelection}
+            onOpenStatusDialog={onOpenStatusDialog}
           />
         </div>
       )}
@@ -478,7 +491,9 @@ function TreeList({
   setDraggedCanvasId,
   // Group selection props
   selectedCanvasIds,
-  onToggleCanvasSelection
+  onToggleCanvasSelection,
+  // Status management props
+  onOpenStatusDialog
 }: {
   nodes: CanvasNode[]
   onSelectCanvas: (canvasId: string) => void
@@ -497,6 +512,8 @@ function TreeList({
   // Group selection props
   selectedCanvasIds?: Set<string>
   onToggleCanvasSelection?: (canvasId: string) => void
+  // Status management props
+  onOpenStatusDialog?: (canvasId: string) => void
 }) {
   return (
     <div className="space-y-1">
@@ -519,6 +536,7 @@ function TreeList({
           setDraggedCanvasId={setDraggedCanvasId}
           selectedCanvasIds={selectedCanvasIds}
           onToggleCanvasSelection={onToggleCanvasSelection}
+          onOpenStatusDialog={onOpenStatusDialog}
         />
       ))}
     </div>
@@ -544,7 +562,10 @@ export function CanvasTreeView({
   onBulkArchive,
   // Edit canvas props
   onUpdateCanvas,
-  enterpriseContext
+  enterpriseContext,
+  // Status management props
+  onStatusChange,
+  userRole
 }: CanvasTreeViewProps) {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set())
   const [draggedCanvasId, setDraggedCanvasId] = useState<string | null>(null)
@@ -553,6 +574,8 @@ export function CanvasTreeView({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null)
   const [editingCanvasData, setEditingCanvasData] = useState<any>(null)
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false)
+  const [statusCanvas, setStatusCanvas] = useState<any>(null)
   
   // Load expanded nodes from localStorage on mount
   useEffect(() => {
@@ -696,6 +719,54 @@ export function CanvasTreeView({
     } catch (error) {
       console.error('Error updating canvas:', error)
       // You might want to show an error toast here
+    }
+  }
+
+  // Handle status change
+  const handleStatusChange = async (canvasId: string, newStatus: string, justification?: string) => {
+    try {
+      // Call the parent status change handler if provided
+      if (onStatusChange) {
+        await onStatusChange(canvasId, newStatus, justification)
+      } else {
+        // Default implementation - update via API
+        const response = await fetch(`/api/business-canvas/${canvasId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: newStatus,
+            // Add justification to audit log if needed
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to update canvas status')
+        }
+
+        console.log('✅ Canvas status updated successfully')
+      }
+    } catch (error) {
+      console.error('Error updating canvas status:', error)
+      throw error
+    }
+  }
+
+  // Handle open status dialog
+  const handleOpenStatusDialog = async (canvasId: string) => {
+    try {
+      // Fetch canvas data for status change
+      const response = await fetch(`/api/business-canvas/${canvasId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch canvas data')
+      }
+      const canvasData = await response.json()
+      
+      setStatusCanvas(canvasData)
+      setIsStatusDialogOpen(true)
+    } catch (error) {
+      console.error('Error fetching canvas data for status change:', error)
     }
   }
 
@@ -870,19 +941,33 @@ export function CanvasTreeView({
           setDraggedCanvasId={setDraggedCanvasId}
           selectedCanvasIds={selectedCanvasIds}
           onToggleCanvasSelection={onToggleCanvasSelection}
+          onOpenStatusDialog={handleOpenStatusDialog}
         />
       </CardContent>
       )}
 
       {/* Edit Canvas Modal */}
-      <EditCanvasForm
-        onUpdateCanvas={handleUpdateCanvas}
+      <CanvasForm
+        mode="edit"
+        onSubmit={(businessInfo) => handleUpdateCanvas(editingCanvasId || '', businessInfo)}
         canvasId={editingCanvasId || ''}
         canvasData={editingCanvasData}
         enterpriseContext={enterpriseContext}
         isOpen={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
       />
+
+      {/* Status Change Dialog */}
+      {statusCanvas && (
+        <StatusChangeDialog
+          isOpen={isStatusDialogOpen}
+          onOpenChange={setIsStatusDialogOpen}
+          canvas={statusCanvas}
+          currentStatus={statusCanvas.status}
+          userRole={userRole || 'USER'}
+          onStatusChange={handleStatusChange}
+        />
+      )}
     </Card>
   )
 } 

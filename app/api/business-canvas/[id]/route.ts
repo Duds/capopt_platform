@@ -3,10 +3,10 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
 
     const businessCanvas = await prisma.businessCanvas.findUnique({
       where: { id },
@@ -44,11 +44,14 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
+    
+    console.log('🔧 API UPDATE - Canvas ID:', id)
+    console.log('🔧 API UPDATE - Request body:', JSON.stringify(body, null, 2))
 
     // Validate that the canvas exists
     const existingCanvas = await prisma.businessCanvas.findUnique({
@@ -74,6 +77,48 @@ export async function PUT(
     if (body.editMode !== undefined) updateData.editMode = body.editMode
     if (body.autoSave !== undefined) updateData.autoSave = body.autoSave
 
+    // Handle enhanced metadata fields
+    if (body.legalName !== undefined) updateData.legalName = body.legalName
+    if (body.abn !== undefined) updateData.abn = body.abn
+    if (body.acn !== undefined) updateData.acn = body.acn
+    if (body.industry !== undefined) updateData.industry = body.industry
+    if (body.sector !== undefined) updateData.sector = body.sector
+    if (body.sectors !== undefined) {
+      // Convert SectorSelection[] to string[] for database storage
+      const sectorCodes = Array.isArray(body.sectors) 
+        ? body.sectors.map((sector: any) => typeof sector === 'string' ? sector : sector.sectorCode)
+        : body.sectors
+      
+      updateData.sectors = sectorCodes
+      
+      // Extract primary sector from SectorSelection[] objects
+      if (Array.isArray(body.sectors) && body.sectors.length > 0) {
+        const primarySector = body.sectors.find((sector: any) => sector.isPrimary)
+        if (primarySector) {
+          updateData.primarySector = typeof primarySector === 'string' ? primarySector : primarySector.sectorCode
+        } else {
+          // If no primary sector is marked, use the first sector as primary
+          updateData.primarySector = sectorCodes[0]
+        }
+      }
+    }
+    if (body.sectorTypes !== undefined) updateData.sectorTypes = body.sectorTypes
+    if (body.businessType !== undefined) updateData.businessType = body.businessType
+    if (body.regional !== undefined) updateData.regional = body.regional
+    if (body.primaryLocation !== undefined) updateData.primaryLocation = body.primaryLocation
+    if (body.coordinates !== undefined) updateData.coordinates = body.coordinates
+    if (body.facilityType !== undefined) updateData.facilityType = body.facilityType
+    if (body.operationalStreams !== undefined) updateData.operationalStreams = body.operationalStreams
+    if (body.strategicObjective !== undefined) updateData.strategicObjective = body.strategicObjective
+    if (body.valueProposition !== undefined) updateData.valueProposition = body.valueProposition
+    if (body.competitiveAdvantage !== undefined) updateData.competitiveAdvantage = body.competitiveAdvantage
+    if (body.annualRevenue !== undefined) updateData.annualRevenue = body.annualRevenue
+    if (body.employeeCount !== undefined) updateData.employeeCount = body.employeeCount
+    if (body.riskProfile !== undefined) updateData.riskProfile = body.riskProfile
+    if (body.digitalMaturity !== undefined) updateData.digitalMaturity = body.digitalMaturity
+    if (body.complianceRequirements !== undefined) updateData.complianceRequirements = body.complianceRequirements
+    if (body.regulatoryFramework !== undefined) updateData.regulatoryFramework = body.regulatoryFramework
+
     // Handle relationship fields (for drag and drop operations)
     if (body.enterpriseId !== undefined) updateData.enterpriseId = body.enterpriseId
     if (body.facilityId !== undefined) updateData.facilityId = body.facilityId
@@ -83,6 +128,8 @@ export async function PUT(
     // Update lastSaved timestamp
     updateData.lastSaved = new Date()
 
+    console.log('🔧 API UPDATE - Update data:', JSON.stringify(updateData, null, 2))
+    
     const updatedCanvas = await prisma.businessCanvas.update({
       where: { id },
       data: updateData,
@@ -101,11 +148,17 @@ export async function PUT(
       }
     })
 
+    console.log('✅ API UPDATE - Canvas updated successfully:', updatedCanvas.name)
     return NextResponse.json(updatedCanvas)
   } catch (error) {
-    console.error('Error updating business canvas:', error)
+    console.error('❌ API UPDATE - Error updating business canvas:', error)
+    console.error('❌ API UPDATE - Error stack:', error instanceof Error ? error.stack : 'No stack trace')
     return NextResponse.json(
-      { error: 'Failed to update business canvas', details: error instanceof Error ? error.message : 'Unknown error' },
+      { 
+        error: 'Failed to update business canvas', 
+        details: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     )
   }
@@ -113,10 +166,10 @@ export async function PUT(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
 
     // Validate that the canvas exists
@@ -248,10 +301,10 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
 
     // Validate that the canvas exists
     const existingCanvas = await prisma.businessCanvas.findUnique({

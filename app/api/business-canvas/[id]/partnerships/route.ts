@@ -29,7 +29,7 @@ export async function GET(
       )
     }
 
-    const partnerships = await prisma.Partnership.findMany({
+    const partnerships = await prisma.partnership.findMany({
       where: { businessCanvasId: id },
       orderBy: { createdAt: 'desc' }
     })
@@ -66,7 +66,7 @@ export async function POST(
 
     const validatedData = PartnershipSchema.parse(body)
 
-    const partnerships = await prisma.Partnership.create({
+    const partnerships = await prisma.partnership.create({
       data: {
         ...validatedData,
         businessCanvasId: id

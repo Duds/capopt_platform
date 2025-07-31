@@ -29,7 +29,7 @@ export async function GET(
       )
     }
 
-    const revenuestreams = await prisma.RevenueStream.findMany({
+    const revenuestreams = await prisma.revenueStream.findMany({
       where: { businessCanvasId: id },
       orderBy: { createdAt: 'desc' }
     })
@@ -66,7 +66,7 @@ export async function POST(
 
     const validatedData = RevenueStreamSchema.parse(body)
 
-    const revenuestreams = await prisma.RevenueStream.create({
+    const revenuestreams = await prisma.revenueStream.create({
       data: {
         ...validatedData,
         businessCanvasId: id

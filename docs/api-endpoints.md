@@ -1,5 +1,14 @@
 # CapOpt Platform API Documentation
 
+> **Related documentation:**
+> - API Design: @docs/design/solution-architecture-design.md#api-design
+> - Security: @docs/design/solution-architecture-design.md#security
+> - User Roles: @docs/role-permissions.md
+> - Architecture: @docs/design/reference-architecture.md
+> - Technical Implementation: @docs/technical-implementation-details.md
+> - Feature Requirements: @docs/design/product-backlog.md
+> - Implementation Status: @docs/implementation-status.md
+
 ## Overview
 
 The CapOpt Platform API provides comprehensive RESTful endpoints for managing operational capability optimisation across strategic, operational, and control & risk layers. All endpoints follow REST conventions and return JSON responses.
@@ -437,3 +446,13 @@ Currently, no rate limiting is implemented. Consider implementing rate limiting 
 4. **Real-time Updates**: Implement WebSocket support for real-time updates
 5. **Audit Logging**: Add comprehensive audit logging
 6. **API Versioning**: Implement API versioning for backward compatibility 
+
+## Related Documentation
+
+- **API Design Patterns:** @docs/design/solution-architecture-design.md#api-design
+- **Security Standards:** @docs/design/solution-architecture-design.md#security
+- **User Roles:** @docs/role-permissions.md
+- **Reference Architecture:** @docs/design/reference-architecture.md
+- **Technical Implementation:** @docs/technical-implementation-details.md
+- **Feature Requirements:** @docs/design/product-backlog.md
+- **Implementation Status:** @docs/implementation-status.md 
