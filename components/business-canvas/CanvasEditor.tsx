@@ -507,6 +507,31 @@ export function CanvasEditor({
           return reverseMap[displayName] || displayName
         }
         
+        // Facility type mapping
+        if (enumType === 'facility-types') {
+          const reverseMap: { [key: string]: string } = {
+            'Crushing Plant': 'CRUSHING_PLANT',
+            'Grinding Mill': 'GRINDING_MILL',
+            'Flotation Plant': 'FLOTATION_PLANT',
+            'Leaching Plant': 'LEACHING_PLANT',
+            'Smelter': 'SMELTER',
+            'Refinery': 'REFINERY',
+            'Power Station': 'POWER_STATION',
+            'Water Treatment Plant': 'WATER_TREATMENT',
+            'Waste Management Facility': 'WASTE_MANAGEMENT',
+            'Warehouse': 'WAREHOUSE',
+            'Office Complex': 'OFFICE',
+            'Laboratory': 'LABORATORY',
+            'Workshop': 'WORKSHOP',
+            'Training Center': 'TRAINING_CENTER',
+            'Underground Mine': 'UNDERGROUND_MINE',
+            'Placer Mine': 'PLACER_MINE',
+            'In-Situ Mine': 'IN_SITU_MINE',
+            'Open Pit Mine': 'OPEN_PIT_MINE'
+          }
+          return reverseMap[displayName] || displayName
+        }
+        
         return displayName
       }
 
@@ -515,7 +540,8 @@ export function CanvasEditor({
         industry: mapDisplayToEnum(formData.industry, 'industry'),
         businessType: mapDisplayToEnum(formData.businessType, 'business-type'),
         regional: mapDisplayToEnum(formData.regional, 'regional'),
-        riskProfile: mapDisplayToEnum(formData.riskProfile, 'risk-profile')
+        riskProfile: mapDisplayToEnum(formData.riskProfile, 'risk-profile'),
+        facilityType: mapDisplayToEnum(formData.facilityType, 'facility-types')
       }
 
       console.log('🔍 SUBMISSION DEBUG - Original form data:', formData)
