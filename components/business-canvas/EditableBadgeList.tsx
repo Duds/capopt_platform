@@ -5,14 +5,26 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { X, Plus, Settings, Shield, FileText, Zap } from 'lucide-react'
+import { X, Plus, Settings, Shield, FileText, Zap, Building, Workflow, Search } from 'lucide-react'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+
+interface MasterDataItem {
+  id: string
+  name: string
+  code?: string
+  description?: string
+  category?: string
+}
 
 interface EditableBadgeListProps {
   items: string[]
   onItemsChange: (items: string[]) => void
   placeholder?: string
-  category: 'operational' | 'compliance' | 'regulatory'
+  category: 'operational' | 'compliance' | 'regulatory' | 'facility' | 'stream'
   maxItems?: number
+  masterData?: MasterDataItem[]
+  allowFreeText?: boolean
 }
 
 export function EditableBadgeList({
@@ -20,10 +32,13 @@ export function EditableBadgeList({
   onItemsChange,
   placeholder = "Add item...",
   category,
-  maxItems = 20
+  maxItems = 20,
+  masterData = [],
+  allowFreeText = false
 }: EditableBadgeListProps) {
   const [newItem, setNewItem] = useState('')
   const [isAdding, setIsAdding] = useState(false)
+  const [open, setOpen] = useState(false)
 
   const handleAddItem = () => {
     const trimmedItem = newItem.trim()
@@ -48,6 +63,14 @@ export function EditableBadgeList({
     }
   }
 
+  const handleSelectMasterData = (item: MasterDataItem) => {
+    const itemName = item.name
+    if (!items.includes(itemName) && items.length < maxItems) {
+      onItemsChange([...items, itemName])
+    }
+    setOpen(false)
+  }
+
   const getCategoryIcon = () => {
     switch (category) {
       case 'operational':
@@ -56,21 +79,46 @@ export function EditableBadgeList({
         return Shield
       case 'regulatory':
         return FileText
+      case 'facility':
+        return Building
+      case 'stream':
+        return Workflow
       default:
         return Settings
     }
   }
 
-  const getCategoryColor = () => {
+  const getCategoryVariant = () => {
     switch (category) {
       case 'operational':
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+        return 'secondary'
       case 'compliance':
-        return 'bg-orange-100 text-orange-800 hover:bg-orange-200'
+        return 'compliance'
       case 'regulatory':
-        return 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+        return 'regulatory'
+      case 'facility':
+        return 'facility'
+      case 'stream':
+        return 'stream'
       default:
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+        return 'outline'
+    }
+  }
+
+  const getCategoryLabel = () => {
+    switch (category) {
+      case 'operational':
+        return 'operational item'
+      case 'compliance':
+        return 'compliance requirement'
+      case 'regulatory':
+        return 'regulatory framework'
+      case 'facility':
+        return 'facility type'
+      case 'stream':
+        return 'operational stream'
+      default:
+        return 'item'
     }
   }
 
@@ -84,8 +132,8 @@ export function EditableBadgeList({
           {items.map((item, index) => (
             <Badge
               key={`${item}-${index}`}
-              variant="outline"
-              className={`flex items-center gap-1 ${getCategoryColor()} cursor-pointer transition-colors`}
+              variant={getCategoryVariant()}
+              className="flex items-center gap-1 cursor-pointer transition-colors"
               onClick={() => handleRemoveItem(item)}
             >
               <CategoryIcon className="h-3 w-3" />
@@ -96,21 +144,68 @@ export function EditableBadgeList({
         </div>
       )}
 
-      {/* Add New Item */}
-      {!isAdding && items.length < maxItems && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Add {category.replace(/([A-Z])/g, ' $1').toLowerCase()}
-        </Button>
-      )}
+      {/* Action Buttons */}
+      <div className="flex gap-2">
+        {/* Add from Master Data Button */}
+        {masterData.length > 0 && (
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4" />
+                Select from list
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] max-w-[90vw] p-0" align="start">
+              <Command>
+                <CommandInput placeholder={`Search ${getCategoryLabel()}s...`} />
+                <CommandList>
+                  <CommandEmpty>No {getCategoryLabel()}s found.</CommandEmpty>
+                  <CommandGroup>
+                    {masterData
+                      .filter(item => !items.includes(item.name))
+                      .map((item) => (
+                        <CommandItem
+                          key={item.id}
+                          onSelect={() => handleSelectMasterData(item)}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-medium truncate">{item.name}</span>
+                            {item.description && (
+                              <span className="text-sm text-muted-foreground truncate">
+                                {item.description}
+                              </span>
+                            )}
+                          </div>
+                        </CommandItem>
+                      ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        )}
 
-      {/* Add Item Input */}
-      {isAdding && (
+        {/* Add Free Text Button */}
+        {allowFreeText && !isAdding && items.length < maxItems && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsAdding(true)}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add custom {getCategoryLabel()}
+          </Button>
+        )}
+      </div>
+
+      {/* Add Item Input (for free text) */}
+      {isAdding && allowFreeText && (
         <div className="flex gap-2">
           <Input
             value={newItem}
@@ -143,7 +238,8 @@ export function EditableBadgeList({
       {/* Help Text */}
       {items.length === 0 && !isAdding && (
         <p className="text-sm text-muted-foreground">
-          No {category.replace(/([A-Z])/g, ' $1').toLowerCase()} items added yet.
+          No {getCategoryLabel()}s added yet.
+          {masterData.length > 0 && ` Click "Select from list" to choose from available ${getCategoryLabel()}s.`}
         </p>
       )}
 

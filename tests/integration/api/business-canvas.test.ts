@@ -6,9 +6,7 @@
  * @note Complex API testing patterns for real-world implementation
  */
 
-import request from 'supertest';
-import { createServer } from 'http';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { GET, POST, PATCH } from '@/app/api/business-canvas/route';
 import { businessCanvasSchema } from '@/lib/validations/strategic';
 import { prisma } from '@/lib/prisma';
@@ -35,31 +33,29 @@ jest.mock('@/lib/prisma', () => ({
   },
 }));
 
-// Mock Next.js request/response
-const createMockRequest = (method: string, url: string, body?: any) => {
-  const req = {
-    method,
-    url,
-    json: jest.fn().mockResolvedValue(body || {}),
-    headers: {},
-  } as any;
-
-  // Add searchParams
+// Mock Next.js App Router request/response
+const createMockRequest = (method: string, url: string, body?: any): NextRequest => {
   const urlObj = new URL(url, 'http://localhost:3000');
-  req.nextUrl = { searchParams: urlObj.searchParams };
-
-  return req;
+  
+  const request = {
+    url: urlObj.toString(),
+    method,
+    headers: new Map([['Content-Type', 'application/json']]),
+    json: jest.fn().mockResolvedValue(body || {}),
+  } as unknown as NextRequest;
+  
+  return request;
 };
 
 const createMockResponse = () => {
-  const res = {
+  const response = {
     status: jest.fn().mockReturnThis(),
     json: jest.fn().mockReturnThis(),
     headers: new Map(),
   } as any;
-
-  res.headers.set = jest.fn();
-  return res;
+  
+  response.headers.set = jest.fn();
+  return response;
 };
 
 describe('Business Canvas API', () => {
@@ -79,7 +75,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('GET', '/api/business-canvas');
       const res = createMockResponse();
 
-      await GET(req as NextApiRequest, res as NextApiResponse);
+      await GET(req, res);
 
       expect(prisma.businessCanvas.findMany).toHaveBeenCalledWith({
         where: {},
@@ -111,7 +107,7 @@ describe('Business Canvas API', () => {
       );
       const res = createMockResponse();
 
-      await GET(req as NextApiRequest, res as NextApiResponse);
+      await GET(req, res);
 
       expect(prisma.businessCanvas.findMany).toHaveBeenCalledWith({
         where: {},
@@ -144,7 +140,7 @@ describe('Business Canvas API', () => {
       );
       const res = createMockResponse();
 
-      await GET(req as NextApiRequest, res as NextApiResponse);
+      await GET(req, res);
 
       expect(prisma.businessCanvas.findMany).toHaveBeenCalledWith({
         where: {
@@ -174,7 +170,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('GET', '/api/business-canvas?isActive=true');
       const res = createMockResponse();
 
-      await GET(req as NextApiRequest, res as NextApiResponse);
+      await GET(req, res);
 
       expect(prisma.businessCanvas.findMany).toHaveBeenCalledWith({
         where: { isActive: true },
@@ -194,7 +190,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('GET', '/api/business-canvas');
       const res = createMockResponse();
 
-      await GET(req as NextApiRequest, res as NextApiResponse);
+      await GET(req, res);
 
       expect(res.headers.set).toHaveBeenCalledWith('Cache-Control', 'no-cache, no-store, must-revalidate');
       expect(res.headers.set).toHaveBeenCalledWith('Pragma', 'no-cache');
@@ -209,7 +205,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('GET', '/api/business-canvas');
       const res = createMockResponse();
 
-      await GET(req as NextApiRequest, res as NextApiResponse);
+      await GET(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
@@ -238,7 +234,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('POST', '/api/business-canvas', canvasData);
       const res = createMockResponse();
 
-      await POST(req as NextApiRequest, res as NextApiResponse);
+      await POST(req, res);
 
       expect(prisma.businessCanvas.create).toHaveBeenCalledWith({
         data: expect.objectContaining(canvasData),
@@ -288,7 +284,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('POST', '/api/business-canvas', complexCanvasData);
       const res = createMockResponse();
 
-      await POST(req as NextApiRequest, res as NextApiResponse);
+      await POST(req, res);
 
       expect(prisma.businessCanvas.create).toHaveBeenCalledWith({
         data: expect.objectContaining(complexCanvasData),
@@ -308,7 +304,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('POST', '/api/business-canvas', invalidCanvasData);
       const res = createMockResponse();
 
-      await POST(req as NextApiRequest, res as NextApiResponse);
+      await POST(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith(
@@ -336,7 +332,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('POST', '/api/business-canvas', canvasWithParent);
       const res = createMockResponse();
 
-      await POST(req as NextApiRequest, res as NextApiResponse);
+      await POST(req, res);
 
       expect(prisma.businessCanvas.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
@@ -365,7 +361,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('POST', '/api/business-canvas', canvasWithEmptyParent);
       const res = createMockResponse();
 
-      await POST(req as NextApiRequest, res as NextApiResponse);
+      await POST(req, res);
 
       expect(prisma.businessCanvas.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
@@ -385,7 +381,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('POST', '/api/business-canvas', invalidCanvasData);
       const res = createMockResponse();
 
-      await POST(req as NextApiRequest, res as NextApiResponse);
+      await POST(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith(
@@ -408,7 +404,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('POST', '/api/business-canvas', canvasData);
       const res = createMockResponse();
 
-      await POST(req as NextApiRequest, res as NextApiResponse);
+      await POST(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
@@ -436,7 +432,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('PATCH', '/api/business-canvas', updateData);
       const res = createMockResponse();
 
-      await PATCH(req as NextApiRequest, res as NextApiResponse);
+      await PATCH(req, res);
 
       expect(prisma.businessCanvas.update).toHaveBeenCalledWith({
         where: expect.any(Object),
@@ -468,7 +464,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('PATCH', '/api/business-canvas', complexUpdateData);
       const res = createMockResponse();
 
-      await PATCH(req as NextApiRequest, res as NextApiResponse);
+      await PATCH(req, res);
 
       expect(prisma.businessCanvas.update).toHaveBeenCalledWith({
         where: expect.any(Object),
@@ -487,7 +483,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('PATCH', '/api/business-canvas', invalidUpdateData);
       const res = createMockResponse();
 
-      await PATCH(req as NextApiRequest, res as NextApiResponse);
+      await PATCH(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith(
@@ -509,7 +505,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('PATCH', '/api/business-canvas', updateData);
       const res = createMockResponse();
 
-      await PATCH(req as NextApiRequest, res as NextApiResponse);
+      await PATCH(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
@@ -544,7 +540,7 @@ describe('Business Canvas API', () => {
       );
       const res = createMockResponse();
 
-      await GET(req as NextApiRequest, res as NextApiResponse);
+      await GET(req, res);
 
       expect(prisma.businessCanvas.findMany).toHaveBeenCalledWith({
         where: { enterpriseId: 'enterprise-1' },
@@ -587,7 +583,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('POST', '/api/business-canvas', canvasWithArrays);
       const res = createMockResponse();
 
-      await POST(req as NextApiRequest, res as NextApiResponse);
+      await POST(req, res);
 
       expect(prisma.businessCanvas.create).toHaveBeenCalledWith({
         data: expect.objectContaining(canvasWithArrays),
@@ -615,7 +611,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('POST', '/api/business-canvas', canvasWithEnums);
       const res = createMockResponse();
 
-      await POST(req as NextApiRequest, res as NextApiResponse);
+      await POST(req, res);
 
       expect(prisma.businessCanvas.create).toHaveBeenCalledWith({
         data: expect.objectContaining(canvasWithEnums),
@@ -629,7 +625,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('GET', '/api/business-canvas?include=invalid,fields');
       const res = createMockResponse();
 
-      await GET(req as NextApiRequest, res as NextApiResponse);
+      await GET(req, res);
 
       // Should handle gracefully without crashing
       expect(prisma.businessCanvas.findMany).toHaveBeenCalled();
@@ -641,7 +637,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('GET', '/api/business-canvas');
       const res = createMockResponse();
 
-      await GET(req as NextApiRequest, res as NextApiResponse);
+      await GET(req, res);
 
       expect(res.json).toHaveBeenCalledWith([]);
     });
@@ -662,7 +658,7 @@ describe('Business Canvas API', () => {
       });
       const res = createMockResponse();
 
-      await POST(req as NextApiRequest, res as NextApiResponse);
+      await POST(req, res);
 
       expect(res.json).toHaveBeenCalledWith(canvasWithNulls);
     });
@@ -674,7 +670,7 @@ describe('Business Canvas API', () => {
       const req = createMockRequest('GET', '/api/business-canvas');
       const res = createMockResponse();
 
-      await GET(req as NextApiRequest, res as NextApiResponse);
+      await GET(req, res);
 
       expect(res.json).toHaveBeenCalledWith(largeDataSet);
       expect(largeDataSet).toHaveLength(1000);

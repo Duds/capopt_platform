@@ -1,0 +1,122 @@
+@startwbs CapOpt-Framework-Implementation-WBS
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+
+* **Operational Capability Framework Implementation**
+** 1.0 Framework Foundation
+*** 1.1 Industry Classification
+**** 1.1.1 Industry Master Data
+**** 1.1.2 Industry-Sector Mapping
+**** 1.1.3 Industry Validation Rules
+*** 1.2 Sector Framework
+**** 1.2.1 Sector Categories
+***** 1.2.1.1 Commodity Sectors
+***** 1.2.1.2 Value Chain Sectors
+***** 1.2.1.3 Business Model Sectors
+***** 1.2.1.4 Support Services Sectors
+**** 1.2.2 Sector-Industry Relationships
+**** 1.2.3 Sector Validation Logic
+
+** 2.0 Operational Framework
+*** 2.1 Operational Streams
+**** 2.1.1 Stream Categories
+***** 2.1.1.1 Extraction Processes
+***** 2.1.1.2 Processing Operations
+***** 2.1.1.3 Safety Systems
+***** 2.1.1.4 Environmental Management
+***** 2.1.1.5 Logistics & Transport
+***** 2.1.1.6 Quality Control
+***** 2.1.1.7 Security Systems
+***** 2.1.1.8 Maintenance Operations
+**** 2.1.2 Stream-Sector Mapping
+**** 2.1.3 Stream Auto-Population Logic
+*** 2.2 Facility Types
+**** 2.2.1 Facility Categories
+***** 2.2.1.1 Extraction Facilities
+***** 2.2.1.2 Processing Facilities
+***** 2.2.1.3 Infrastructure Facilities
+***** 2.2.1.4 Support Facilities
+**** 2.2.2 Facility-Industry Mapping
+**** 2.2.3 Facility Multi-Select Logic
+
+** 3.0 Compliance Framework
+*** 3.1 Compliance Requirements
+**** 3.1.1 Regulatory Categories
+***** 3.1.1.1 Federal Requirements
+***** 3.1.1.2 State Requirements
+***** 3.1.1.3 Industry Standards
+***** 3.1.1.4 International Requirements
+**** 3.1.2 Compliance-Sector Mapping
+**** 3.1.3 Compliance Auto-Population
+*** 3.2 Regulatory Frameworks
+**** 3.2.1 Framework Categories
+***** 3.2.1.1 Federal Frameworks
+***** 3.2.1.2 State Frameworks
+***** 3.2.1.3 Industry Frameworks
+***** 3.2.1.4 International Frameworks
+**** 3.2.2 Framework-Industry Mapping
+**** 3.2.3 Framework Selection Logic
+
+** 4.0 Business Canvas Integration
+*** 4.1 Framework Associations
+**** 4.1.1 Operational Stream Associations
+**** 4.1.2 Compliance Framework Associations
+**** 4.1.3 Facility Type Associations
+*** 4.2 Auto-Population Engine
+**** 4.2.1 Sector-Based Selection
+**** 4.2.2 Industry Filtering
+**** 4.2.3 Cross-Reference Logic
+*** 4.3 Manual Override System
+**** 4.3.1 Add Framework Items
+**** 4.3.2 Remove Framework Items
+**** 4.3.3 Convert Auto/Manual Status
+
+** 5.0 User Interface
+*** 5.1 Framework Selection Components
+**** 5.1.1 Industry Selector
+**** 5.1.2 Sector Multi-Selector
+**** 5.1.3 Facility Type Multi-Selector
+**** 5.1.4 Framework Management Interface
+*** 5.2 Framework Display
+**** 5.2.1 Auto-Populated Items Display
+**** 5.2.2 Manual Items Display
+**** 5.2.3 Framework Status Indicators
+*** 5.3 Framework Validation
+**** 5.3.1 Required Framework Validation
+**** 5.3.2 Framework Compatibility Checks
+**** 5.3.3 Framework Conflict Resolution
+
+** 6.0 Data Management
+*** 6.1 Framework Data Models
+**** 6.1.1 Industry Data Model
+**** 6.1.2 Sector Data Model
+**** 6.1.3 Operational Stream Data Model
+**** 6.1.4 Facility Type Data Model
+**** 6.1.5 Compliance Data Model
+**** 6.1.6 Regulatory Framework Data Model
+*** 6.2 Association Tracking
+**** 6.2.1 Auto-Applied Flag Management
+**** 6.2.2 Association History Tracking
+**** 6.2.3 Framework Change Auditing
+*** 6.3 Data Migration
+**** 6.3.1 Existing Data Migration
+**** 6.3.2 Framework Association Backfill
+**** 6.3.3 Data Validation & Cleanup
+
+** 7.0 Testing & Quality Assurance
+*** 7.1 Unit Testing
+**** 7.1.1 Framework Logic Testing
+**** 7.1.2 Auto-Population Testing
+**** 7.1.3 Association Management Testing
+*** 7.2 Integration Testing
+**** 7.2.1 End-to-End Framework Selection
+**** 7.2.2 Business Canvas Integration
+**** 7.2.3 Framework Association Persistence
+*** 7.3 User Acceptance Testing
+**** 7.3.1 Framework Selection Workflow
+**** 7.3.2 Auto-Population Accuracy
+**** 7.3.3 Manual Override Functionality
+
+@endwbs 

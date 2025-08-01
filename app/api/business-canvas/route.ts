@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { businessCanvasSchema } from '@/lib/validations/strategic'
 import { prisma } from '@/lib/prisma'
+import { applyIndustryFrameworks } from '@/lib/utils/framework-utils'
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,6 +11,8 @@ export async function GET(request: NextRequest) {
     const enterpriseId = searchParams.get('enterpriseId')
     const facilityId = searchParams.get('facilityId')
     const businessUnitId = searchParams.get('businessUnitId')
+    const industry = searchParams.get('industry')
+    const sector = searchParams.get('sector')
 
     // Build where clause
     const where: any = {}
@@ -25,38 +28,53 @@ export async function GET(request: NextRequest) {
     if (businessUnitId) {
       where.businessUnitId = businessUnitId
     }
-
-    // Build include clause with basic relationships only
-    const includeClause: any = {}
-
-    // Canvas content relationships (these should always exist)
-    if (include.includes('valuePropositions')) {
-      includeClause.valuePropositions = true
+    if (industry) {
+      where.industry = industry
     }
-    if (include.includes('customerSegments')) {
-      includeClause.customerSegments = true
-    }
-    if (include.includes('revenueStreams')) {
-      includeClause.revenueStreams = true
-    }
-    if (include.includes('partnerships')) {
-      includeClause.partnerships = true
-    }
-    if (include.includes('resources')) {
-      includeClause.resources = true
-    }
-    if (include.includes('activities')) {
-      includeClause.activities = true
-    }
-    if (include.includes('costStructures')) {
-      includeClause.costStructures = true
-    }
-    if (include.includes('channels')) {
-      includeClause.channels = true
+    if (sector) {
+      where.sector = sector
     }
 
-    // Note: Enterprise context and enhanced features will be added back
-    // once the database schema is fully migrated and tested
+    // Build include clause with framework hierarchy relationships
+    const includeClause: any = {
+      // Canvas content relationships
+      valuePropositions: include.includes('valuePropositions'),
+      customerSegments: include.includes('customerSegments'),
+      revenueStreams: include.includes('revenueStreams'),
+      partnerships: include.includes('partnerships'),
+      resources: include.includes('resources'),
+      activities: include.includes('activities'),
+      costStructures: include.includes('costStructures'),
+      channels: include.includes('channels'),
+      
+      // Framework hierarchy relationships
+      frameworkOperationalStreams: include.includes('frameworks') ? {
+        include: {
+          operationalStream: true,
+          IndustryOperationalStreams: true
+        }
+      } : false,
+      frameworkComplianceFrameworks: include.includes('frameworks') ? {
+        include: {
+          complianceFramework: true,
+          RegulatoryFramework: true,
+          IndustryComplianceFramework: true
+        }
+      } : false,
+      frameworkFacilityTypes: include.includes('frameworks') ? {
+        include: {
+          facilityType: true,
+          IndustryFacilityTypes: true
+        }
+      } : false,
+      
+      // Enterprise context relationships
+      enterprise: include.includes('enterprise'),
+      facility: include.includes('facility'),
+      businessUnit: include.includes('businessUnit'),
+      parentCanvas: include.includes('hierarchy'),
+      childCanvases: include.includes('hierarchy')
+    }
 
     const businessCanvases = await prisma.businessCanvas.findMany({
       where,
@@ -72,6 +90,9 @@ export async function GET(request: NextRequest) {
     console.log('🔍 API DEBUG - Business Canvases fetched:', businessCanvases.length)
     businessCanvases.forEach(canvas => {
       console.log(`  - ${canvas.name}: parentCanvasId = ${canvas.parentCanvasId || 'ROOT'}`)
+      if (canvas.industry) {
+        console.log(`    Industry: ${canvas.industry}, Sector: ${canvas.sector || 'N/A'}`)
+      }
     })
     
     // Add cache-busting headers to prevent browser caching
@@ -98,129 +119,32 @@ export async function POST(request: NextRequest) {
     
     const validatedData = businessCanvasSchema.parse(body)
     console.log('🔍 API DEBUG - Validated data:', JSON.stringify(validatedData, null, 2))
-    
-    // Check for duplicate canvas name
-    const existingCanvas = await prisma.businessCanvas.findFirst({
-      where: {
-        name: validatedData.name,
-        isActive: true
-      }
-    })
-    
-    if (existingCanvas) {
-      return NextResponse.json(
-        { 
-          error: 'Canvas name already exists', 
-          details: `A canvas with the name "${validatedData.name}" already exists. Please choose a different name.`,
-          code: 'DUPLICATE_NAME'
-        },
-        { status: 409 }
-      )
-    }
-    
-    // Build data object with enhanced fields
-    const data: any = {
-      name: validatedData.name
-    }
-    
-    if (validatedData.description !== undefined) data.description = validatedData.description
-    if (validatedData.version !== undefined) data.version = validatedData.version
-    if (validatedData.isActive !== undefined) data.isActive = validatedData.isActive
-    if (validatedData.status !== undefined) data.status = validatedData.status
-    if (validatedData.editMode !== undefined) data.editMode = validatedData.editMode
-    if (validatedData.autoSave !== undefined) data.autoSave = validatedData.autoSave
-    if (validatedData.enterpriseId !== undefined) data.enterpriseId = validatedData.enterpriseId
-    if (validatedData.facilityId !== undefined) data.facilityId = validatedData.facilityId
-    if (validatedData.businessUnitId !== undefined) data.businessUnitId = validatedData.businessUnitId
-    if (validatedData.parentCanvasId !== undefined) {
-      console.log('🔍 API DEBUG - parentCanvasId received:', validatedData.parentCanvasId, 'type:', typeof validatedData.parentCanvasId)
-      
-      // Convert empty string to null to prevent foreign key constraint violation
-      if (validatedData.parentCanvasId === '' || (typeof validatedData.parentCanvasId === 'string' && validatedData.parentCanvasId.trim() === '')) {
-        console.log('🔍 API DEBUG - Converting empty/whitespace string parentCanvasId to null')
-        data.parentCanvasId = null
-      } else {
-        data.parentCanvasId = validatedData.parentCanvasId
-      }
-    }
-    if (validatedData.templateId !== undefined) data.templateId = validatedData.templateId
 
-    // Handle enhanced metadata fields
-    if (validatedData.legalName !== undefined) data.legalName = validatedData.legalName
-    if (validatedData.abn !== undefined) data.abn = validatedData.abn
-    if (validatedData.acn !== undefined) data.acn = validatedData.acn
-    if (validatedData.industry !== undefined) data.industry = validatedData.industry
-    if (validatedData.sector !== undefined) data.sector = validatedData.sector
-    if (validatedData.sectors !== undefined) data.sectors = validatedData.sectors
-    if (validatedData.sectorTypes !== undefined) data.sectorTypes = validatedData.sectorTypes
-    if (validatedData.businessType !== undefined) data.businessType = validatedData.businessType
-    if (validatedData.regional !== undefined) data.regional = validatedData.regional
-    if (validatedData.primaryLocation !== undefined) data.primaryLocation = validatedData.primaryLocation
-    if (validatedData.coordinates !== undefined) data.coordinates = validatedData.coordinates
-    if (validatedData.facilityType !== undefined) data.facilityType = validatedData.facilityType
-    if (validatedData.operationalStreams !== undefined) data.operationalStreams = validatedData.operationalStreams
-    if (validatedData.strategicObjective !== undefined) data.strategicObjective = validatedData.strategicObjective
-    if (validatedData.valueProposition !== undefined) data.valueProposition = validatedData.valueProposition
-    if (validatedData.competitiveAdvantage !== undefined) data.competitiveAdvantage = validatedData.competitiveAdvantage
-    if (validatedData.annualRevenue !== undefined) data.annualRevenue = validatedData.annualRevenue
-    if (validatedData.employeeCount !== undefined) data.employeeCount = validatedData.employeeCount
-    if (validatedData.riskProfile !== undefined) data.riskProfile = validatedData.riskProfile
-    if (validatedData.complianceRequirements !== undefined) data.complianceRequirements = validatedData.complianceRequirements
-    if (validatedData.regulatoryFramework !== undefined) data.regulatoryFramework = validatedData.regulatoryFramework
+    // Extract framework-related data
+    const {
+      industry,
+      sector,
+      operationalStreams,
+      complianceRequirements,
+      regulatoryFramework,
+      facilityTypes, // Changed from facilityType
+      ...canvasData
+    } = validatedData
 
-    // Handle nested relationships
-    if (validatedData.valuePropositions) {
-      data.valuePropositions = {
-        create: validatedData.valuePropositions
-      }
-    }
+    // Create the business canvas
+    const cleanCanvasData = Object.fromEntries(
+      Object.entries(canvasData).filter(([_, value]) => value !== undefined)
+    ) as any
 
-    if (validatedData.customerSegments) {
-      data.customerSegments = {
-        create: validatedData.customerSegments
-      }
-    }
-
-    if (validatedData.revenueStreams) {
-      data.revenueStreams = {
-        create: validatedData.revenueStreams
-      }
-    }
-
-    if (validatedData.partnerships) {
-      data.partnerships = {
-        create: validatedData.partnerships
-      }
-    }
-
-    if (validatedData.resources) {
-      data.resources = {
-        create: validatedData.resources
-      }
-    }
-
-    if (validatedData.activities) {
-      data.activities = {
-        create: validatedData.activities
-      }
-    }
-
-    if (validatedData.costStructures) {
-      data.costStructures = {
-        create: validatedData.costStructures
-      }
-    }
-
-    if (validatedData.channels) {
-      data.channels = {
-        create: validatedData.channels
-      }
-    }
-    
-    console.log('🔍 API DEBUG - Final data for Prisma:', JSON.stringify(data, null, 2))
-    
     const businessCanvas = await prisma.businessCanvas.create({
-      data,
+      data: {
+        ...cleanCanvasData,
+        ...(industry && { industry }),
+        ...(sector && { sector }),
+        ...(operationalStreams && { operationalStreams }),
+        ...(complianceRequirements && { complianceRequirements }),
+        ...(regulatoryFramework && { regulatoryFramework })
+      },
       include: {
         valuePropositions: true,
         customerSegments: true,
@@ -232,12 +156,52 @@ export async function POST(request: NextRequest) {
         channels: true
       }
     })
+
+    // Apply industry-specific frameworks if industry is specified
+    if (industry) {
+      const result = await applyIndustryFrameworks(businessCanvas.id, industry, sector, {
+        replaceExisting: false,
+        markAsAutoApplied: true
+      })
+      
+      if (result.errors.length > 0) {
+        console.warn('⚠️ Framework application warnings:', result.errors)
+      }
+      
+      console.log(`✅ Applied ${result.applied.totalFrameworks} frameworks to canvas ${businessCanvas.id}`)
+    }
+
+    // Create facility type associations if facilityTypes are provided
+    if (facilityTypes && facilityTypes.length > 0) {
+      console.log(`🔧 Creating ${facilityTypes.length} facility type associations`)
+      
+      for (const facilityTypeId of facilityTypes) {
+        await prisma.businessCanvasFacilityTypes.upsert({
+          where: {
+            businessCanvasId_facilityTypeId: {
+              businessCanvasId: businessCanvas.id,
+              facilityTypeId: facilityTypeId
+            }
+          },
+          update: {
+            isAutoApplied: false // Mark as manually selected
+          },
+          create: {
+            businessCanvasId: businessCanvas.id,
+            facilityTypeId: facilityTypeId,
+            isAutoApplied: false // Mark as manually selected
+          }
+        })
+      }
+      
+      console.log(`✅ Created ${facilityTypes.length} facility type associations`)
+    }
+
+    console.log('✅ Business canvas created successfully:', businessCanvas.id)
     
-    console.log('🔍 API DEBUG - Canvas created successfully:', businessCanvas.id)
     return NextResponse.json(businessCanvas, { status: 201 })
   } catch (error) {
-    console.error('❌ Error creating business canvas:', error)
-    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace')
+    console.error('Error creating business canvas:', error)
     return NextResponse.json(
       { error: 'Failed to create business canvas', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -245,136 +209,227 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function PATCH(request: NextRequest) {
+// Helper function to apply industry-specific frameworks (legacy - now using utility)
+async function applyIndustryFrameworksLegacy(canvasId: string, industry: string, sector?: string) {
+  console.log(`🔧 Applying frameworks for industry: ${industry}, sector: ${sector || 'N/A'}`)
+  
   try {
-    const body = await request.json()
-    const { action, canvasId } = body
-
-    if (action === 'clone' && canvasId) {
-      // Find the canvas to clone
-      const sourceCanvas = await prisma.businessCanvas.findUnique({
-        where: { id: canvasId },
-        include: {
-          valuePropositions: true,
-          customerSegments: true,
-          revenueStreams: true,
-          partnerships: true,
-          resources: true,
-          activities: true,
-          costStructures: true,
-          channels: true
-        }
-      })
-
-      if (!sourceCanvas) {
-        return NextResponse.json(
-          { error: 'Source canvas not found' },
-          { status: 404 }
-        )
+    // Apply operational streams
+    const operationalStreams = await prisma.industryOperationalStreamAssociation.findMany({
+      where: {
+        industry: { code: industry },
+        sector: sector ? { code: sector } : undefined,
+        isApplicable: true
+      },
+      include: {
+        operationalStream: true
       }
+    })
 
-      // Create a new canvas with cloned data
-      const clonedCanvas = await prisma.businessCanvas.create({
-        data: {
-          name: `${sourceCanvas.name} (Copy)`,
-          description: sourceCanvas.description,
-          version: '1.0',
-          isActive: true,
-          status: 'DRAFT',
-          editMode: 'SINGLE_USER',
-          autoSave: true,
-          enterpriseId: sourceCanvas.enterpriseId,
-          facilityId: sourceCanvas.facilityId,
-          businessUnitId: sourceCanvas.businessUnitId,
-          parentCanvasId: sourceCanvas.parentCanvasId,
-          // Clone all related data
-          valuePropositions: {
-            create: sourceCanvas.valuePropositions.map(vp => ({
-              description: vp.description,
-              priority: vp.priority
-            }))
-          },
-          customerSegments: {
-            create: sourceCanvas.customerSegments.map(cs => ({
-              name: cs.name,
-              description: cs.description,
-              size: cs.size,
-              priority: cs.priority
-            }))
-          },
-          revenueStreams: {
-            create: sourceCanvas.revenueStreams.map(rs => ({
-              type: rs.type,
-              description: rs.description,
-              estimatedValue: rs.estimatedValue,
-              frequency: rs.frequency
-            }))
-          },
-          partnerships: {
-            create: sourceCanvas.partnerships.map(p => ({
-              name: p.name,
-              type: p.type,
-              description: p.description,
-              value: p.value
-            }))
-          },
-          resources: {
-            create: sourceCanvas.resources.map(r => ({
-              name: r.name,
-              type: r.type,
-              description: r.description,
-              availability: r.availability,
-              cost: r.cost
-            }))
-          },
-          activities: {
-            create: sourceCanvas.activities.map(a => ({
-              name: a.name,
-              description: a.description,
-              priority: a.priority,
-              cost: a.cost
-            }))
-          },
-          costStructures: {
-            create: sourceCanvas.costStructures.map(cs => ({
-              description: cs.description,
-              category: cs.category,
-              amount: cs.amount,
-              frequency: cs.frequency
-            }))
-          },
-          channels: {
-            create: sourceCanvas.channels.map(c => ({
-              type: c.type,
-              description: c.description,
-              effectiveness: c.effectiveness,
-              cost: c.cost
-            }))
+    for (const stream of operationalStreams) {
+      await prisma.businessCanvasOperationalStreams.upsert({
+        where: {
+          businessCanvasId_operationalStreamId: {
+            businessCanvasId: canvasId,
+            operationalStreamId: stream.operationalStreamId
           }
         },
-        include: {
-          valuePropositions: true,
-          customerSegments: true,
-          revenueStreams: true,
-          partnerships: true,
-          resources: true,
-          activities: true,
-          costStructures: true,
-          channels: true
+        update: {
+          isAutoApplied: true
+        },
+        create: {
+          businessCanvasId: canvasId,
+          operationalStreamId: stream.operationalStreamId,
+          isAutoApplied: true
         }
       })
-
-      return NextResponse.json(clonedCanvas, { status: 201 })
     }
 
-    return NextResponse.json(
-      { error: 'Invalid action' },
-      { status: 400 }
-    )
+    // Apply compliance frameworks
+    const complianceFrameworks = await prisma.industryComplianceRequirementAssociation.findMany({
+      where: {
+        industry: { code: industry },
+        sector: sector ? { code: sector } : undefined,
+        isApplicable: true
+      },
+      include: {
+        complianceRequirement: true
+      }
+    })
+
+    for (const framework of complianceFrameworks) {
+      await prisma.businessCanvasComplianceFrameworks.upsert({
+        where: {
+          businessCanvasId_complianceFrameworkId: {
+            businessCanvasId: canvasId,
+            complianceFrameworkId: framework.complianceRequirementId
+          }
+        },
+        update: {
+          isAutoApplied: true
+        },
+        create: {
+          businessCanvasId: canvasId,
+          complianceFrameworkId: framework.complianceRequirementId,
+          isAutoApplied: true
+        }
+      })
+    }
+
+    // Apply facility types
+    const facilityTypes = await prisma.industryFacilityTypeAssociation.findMany({
+      where: {
+        industry: { code: industry },
+        isApplicable: true
+      },
+      include: {
+        facilityType: true
+      }
+    })
+
+    for (const facilityType of facilityTypes) {
+      await prisma.businessCanvasFacilityTypes.upsert({
+        where: {
+          businessCanvasId_facilityTypeId: {
+            businessCanvasId: canvasId,
+            facilityTypeId: facilityType.facilityTypeId
+          }
+        },
+        update: {
+          isAutoApplied: true
+        },
+        create: {
+          businessCanvasId: canvasId,
+          facilityTypeId: facilityType.facilityTypeId,
+          isAutoApplied: true
+        }
+      })
+    }
+
+    console.log(`✅ Applied ${operationalStreams.length} operational streams, ${complianceFrameworks.length} compliance frameworks, ${facilityTypes.length} facility types`)
   } catch (error) {
-    console.error('Error cloning business canvas:', error)
+    console.error('❌ Error applying industry frameworks:', error)
+    throw error
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Canvas ID is required' },
+        { status: 400 }
+      )
+    }
+
+    const body = await request.json()
+    console.log('🔍 API DEBUG - Updating canvas with data:', JSON.stringify(body, null, 2))
+    
+    const validatedData = businessCanvasSchema.partial().parse(body)
+    console.log('🔍 API DEBUG - Validated update data:', JSON.stringify(validatedData, null, 2))
+
+    // Extract framework-related data
+    const {
+      industry,
+      sector,
+      operationalStreams,
+      complianceRequirements,
+      regulatoryFramework,
+      facilityTypes,
+      ...canvasData
+    } = validatedData
+
+    // Update the business canvas
+    const cleanCanvasData = Object.fromEntries(
+      Object.entries(canvasData).filter(([_, value]) => value !== undefined)
+    ) as any
+
+    const businessCanvas = await prisma.businessCanvas.update({
+      where: { id },
+      data: {
+        ...cleanCanvasData,
+        ...(industry !== undefined && { industry }),
+        ...(sector !== undefined && { sector }),
+        ...(operationalStreams !== undefined && { operationalStreams }),
+        ...(complianceRequirements !== undefined && { complianceRequirements }),
+        ...(regulatoryFramework !== undefined && { regulatoryFramework })
+      },
+      include: {
+        valuePropositions: true,
+        customerSegments: true,
+        revenueStreams: true,
+        partnerships: true,
+        resources: true,
+        activities: true,
+        costStructures: true,
+        channels: true,
+        frameworkOperationalStreams: {
+          include: {
+            operationalStream: true
+          }
+        },
+        frameworkComplianceFrameworks: {
+          include: {
+            complianceFramework: true
+          }
+        },
+        frameworkFacilityTypes: {
+          include: {
+            facilityType: true
+          }
+        }
+      }
+    })
+
+    // Update facility type associations if facilityTypes are provided
+    if (facilityTypes !== undefined) {
+      console.log(`🔧 Updating facility type associations for canvas ${id}`)
+      
+      // Remove existing facility type associations
+      await prisma.businessCanvasFacilityTypes.deleteMany({
+        where: { businessCanvasId: id }
+      })
+      
+      // Create new facility type associations
+      if (facilityTypes.length > 0) {
+        for (const facilityTypeId of facilityTypes) {
+          await prisma.businessCanvasFacilityTypes.create({
+            data: {
+              businessCanvasId: id,
+              facilityTypeId: facilityTypeId,
+              isAutoApplied: false // Mark as manually selected
+            }
+          })
+        }
+      }
+      
+      console.log(`✅ Updated facility type associations: ${facilityTypes.length} types`)
+    }
+
+    // Re-apply industry-specific frameworks if industry changed
+    if (industry !== undefined) {
+      const result = await applyIndustryFrameworks(id, industry, sector, {
+        replaceExisting: true,
+        markAsAutoApplied: true
+      })
+      
+      if (result.errors.length > 0) {
+        console.warn('⚠️ Framework re-application warnings:', result.errors)
+      }
+      
+      console.log(`✅ Re-applied ${result.applied.totalFrameworks} frameworks to canvas ${id}`)
+    }
+
+    console.log('✅ Business canvas updated successfully:', id)
+    
+    return NextResponse.json(businessCanvas)
+  } catch (error) {
+    console.error('Error updating business canvas:', error)
     return NextResponse.json(
-      { error: 'Failed to clone business canvas', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to update business canvas', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

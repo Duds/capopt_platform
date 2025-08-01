@@ -8,7 +8,6 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { userTestIds } from '@/lib/testSelectors';
-import { UserCard } from '@/components/UserCard';
 
 // Mock the UserCard component for demonstration
 const UserCard = ({ user, onEdit, onDelete }: {
@@ -39,6 +38,7 @@ const UserCard = ({ user, onEdit, onDelete }: {
         {onEdit && (
           <button 
             data-testid={userTestIds.userEditButton}
+            role="button"
             onClick={() => onEdit(user.id)}
           >
             Edit
@@ -47,6 +47,7 @@ const UserCard = ({ user, onEdit, onDelete }: {
         {onDelete && (
           <button 
             data-testid={userTestIds.userDeleteButton}
+            role="button"
             onClick={() => onDelete(user.id)}
           >
             Delete
@@ -69,7 +70,7 @@ describe('UserCard', () => {
     
     // Validate content is displayed
     expect(screen.getByText('John Smith')).toBeInTheDocument();
-    expect(screen.getByText('john.smith@example.com.au')).toBeInTheDocument();
+    expect(screen.getByText('john.smith@crackedmountain.com.au')).toBeInTheDocument();
     expect(screen.getByText('Active')).toBeInTheDocument();
   });
 

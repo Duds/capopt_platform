@@ -35,16 +35,17 @@ export function useIndustries(): UseIndustriesReturn {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/industries')
+      const response = await fetch('/api/industries?includeSectors=true')
       if (!response.ok) {
         throw new Error('Failed to fetch industries')
       }
       
       const data = await response.json()
-      if (data.success) {
-        setIndustries(data.industries)
+      // The API returns the data directly as an array, not wrapped in a success object
+      if (Array.isArray(data)) {
+        setIndustries(data)
       } else {
-        throw new Error(data.error || 'Failed to fetch industries')
+        throw new Error('Invalid response format')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch industries')

@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useIndustries, type Industry } from '@/hooks/use-industries'
 import { useOperationalStreams, useComplianceFrameworks, useSectorRecommendations } from '@/hooks/use-enum-values'
+import { useFacilityTypes } from '@/hooks/use-facility-types'
+import { useOperationalStreams as useOperationalStreamsData } from '@/hooks/use-operational-streams'
+import { usePatternAssignment } from '@/hooks/use-pattern-assignment'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,6 +16,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { LocationInput } from '@/components/ui/location-input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DynamicSelect } from '@/components/ui/dynamic-select'
+import { MultiSelect } from '@/components/ui/multi-select'
 import { IndustrySectorSelector } from './IndustrySectorSelector'
 import { EditableBadgeList } from './EditableBadgeList'
 import { 
@@ -31,7 +35,9 @@ import {
   AlertCircle,
   CheckCircle,
   X,
-  Info
+  Info,
+  Sparkles,
+  Loader2
 } from 'lucide-react'
 
 interface SectorSelection {
@@ -55,7 +61,7 @@ interface BusinessInformation {
   primaryLocation: string
   
   // Facility & Operations
-  facilityType: string
+  facilityTypes: string[] // Changed from facilityType: string to facilityTypes: string[]
   operationalStreams: string[]
   
   // Strategic & Financial
@@ -100,8 +106,10 @@ export function CanvasEditor({
   isOpen,
   onOpenChange
 }: CanvasEditorProps) {
-  const { industries, loading: industriesLoading, error: industriesError } = useIndustries()
-
+  const [currentStep, setCurrentStep] = useState(1)
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
+  
+  // Form data state
   const [formData, setFormData] = useState<BusinessInformation>({
     name: '',
     legalName: '',
@@ -112,7 +120,7 @@ export function CanvasEditor({
     sectors: [],
     regional: '',
     primaryLocation: '',
-    facilityType: '',
+    facilityTypes: [],
     operationalStreams: [],
     strategicObjective: '',
     valueProposition: '',
@@ -124,82 +132,73 @@ export function CanvasEditor({
     regulatoryFramework: []
   })
 
-  console.log('🔍 INITIAL FORM DATA DEBUG - Initial form data:', formData)
-
-  // Debug log for form data changes
-  useEffect(() => {
-    console.log('🔍 FORM DATA CHANGE DEBUG - Form data updated:', formData)
-  }, [formData])
-
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
-  const [currentStep, setCurrentStep] = useState(1)
-  const [stepCompletion, setStepCompletion] = useState<boolean[]>([false, false, false, false])
-  const [isDataLoaded, setIsDataLoaded] = useState(false)
-
+  // Hooks
+  const { industries, loading: industriesLoading, error: industriesError } = useIndustries()
+  
   // Get current industry code for API calls
-  const currentIndustryCode = formData.industry ? 
-    industries.find(i => i.name === formData.industry)?.code : undefined
+  const currentIndustryCode = industries.find(ind => ind.name === formData.industry)?.code
+  const currentSectorCodes = formData.sectors.map(s => s.sectorCode)
+  
+  const { facilityTypes, loading: facilityTypesLoading, error: facilityTypesError, refetch: refetchFacilityTypes } = useFacilityTypes(currentIndustryCode)
+  const { operationalStreams, loading: operationalStreamsLoading, error: operationalStreamsError, refetch: refetchOperationalStreams } = useOperationalStreamsData(currentIndustryCode, currentSectorCodes)
+  const { values: complianceFrameworks, loading: complianceFrameworksLoading, error: complianceFrameworksError, refetch: refetchComplianceFrameworks } = useComplianceFrameworks(currentIndustryCode)
+  const { recommendations, loading: recommendationsLoading, error: recommendationsError } = useSectorRecommendations()
+  
+  // Pattern assignment hook
+  const { 
+    assignment: patternAssignment, 
+    loading: patternLoading, 
+    error: patternError, 
+    assignPatterns, 
+    clearAssignment 
+  } = usePatternAssignment()
 
-  console.log('🔍 INDUSTRY CODE DEBUG - Form industry:', formData.industry)
-  console.log('🔍 INDUSTRY CODE DEBUG - Available industries:', industries)
-  console.log('🔍 INDUSTRY CODE DEBUG - Current industry code:', currentIndustryCode)
-  console.log('🔍 INDUSTRY CODE DEBUG - Canvas data industry:', canvasData?.industry)
-
-  // Get selected sector codes for recommendations
-  const selectedSectorCodes = formData.sectors.map(s => s.sectorCode)
-
-  // Fetch sector-based recommendations
-  const { recommendations, loading: recommendationsLoading } = useSectorRecommendations(
-    currentIndustryCode, 
-    selectedSectorCodes
-  )
-
-  // Auto-populate operational streams and compliance requirements when sectors change
+  // Pattern assignment effect
   useEffect(() => {
-    // Don't auto-populate if we're in edit mode and data hasn't been loaded yet
-    if (mode === 'edit' && !isDataLoaded) {
-      console.log('🔍 AUTO-POPULATION DEBUG - Skipping auto-population in edit mode before data loaded')
-      return
-    }
-    
-    if (formData.sectors.length > 0 && recommendations && !recommendationsLoading) {
-      console.log('🔍 AUTO-POPULATION DEBUG - Auto-populating from recommendations')
+    if (currentIndustryCode && currentSectorCodes.length > 0 && formData.primaryLocation) {
+      console.log('🔧 Triggering pattern assignment for:', {
+        industry: currentIndustryCode,
+        sectors: currentSectorCodes,
+        location: formData.primaryLocation
+      })
       
-      // Auto-populate operational streams from sector recommendations
-      if (recommendations.operationalStreams && recommendations.operationalStreams.length > 0) {
-        setFormData(prev => ({
-          ...prev,
-          operationalStreams: [...new Set([...prev.operationalStreams, ...recommendations.operationalStreams])]
-        }))
-      }
-
-      // Auto-populate compliance requirements from sector recommendations
-      if (recommendations.complianceRequirements && recommendations.complianceRequirements.length > 0) {
-        setFormData(prev => ({
-          ...prev,
-          complianceRequirements: [...new Set([...prev.complianceRequirements, ...recommendations.complianceRequirements])]
-        }))
-      }
-
-      // Auto-populate regulatory framework from sector recommendations
-      if (recommendations.regulatoryFramework && recommendations.regulatoryFramework.length > 0) {
-        setFormData(prev => ({
-          ...prev,
-          regulatoryFramework: [...new Set([...prev.regulatoryFramework, ...recommendations.regulatoryFramework])]
-        }))
-      }
+      assignPatterns({
+        industry: currentIndustryCode,
+        sectors: currentSectorCodes,
+        location: formData.primaryLocation,
+        businessSize: formData.employeeCount > 1000 ? 'LARGE' : 
+                     formData.employeeCount > 100 ? 'MEDIUM' : 'SMALL',
+        riskProfile: formData.riskProfile
+      })
     }
-  }, [formData.sectors, recommendations, recommendationsLoading, mode, isDataLoaded])
+  }, [currentIndustryCode, currentSectorCodes.join(','), formData.primaryLocation, formData.employeeCount, formData.riskProfile])
 
-  // Reset related fields when industry changes
+  // Apply pattern assignment when available
+  useEffect(() => {
+    if (patternAssignment) {
+      console.log('🎯 Applying pattern assignment:', patternAssignment)
+      
+      setFormData(prev => ({
+        ...prev,
+        facilityTypes: [...new Set([...prev.facilityTypes, ...(patternAssignment.facilityTypes || [])])],
+        operationalStreams: [...new Set([...prev.operationalStreams, ...(patternAssignment.operationalStreams || [])])],
+        complianceRequirements: [...new Set([...prev.complianceRequirements, ...(patternAssignment.complianceRequirements || [])])],
+        regulatoryFramework: [...new Set([...prev.regulatoryFramework, ...(patternAssignment.regulatoryFrameworks || [])])]
+      }))
+    }
+  }, [patternAssignment])
+
   const handleIndustryChange = (industryName: string) => {
     console.log('🔍 INDUSTRY CHANGE DEBUG - New industry name:', industryName)
+    
+    // Clear pattern assignment when industry changes
+    clearAssignment()
     
     setFormData(prev => ({
       ...prev,
       industry: industryName, // Store the display name
       sectors: [], // Reset sectors when industry changes
-      facilityType: '', // Reset facility type when industry changes
+      facilityTypes: [], // Reset facility types when industry changes
       operationalStreams: [], // Reset operational streams
       complianceRequirements: [], // Reset compliance requirements
       regulatoryFramework: [] // Reset regulatory framework
@@ -312,7 +311,7 @@ export function CanvasEditor({
         sectors,
         regional: getDefaultValue('regional', canvasData.regional, ''),
         primaryLocation: getDefaultValue('primaryLocation', canvasData.primaryLocation, defaultLocation),
-        facilityType: getDefaultValue('facilityType', canvasData.facilityType, ''),
+        facilityTypes: canvasData.facilityTypes || [], // Changed from facilityType to facilityTypes
         operationalStreams: canvasData.operationalStreams || [],
         strategicObjective: canvasData.strategicObjective || '',
         valueProposition: canvasData.valueProposition || '',
@@ -330,14 +329,12 @@ export function CanvasEditor({
       console.log('🔍 DATA LOADING DEBUG - Industry value:', formDataToSet.industry)
       console.log('🔍 DATA LOADING DEBUG - Business type value:', formDataToSet.businessType)
       setFormData(formDataToSet)
-      setIsDataLoaded(true) // Mark data as loaded
     } else if (mode === 'edit' && canvasData && industries.length === 0) {
       console.log('🔍 DATA LOADING DEBUG - Waiting for industries to load...')
     } else if (mode === 'edit' && !canvasData) {
       console.log('🔍 DATA LOADING DEBUG - No canvas data provided for edit mode')
     } else if (mode === 'create') {
       console.log('🔍 DATA LOADING DEBUG - Create mode, marking as loaded')
-      setIsDataLoaded(true) // For create mode, mark as loaded immediately
     }
   }, [mode, canvasData, industries, convertSectorsToUI])
 
@@ -355,6 +352,47 @@ export function CanvasEditor({
     if (field === 'industry') {
       handleIndustryChange(value)
     }
+    
+    // Special handling for sectors change - trigger automatic pattern assignment
+    if (field === 'sectors') {
+      handleSectorsChange(value)
+    }
+  }
+
+  // Handle sector changes with automatic pattern assignment
+  const handleSectorsChange = async (newSectors: SectorSelection[]) => {
+    console.log('🔍 SECTORS CHANGE DEBUG - New sectors:', newSectors)
+    
+    // Only proceed if we have both industry and sectors
+    if (!formData.industry || newSectors.length === 0) {
+      console.log('🔍 SECTORS CHANGE DEBUG - Missing industry or sectors, skipping pattern assignment')
+      return
+    }
+    
+    try {
+      // Get industry code from the existing currentIndustryCode variable
+      const industryCode = currentIndustryCode || formData.industry
+      const sectorCodes = newSectors.map(s => s.sectorCode)
+      
+      console.log('🔍 SECTORS CHANGE DEBUG - Triggering pattern assignment for:', {
+        industry: formData.industry,
+        industryCode,
+        sectorCodes
+      })
+      
+      // Use the existing pattern assignment system
+      assignPatterns({
+        industry: industryCode,
+        sectors: sectorCodes,
+        location: formData.primaryLocation || '',
+        businessSize: formData.employeeCount > 1000 ? 'LARGE' : 
+                     formData.employeeCount > 100 ? 'MEDIUM' : 'SMALL',
+        riskProfile: formData.riskProfile || 'MEDIUM'
+      })
+      
+    } catch (error) {
+      console.error('🔍 SECTORS CHANGE DEBUG - Error in pattern assignment:', error)
+    }
   }
 
   const validateStep = (step: number): boolean => {
@@ -362,10 +400,10 @@ export function CanvasEditor({
 
     console.log('🔍 VALIDATION DEBUG - Validating step:', step)
     console.log('🔍 VALIDATION DEBUG - Current form data:', formData)
-    console.log('🔍 VALIDATION DEBUG - Is data loaded:', isDataLoaded)
+    console.log('🔍 VALIDATION DEBUG - Canvas data available:', !!canvasData)
 
     // If data is not loaded yet, don't validate
-    if (mode === 'edit' && !isDataLoaded) {
+    if (mode === 'edit' && !canvasData) {
       console.log('🔍 VALIDATION DEBUG - Data not loaded yet, skipping validation')
       return true
     }
@@ -390,12 +428,12 @@ export function CanvasEditor({
 
       case 2:
         console.log('🔍 VALIDATION DEBUG - Step 2 validation:')
-        console.log('  - facilityType:', formData.facilityType, 'empty:', !formData.facilityType)
+        console.log('  - facilityTypes:', formData.facilityTypes, 'length:', formData.facilityTypes.length, 'empty:', formData.facilityTypes.length === 0)
         console.log('  - sectors:', formData.sectors, 'length:', formData.sectors.length, 'empty:', formData.sectors.length === 0)
         console.log('  - sectors type:', typeof formData.sectors, 'isArray:', Array.isArray(formData.sectors))
         console.log('  - sectors details:', JSON.stringify(formData.sectors, null, 2))
         
-        if (!formData.facilityType || !formData.facilityType.trim()) errors.facilityType = 'Facility type is required'
+        if (!formData.facilityTypes || formData.facilityTypes.length === 0) errors.facilityTypes = 'At least one facility type must be selected'
         if (!formData.sectors || formData.sectors.length === 0) errors.sectors = 'At least one sector must be selected'
         break
 
@@ -431,11 +469,6 @@ export function CanvasEditor({
   const handleNextStep = () => {
     if (validateStep(currentStep)) {
       setCurrentStep(prev => Math.min(prev + 1, 4))
-      setStepCompletion(prev => {
-        const newCompletion = [...prev]
-        newCompletion[currentStep - 1] = true
-        return newCompletion
-      })
     }
   }
 
@@ -541,7 +574,7 @@ export function CanvasEditor({
         businessType: mapDisplayToEnum(formData.businessType, 'business-type'),
         regional: mapDisplayToEnum(formData.regional, 'regional'),
         riskProfile: mapDisplayToEnum(formData.riskProfile, 'risk-profile'),
-        facilityType: mapDisplayToEnum(formData.facilityType, 'facility-types')
+        facilityTypes: formData.facilityTypes.map(type => mapDisplayToEnum(type, 'facility-types'))
       }
 
       console.log('🔍 SUBMISSION DEBUG - Original form data:', formData)
@@ -706,68 +739,106 @@ export function CanvasEditor({
         )}
       </div>
 
-      <DynamicSelect
-        label="Facility Type"
-        value={formData.facilityType}
-        onValueChange={(value) => handleInputChange('facilityType', value)}
-        enumType="facility-types"
-        industryCode={currentIndustryCode}
-        required
-        error={validationErrors.facilityType}
-        showError={!!validationErrors.facilityType}
-      />
-      {validationErrors.facilityType && (
-        <p className="text-sm text-red-500 mt-1">{validationErrors.facilityType}</p>
-      )}
-
       <div>
-        <Label>Operational Streams</Label>
-        <p className="text-sm text-muted-foreground mb-2">
-          Auto-populated based on selected sectors. Add or remove as needed.
-        </p>
+        <Label className="flex items-center gap-2">
+          Facility Types <span className="text-red-500">*</span>
+          {patternLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+        </Label>
         <EditableBadgeList
-          items={formData.operationalStreams}
-          onItemsChange={(streams: string[]) => handleInputChange('operationalStreams', streams)}
-          category="operational"
-          placeholder="Add operational stream..."
+          items={formData.facilityTypes}
+          onItemsChange={(types: string[]) => handleInputChange('facilityTypes', types)}
+          category="facility"
+          placeholder="Add facility type..."
+          masterData={facilityTypes.map(type => ({
+            id: type.id,
+            name: type.name,
+            description: type.description,
+            category: type.category
+          }))}
         />
+        {validationErrors.facilityTypes && (
+          <p className="text-sm text-red-500 mt-1">{validationErrors.facilityTypes}</p>
+        )}
+        {facilityTypesLoading && (
+          <p className="text-sm text-blue-500 mt-1">Loading facility types...</p>
+        )}
+        {facilityTypesError && (
+          <p className="text-sm text-red-500 mt-1">Error loading facility types: {facilityTypesError}</p>
+        )}
+        {facilityTypes.length === 0 && !facilityTypesLoading && (
+          <p className="text-sm text-orange-500 mt-1">No facility types available for this industry</p>
+        )}
       </div>
 
       <div>
-        <Label>Compliance Requirements</Label>
-        <p className="text-sm text-muted-foreground mb-2">
-          Auto-populated based on selected sectors. Add or remove as needed.
-        </p>
+        <Label className="flex items-center gap-2">
+          Operational Streams
+          {patternLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+        </Label>
+        <EditableBadgeList
+          items={formData.operationalStreams}
+          onItemsChange={(streams: string[]) => handleInputChange('operationalStreams', streams)}
+          category="stream"
+          placeholder="Add operational stream..."
+          masterData={operationalStreams.map(stream => ({
+            id: stream.id,
+            name: stream.name,
+            description: stream.description,
+            category: stream.category
+          }))}
+        />
+        {patternError && (
+          <p className="text-sm text-orange-600 mt-1">
+            ⚠️ Pattern assignment failed: {patternError}
+          </p>
+        )}
+        {operationalStreamsLoading && (
+          <p className="text-sm text-blue-500 mt-1">Loading operational streams...</p>
+        )}
+        {operationalStreamsError && (
+          <p className="text-sm text-red-500 mt-1">Error loading operational streams: {operationalStreamsError}</p>
+        )}
+        {operationalStreams.length === 0 && !operationalStreamsLoading && (
+          <p className="text-sm text-orange-500 mt-1">No operational streams available for this industry/sectors</p>
+        )}
+      </div>
+
+      <div>
+        <Label className="flex items-center gap-2">
+          Compliance Requirements
+          {patternLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+        </Label>
         <EditableBadgeList
           items={formData.complianceRequirements}
           onItemsChange={(requirements: string[]) => handleInputChange('complianceRequirements', requirements)}
           category="compliance"
           placeholder="Add compliance requirement..."
+          masterData={Object.entries(complianceFrameworks).map(([key, value]) => ({
+            id: key,
+            name: value,
+            description: `Compliance framework: ${value}`,
+            category: 'compliance'
+          }))}
         />
       </div>
 
       <div>
-        <Label>Regulatory Framework</Label>
-        <p className="text-sm text-muted-foreground mb-2">
-          Auto-populated based on selected sectors. Add or remove as needed.
-        </p>
+        <Label className="flex items-center gap-2">
+          Regulatory Framework
+          {patternLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+        </Label>
         <EditableBadgeList
           items={formData.regulatoryFramework}
           onItemsChange={(framework: string[]) => handleInputChange('regulatoryFramework', framework)}
           category="regulatory"
           placeholder="Add regulatory framework..."
+          masterData={Object.entries(complianceFrameworks).map(([key, value]) => ({
+            id: key,
+            name: value,
+            description: `Regulatory framework: ${value}`,
+            category: 'regulatory'
+          }))}
         />
-      </div>
-      
-      {/* Debug info */}
-      <div className="p-4 bg-gray-100 rounded-lg text-xs">
-        <p><strong>Debug Info:</strong></p>
-        <p>Facility Type: "{formData.facilityType}"</p>
-        <p>Sectors: {JSON.stringify(formData.sectors)}</p>
-        <p>Sectors Length: {formData.sectors.length}</p>
-        <p>Operational Streams: {JSON.stringify(formData.operationalStreams)}</p>
-        <p>Compliance Requirements: {JSON.stringify(formData.complianceRequirements)}</p>
-        <p>Regulatory Framework: {JSON.stringify(formData.regulatoryFramework)}</p>
       </div>
     </div>
   )
@@ -968,7 +1039,7 @@ export function CanvasEditor({
 
           {/* Form Content */}
           <div className="space-y-6">
-            {mode === 'edit' && !isDataLoaded ? (
+            {mode === 'edit' && !canvasData ? (
               <div className="flex items-center justify-center p-8">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
@@ -1000,7 +1071,7 @@ export function CanvasEditor({
             <Button
               variant="outline"
               onClick={handlePreviousStep}
-              disabled={currentStep === 1 || (mode === 'edit' && !isDataLoaded)}
+              disabled={currentStep === 1 || (mode === 'edit' && !canvasData)}
               className="flex items-center gap-2"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -1011,7 +1082,7 @@ export function CanvasEditor({
               {currentStep < 4 ? (
                 <Button
                   onClick={handleNextStep}
-                  disabled={Object.keys(validationErrors).length > 0 || (mode === 'edit' && !isDataLoaded)}
+                  disabled={Object.keys(validationErrors).length > 0 || (mode === 'edit' && !canvasData)}
                   className="flex items-center gap-2"
                 >
                   Next
@@ -1020,7 +1091,7 @@ export function CanvasEditor({
               ) : (
                 <Button
                   onClick={handleSubmit}
-                  disabled={Object.keys(validationErrors).length > 0 || (mode === 'edit' && !isDataLoaded)}
+                  disabled={Object.keys(validationErrors).length > 0 || (mode === 'edit' && !canvasData)}
                   className="flex items-center gap-2"
                 >
                   {(() => {

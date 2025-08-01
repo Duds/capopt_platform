@@ -234,8 +234,9 @@ export function useBusinessCanvas() {
       setLoading(true)
       setError(null)
       
-      // Temporarily use only basic relationships until new tables are fully set up
-      const response = await fetch('/api/business-canvas?include=valuePropositions,customerSegments,revenueStreams,partnerships,resources,activities,costStructures,channels', {
+      // Add cache-busting parameter to prevent cached 404 responses
+      const timestamp = Date.now()
+      const response = await fetch(`/api/business-canvas?include=valuePropositions,customerSegments,revenueStreams,partnerships,resources,activities,costStructures,channels&_t=${timestamp}`, {
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
@@ -245,7 +246,8 @@ export function useBusinessCanvas() {
       })
       
       if (!response.ok) {
-        throw new Error(`Failed to fetch business canvases: ${response.statusText}`)
+        console.error('🔴 API ERROR - Status:', response.status, 'StatusText:', response.statusText)
+        throw new Error(`Failed to fetch business canvases: ${response.status} ${response.statusText}`)
       }
       
       const data = await response.json()
@@ -287,7 +289,7 @@ export function useBusinessCanvas() {
       })))
       
       setBusinessCanvases(uniqueCanvases)
-      console.log('🟢 FETCH BUSINESS CANVASES COMPLETED')
+      console.log('🢢 FETCH BUSINESS CANVASES COMPLETED')
     } catch (err) {
       console.error('🔴 FETCH BUSINESS CANVASES ERROR:', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch business canvases')
@@ -314,6 +316,7 @@ export function useBusinessCanvas() {
   const saveCanvas = useCallback(async (canvasData: Partial<BusinessCanvas>) => {
     try {
       setError(null)
+      console.log('🔧 HOOK DEBUG - Saving canvas:', canvasData.id, canvasData.name)
       
       const response = await fetch(`/api/business-canvas/${canvasData.id}`, {
         method: 'PUT',
@@ -328,25 +331,26 @@ export function useBusinessCanvas() {
       }
       
       const savedCanvas = await response.json()
+      console.log('✅ HOOK DEBUG - Canvas saved successfully:', savedCanvas.name)
       
-      // Update local state
-      setBusinessCanvases(prev => 
-        prev.map(canvas => 
-          canvas.id === savedCanvas.id ? savedCanvas : canvas
-        )
-      )
+      // Refresh all canvas data to ensure UI is up to date
+      await fetchBusinessCanvases()
       
-      setCurrentCanvas(savedCanvas)
+      // Update current canvas if it's the one being edited
+      if (currentCanvas?.id === savedCanvas.id) {
+        setCurrentCanvas(savedCanvas)
+      }
+      
       setHasUnsavedChanges(false)
       setLastSaved(new Date().toISOString())
       
       return savedCanvas
     } catch (err) {
-      console.error('Error saving canvas:', err)
+      console.error('❌ HOOK DEBUG - Error saving canvas:', err)
       setError(err instanceof Error ? err.message : 'Failed to save canvas')
       throw err
     }
-  }, [])
+  }, [fetchBusinessCanvases, currentCanvas])
 
   // Create new canvas
   const createCanvas = useCallback(async (canvasData: {

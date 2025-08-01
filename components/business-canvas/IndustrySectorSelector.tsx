@@ -247,14 +247,14 @@ export function IndustrySectorSelector({
     .filter(category => category.sectors.length > 0) // Only show categories that have sectors
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full max-w-full">
       {/* Sector Selection Tabs */}
       <Tabs defaultValue={SECTOR_CATEGORIES[0]?.id || "commodity"} className="w-full">
-        <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${SECTOR_CATEGORIES.length}, 1fr)` }}>
+        <TabsList className="flex flex-wrap gap-1 w-full">
           {SECTOR_CATEGORIES.map(category => (
-            <TabsTrigger key={category.id} value={category.id} className="flex items-center gap-2">
-              <category.icon className="h-4 w-4" />
-              {category.name}
+            <TabsTrigger key={category.id} value={category.id} className="flex items-center gap-2 flex-1 min-w-0">
+              <category.icon className="h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{category.name}</span>
             </TabsTrigger>
           ))}
         </TabsList>
@@ -288,14 +288,14 @@ export function IndustrySectorSelector({
                               disabled={disabled}
                             />
                             
-                            <div className="flex-1 space-y-2">
+                            <div className="flex-1 space-y-2 min-w-0">
                               <div className="flex items-center justify-between">
-                                <Label className="text-sm font-medium cursor-pointer">
+                                <Label className="text-sm font-medium cursor-pointer truncate">
                                   {sector.name}
                                 </Label>
                                 <Badge 
                                   variant="outline" 
-                                  className={`text-xs ${getRiskProfileColor(sector.riskProfile)}`}
+                                  className={`text-xs flex-shrink-0 ${getRiskProfileColor(sector.riskProfile)}`}
                                 >
                                   {sector.riskProfile}
                                 </Badge>

@@ -1,0 +1,698 @@
+@startwbs CapOpt-Operational-Capability-Framework-Hierarchy
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+
+* **Level 1: Industry Classification**
+** Mining & Metals
+*** **COMMODITY**
+**** Copper Mining & Processing
+**** Gold & Silver Mining
+**** Uranium Mining
+**** Iron Ore Mining
+**** Coal Mining
+**** Lithium Mining
+**** Rare Earth Elements
+**** Nickel Mining
+**** Zinc Mining
+**** Lead Mining
+**** Aluminum Mining
+**** Diamond Mining
+**** Silver Mining
+*** **VALUE_CHAIN**
+**** Exploration & Prospecting
+**** Mine Development
+**** Mine Production
+**** Mineral Processing
+**** Metal Refining
+**** Mine Closure & Rehabilitation
+*** **BUSINESS_MODEL**
+**** Major Mining Companies
+**** Junior Miners
+**** State-Owned Mining Enterprises
+**** Artisanal & Small-Scale Mining
+*** **SUPPORT_SERVICES**
+**** Mining Equipment & Technology Services
+**** Contract Mining Services
+**** Mining Environmental Services
+**** Mining Logistics & Export
+
+** Oil & Gas
+*** **COMMODITY**
+**** Crude Oil Production
+**** Natural Gas Production
+**** Liquefied Natural Gas
+**** Refined Petroleum Products
+*** **VALUE_CHAIN**
+**** Oil & Gas Exploration
+**** Oil & Gas Production
+**** Oil Refining
+**** Oil & Gas Distribution
+*** **BUSINESS_MODEL**
+**** Major Oil Companies
+**** Independent Producers
+**** National Oil Companies
+*** **SUPPORT_SERVICES**
+**** Oilfield Services
+**** Pipeline Services
+
+** Chemicals
+*** **COMMODITY**
+**** Basic Chemicals
+**** Specialty Chemicals
+**** Petrochemicals
+*** **VALUE_CHAIN**
+**** Chemical Research & Development
+**** Chemical Manufacturing
+**** Chemical Distribution
+*** **BUSINESS_MODEL**
+**** Major Chemical Companies
+**** Specialty Chemical Companies
+*** **SUPPORT_SERVICES**
+**** Laboratory Services
+
+** Manufacturing
+*** **COMMODITY**
+**** Steel Manufacturing
+**** Aluminum Products
+**** Automotive Manufacturing
+*** **VALUE_CHAIN**
+**** Product Design
+**** Manufacturing Operations
+**** Quality Control
+*** **BUSINESS_MODEL**
+**** Original Equipment Manufacturers
+**** Contract Manufacturing
+*** **SUPPORT_SERVICES**
+**** Maintenance Services
+
+** Construction
+*** **COMMODITY**
+**** Infrastructure Construction
+**** Commercial Construction
+**** Residential Construction
+**** Industrial Construction
+*** **VALUE_CHAIN**
+**** Architectural Design
+**** Construction Operations
+**** Project Management
+*** **BUSINESS_MODEL**
+**** General Contractors
+**** Specialty Contractors
+*** **SUPPORT_SERVICES**
+**** Construction Services
+
+** Transportation
+*** **COMMODITY**
+**** Freight Transportation
+**** Passenger Transportation
+*** **VALUE_CHAIN**
+**** Logistics Management
+**** Transportation Operations
+**** Transport Infrastructure
+*** **BUSINESS_MODEL**
+**** Transport Carriers
+**** Logistics Providers
+*** **SUPPORT_SERVICES**
+**** Transport Services
+
+** Healthcare
+*** **COMMODITY**
+**** Pharmaceuticals
+**** Medical Devices
+*** **VALUE_CHAIN**
+**** Medical Research
+**** Healthcare Manufacturing
+**** Healthcare Distribution
+**** Healthcare Services
+*** **BUSINESS_MODEL**
+**** Pharmaceutical Companies
+**** Medical Device Companies
+**** Healthcare Providers
+*** **SUPPORT_SERVICES**
+**** Healthcare Support Services
+
+** Financial Services
+*** **COMMODITY**
+**** Banking Services
+**** Insurance Services
+**** Investment Services
+*** **VALUE_CHAIN**
+**** Retail Banking
+**** Wholesale Banking
+**** Investment Banking
+*** **BUSINESS_MODEL**
+**** Commercial Banks
+**** Investment Firms
+**** Insurance Companies
+*** **SUPPORT_SERVICES**
+**** Financial Technology
+
+** Technology
+*** **COMMODITY**
+**** Software Products
+**** Hardware Products
+*** **VALUE_CHAIN**
+**** Technology Research
+**** Product Development
+**** Technology Services
+**** Cloud Computing
+*** **BUSINESS_MODEL**
+**** Software Companies
+**** Hardware Companies
+**** Technology Service Providers
+*** **SUPPORT_SERVICES**
+**** Technology Support Services
+
+** Retail
+*** **COMMODITY**
+**** Business-to-Business
+**** Business-to-Consumer
+*** **VALUE_CHAIN**
+**** Procurement
+**** Distribution
+**** Sales Operations
+**** E-commerce
+*** **BUSINESS_MODEL**
+**** Retailers
+**** Wholesalers
+**** E-commerce Platforms
+*** **SUPPORT_SERVICES**
+**** Retail Support Services
+
+** Agriculture
+*** **COMMODITY**
+**** Crop Farming
+**** Livestock Farming
+**** Food Processing
+*** **VALUE_CHAIN**
+**** Farming Operations
+**** Agricultural Processing
+**** Agricultural Distribution
+*** **BUSINESS_MODEL**
+**** Farmers
+**** Agribusiness Companies
+*** **SUPPORT_SERVICES**
+**** Agricultural Technology
+
+** Utilities
+*** **COMMODITY**
+**** Electricity Generation
+**** Water Treatment
+**** Gas Distribution
+**** Waste Management
+*** **VALUE_CHAIN**
+**** Power Generation
+**** Power Transmission
+**** Power Distribution
+*** **BUSINESS_MODEL**
+**** Utility Companies
+**** Independent Power Producers
+*** **SUPPORT_SERVICES**
+**** Utility Support Services
+
+** Defence
+*** **COMMODITY**
+**** Aerospace Systems
+**** Maritime Defence Systems
+**** Land Defence Systems
+**** Cyber Defence Systems
+*** **VALUE_CHAIN**
+**** Defence Research
+**** Defence Development
+**** Defence Manufacturing
+**** Defence Maintenance
+*** **BUSINESS_MODEL**
+**** Defence Contractors
+**** Government Defence
+*** **SUPPORT_SERVICES**
+**** Defence Support Services
+
+** Aerospace
+*** **COMMODITY**
+**** Commercial Airlines
+**** Defence Aerospace
+**** Space Exploration
+*** **VALUE_CHAIN**
+**** Aerospace Design
+**** Aerospace Manufacturing
+**** Aerospace Maintenance
+**** Aviation Services
+*** **BUSINESS_MODEL**
+**** Airlines
+**** Aerospace Manufacturers
+*** **SUPPORT_SERVICES**
+**** Aerospace Support Services
+
+** Maritime
+*** **COMMODITY**
+**** Commercial Shipping
+**** Defence Maritime
+**** Fishing
+*** **VALUE_CHAIN**
+**** Shipping Operations
+**** Port Operations
+**** Marine Services
+*** **BUSINESS_MODEL**
+**** Shipping Companies
+**** Port Operators
+*** **SUPPORT_SERVICES**
+**** Maritime Support Services
+
+** Other
+*** **VALUE_CHAIN**
+**** Custom Industry
+
+** Level 2: Operational Streams (by Industry & Sector)
+*** **Mining & Metals - Copper**
+**** Open Pit Mining
+**** Underground Mining
+**** Ore Processing
+**** Concentrate Production
+**** Smelting Operations
+**** Refining Operations
+**** Tailings Management
+**** Water Management
+**** Dust Control
+**** Safety Systems
+
+*** **Mining & Metals - Gold**
+**** Open Pit Mining
+**** Underground Mining
+**** Heap Leaching
+**** Cyanidation
+**** Gravity Concentration
+**** Refining Operations
+**** Security & Transport
+**** Assay Laboratory
+**** Chain of Custody
+**** Environmental Monitoring
+
+*** **Mining & Metals - Uranium**
+**** In-Situ Leaching
+**** Open Pit Mining
+**** Radiation Safety
+**** Nuclear Compliance
+**** Transport Security
+**** Radiation Monitoring
+**** Waste Management
+**** Security Clearances
+**** International Safeguards
+
+*** **Mining & Metals - Coal**
+**** Open Cut Mining
+**** Underground Mining
+**** Coal Processing
+**** Transport & Logistics
+**** Environmental Management
+**** Rehabilitation
+**** Dust Control
+**** Noise Management
+
+*** **Mining & Metals - Iron Ore**
+**** Open Pit Mining
+**** Ore Processing
+**** Beneficiation
+**** Pelletizing
+**** Transport & Logistics
+**** Port Operations
+**** Environmental Management
+**** Rehabilitation
+
+*** **Oil & Gas - Exploration**
+**** Seismic Surveying
+**** Drilling Operations
+**** Well Testing
+**** Reservoir Analysis
+**** Environmental Assessment
+
+*** **Oil & Gas - Production**
+**** Well Operations
+**** Production Optimization
+**** Artificial Lift
+**** Well Maintenance
+**** Production Monitoring
+
+*** **Oil & Gas - Refining**
+**** Crude Oil Processing
+**** Distillation
+**** Cracking Operations
+**** Product Blending
+**** Quality Control
+**** Safety Systems
+
+*** **Oil & Gas - Distribution**
+**** Pipeline Operations
+**** Storage Management
+**** Terminal Operations
+**** Transport Logistics
+**** Emergency Response
+
+** Level 3: Facility Types (by Industry)
+*** **Mining & Metals**
+**** **EXTRACTION**
+***** Open Pit Mine
+***** Underground Mine
+***** Placer Mine
+***** In-Situ Mine
+**** **PROCESSING**
+***** Crushing Plant
+***** Grinding Mill
+***** Flotation Plant
+***** Leaching Plant
+***** Smelter
+***** Refinery
+**** **INFRASTRUCTURE**
+***** Power Station
+***** Water Treatment Plant
+***** Waste Management Facility
+***** Warehouse
+**** **SUPPORT**
+***** Office Complex
+***** Laboratory
+***** Workshop
+***** Training Center
+
+*** **Oil & Gas**
+**** **EXTRACTION**
+***** Onshore Well
+***** Offshore Platform
+***** Fracking Site
+***** Gas Plant
+**** **PROCESSING**
+***** Oil Refinery
+***** Cracking Unit
+***** Distillation Tower
+***** Compressor Station
+**** **INFRASTRUCTURE**
+***** Pipeline Terminal
+***** Storage Tank Farm
+***** LNG Terminal
+***** Power Station
+**** **SUPPORT**
+***** Control Room
+***** Laboratory
+***** Office Complex
+
+*** **Chemicals**
+**** **PROCESSING**
+***** Chemical Plant
+***** Reactor Unit
+***** Distillation Plant
+***** Polymerization Plant
+**** **INFRASTRUCTURE**
+***** Storage Tank Farm
+***** Pipeline Network
+***** Waste Treatment Plant
+***** Warehouse
+**** **SUPPORT**
+***** Laboratory
+***** Control Room
+***** Office Complex
+
+*** **Manufacturing**
+**** **PROCESSING**
+***** Assembly Plant
+***** Fabrication Plant
+***** Production Line
+***** Quality Control Facility
+**** **INFRASTRUCTURE**
+***** Warehouse
+***** Distribution Center
+***** Maintenance Shop
+**** **SUPPORT**
+***** Office Complex
+***** Laboratory
+***** Training Center
+
+*** **Defence**
+**** **PROCESSING**
+***** Weapons Factory
+***** Munitions Plant
+***** Electronics Factory
+***** Testing Facility
+**** **INFRASTRUCTURE**
+***** Secure Storage Facility
+***** Communications Center
+***** Power Station
+**** **SUPPORT**
+***** Security Office
+***** Laboratory
+***** Training Facility
+
+** Level 4: Compliance Requirements (by Industry)
+*** **Mining - Coal Mining**
+**** WHS Act 2011
+**** Mining Act 1992
+**** Environmental Protection Act
+**** Water Management Act
+**** Native Title Act
+**** Minerals Resources Act
+**** Coal Mining Safety and Health Act
+**** Mining and Quarrying Safety and Health Act
+**** Environmental Protection and Biodiversity Conservation Act
+**** National Greenhouse and Energy Reporting Act
+
+*** **Mining - Metals Mining**
+**** WHS Act 2011
+**** Mining Act 1992
+**** Environmental Protection Act
+**** Water Management Act
+**** Native Title Act
+**** Minerals Resources Act
+**** Mining and Quarrying Safety and Health Act
+**** Environmental Protection and Biodiversity Conservation Act
+**** National Greenhouse and Energy Reporting Act
+**** Hazardous Waste Act
+
+*** **Mining - Precious Metals**
+**** WHS Act 2011
+**** Mining Act 1992
+**** Environmental Protection Act
+**** Water Management Act
+**** Native Title Act
+**** Minerals Resources Act
+**** Precious Metals Act
+**** Anti-Money Laundering and Counter-Terrorism Financing Act
+**** Customs Act
+**** Security of Critical Infrastructure Act
+
+*** **Mining - Uranium Mining**
+**** WHS Act 2011
+**** Mining Act 1992
+**** Environmental Protection Act
+**** Water Management Act
+**** Native Title Act
+**** Minerals Resources Act
+**** Australian Radiation Protection and Nuclear Safety Act
+**** Nuclear Non-Proliferation (Safeguards) Act
+**** Customs Act
+**** Security of Critical Infrastructure Act
+
+*** **Petrochemical - Oil & Gas**
+**** WHS Act 2011
+**** Dangerous Goods Act
+**** Environmental Protection Act
+**** Petroleum Act
+**** Chemical Control Act
+**** Transport Safety Act
+**** Offshore Petroleum and Greenhouse Gas Storage Act
+**** National Greenhouse and Energy Reporting Act
+**** Environment Protection and Biodiversity Conservation Act
+**** Marine Pollution Act
+
+*** **Petrochemical - Chemical Manufacturing**
+**** WHS Act 2011
+**** Dangerous Goods Act
+**** Environmental Protection Act
+**** Chemical Control Act
+**** Transport Safety Act
+**** Hazardous Waste Act
+**** Industrial Chemicals Act
+**** National Greenhouse and Energy Reporting Act
+**** Environment Protection and Biodiversity Conservation Act
+**** Poisons Standard
+
+*** **Defence - Aerospace**
+**** Defence Trade Controls Act
+**** Customs Act
+**** Security of Critical Infrastructure Act
+**** Australian Security Intelligence Organisation Act
+**** Defence Export Controls
+**** International Traffic in Arms Regulations
+**** WHS Act 2011
+**** Environmental Protection Act
+**** Aviation Safety Act
+**** Civil Aviation Safety Regulations
+
+*** **Defence - Electronics**
+**** Defence Trade Controls Act
+**** Customs Act
+**** Security of Critical Infrastructure Act
+**** Australian Security Intelligence Organisation Act
+**** Defence Export Controls
+**** International Traffic in Arms Regulations
+**** WHS Act 2011
+**** Environmental Protection Act
+**** Telecommunications Act
+**** Radiocommunications Act
+
+*** **Defence - Maritime**
+**** Defence Trade Controls Act
+**** Customs Act
+**** Security of Critical Infrastructure Act
+**** Australian Security Intelligence Organisation Act
+**** Defence Export Controls
+**** International Traffic in Arms Regulations
+**** WHS Act 2011
+**** Environmental Protection Act
+**** Navigation Act
+**** Marine Safety Act
+
+*** **Manufacturing - Heavy Equipment**
+**** WHS Act 2011
+**** Environmental Protection Act
+**** Customs Act
+**** Trade Practices Act
+**** Product Safety Standards
+**** Australian Standards
+**** National Greenhouse and Energy Reporting Act
+**** Environment Protection and Biodiversity Conservation Act
+**** Water Management Act
+**** Waste Management Act
+
+*** **Construction - Infrastructure**
+**** WHS Act 2011
+**** Environmental Protection Act
+**** Building Act
+**** Planning Act
+**** Water Management Act
+**** Heritage Act
+**** Native Title Act
+**** National Greenhouse and Energy Reporting Act
+**** Environment Protection and Biodiversity Conservation Act
+**** Local Government Act
+
+** Level 5: Regulatory Framework (by Industry)
+*** **Mining - Federal**
+**** Environment Protection and Biodiversity Conservation Act
+**** National Greenhouse and Energy Reporting Act
+**** Offshore Petroleum and Greenhouse Gas Storage Act
+**** Native Title Act 1993
+**** Work Health and Safety Act 2011
+
+*** **Mining - State**
+**** Mining and Quarrying Safety and Health Act
+**** Environmental Protection Act
+**** Water Act
+**** Minerals Resources Act
+**** Coal Mining Safety and Health Act
+
+*** **Mining - Industry**
+**** ICMM Sustainable Development Framework
+**** ISO 14001 Environmental Management
+**** OHSAS 18001 Occupational Health and Safety
+**** ISO 45001 Occupational Health and Safety
+**** Global Reporting Initiative (GRI) Standards
+
+*** **Petrochemical - Federal**
+**** Environment Protection and Biodiversity Conservation Act
+**** National Greenhouse and Energy Reporting Act
+**** Offshore Petroleum and Greenhouse Gas Storage Act
+**** Work Health and Safety Act 2011
+**** Marine Pollution Act
+**** Customs Act 1901
+
+*** **Petrochemical - State**
+**** Petroleum Act
+**** Dangerous Goods Safety Act
+**** Environmental Protection Act
+**** Water Act
+**** Transport Safety Act
+
+*** **Petrochemical - Industry**
+**** API Standards
+**** ISO 14001 Environmental Management
+**** OHSAS 18001 Occupational Health and Safety
+**** ISO 45001 Occupational Health and Safety
+**** American Petroleum Institute (API) Standards
+
+*** **Defence - Federal**
+**** Defence Trade Controls Act
+**** Customs Act
+**** Security of Critical Infrastructure Act
+**** Australian Security Intelligence Organisation Act
+**** Work Health and Safety Act 2011
+**** Aviation Safety Act
+
+*** **Defence - International**
+**** International Traffic in Arms Regulations (ITAR)
+**** Wassenaar Arrangement
+**** Missile Technology Control Regime
+**** Australia Group
+**** Nuclear Suppliers Group
+
+*** **Defence - Industry**
+**** AS9100 Aerospace Quality Management
+**** ISO 27001 Information Security
+**** NIST Cybersecurity Framework
+**** ISO 14001 Environmental Management
+**** OHSAS 18001 Occupational Health and Safety
+
+*** **Manufacturing - Federal**
+**** Environment Protection and Biodiversity Conservation Act
+**** National Greenhouse and Energy Reporting Act
+**** Work Health and Safety Act 2011
+**** Trade Practices Act
+**** Customs Act 1901
+
+*** **Manufacturing - State**
+**** Environmental Protection Act
+**** Water Act
+**** Waste Management Act
+**** Work Health and Safety Act
+
+*** **Manufacturing - Industry**
+**** ISO 9001 Quality Management
+**** ISO 14001 Environmental Management
+**** OHSAS 18001 Occupational Health and Safety
+**** ISO 45001 Occupational Health and Safety
+**** Australian Standards
+
+*** **Construction - Federal**
+**** Environment Protection and Biodiversity Conservation Act
+**** National Greenhouse and Energy Reporting Act
+**** Work Health and Safety Act 2011
+**** Native Title Act 1993
+**** Heritage Act
+
+*** **Construction - State**
+**** Building Act
+**** Planning Act
+**** Environmental Protection Act
+**** Water Act
+**** Local Government Act
+
+*** **Construction - Industry**
+**** ISO 9001 Quality Management
+**** ISO 14001 Environmental Management
+**** OHSAS 18001 Occupational Health and Safety
+**** ISO 45001 Occupational Health and Safety
+**** Australian Standards
+
+** Business Canvas Integration
+*** Framework Associations
+**** BusinessCanvasOperationalStreams
+**** BusinessCanvasComplianceFrameworks
+**** BusinessCanvasFacilityTypes
+*** Auto-Population Logic
+**** Sector-Based Selection
+**** Industry Filtering
+**** Manual Override
+*** Tracking & Audit
+**** isAutoApplied Flag
+**** Association History
+**** Compliance Monitoring
+
+@endwbs 

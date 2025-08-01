@@ -15,34 +15,34 @@ datasource db {
 // ============================================================================
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   name      String
   password  String
-  role      UserRole @default(USER)
-  isActive  Boolean  @default(true)
+  role      UserRole  @default(USER)
+  isActive  Boolean   @default(true)
   lastLogin DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   // Enterprise relationships
   enterpriseId String?
   departmentId String?
 
   // Relationships
-  enterprise   Enterprise? @relation("EnterpriseUsers", fields: [enterpriseId], references: [id])
-  department   Department? @relation("DepartmentUsers", fields: [departmentId], references: [id])
-  createdProcesses    Process[]    @relation("ProcessCreator")
-  createdControls     CriticalControl[] @relation("ControlCreator")
-  createdAssets       Asset[]      @relation("AssetCreator")
-  maturityAssessments MaturityAssessment[] @relation("AssessmentCreator")
-  auditLogs          AuditLog[]
-  verificationLogs    VerificationLog[] @relation("VerificationUser")
-  riskAlerts         RiskAlert[] @relation("AlertAssignee")
-  createdCanvasVersions CanvasVersion[] @relation("CanvasVersionCreator")
+  enterprise                 Enterprise?          @relation("EnterpriseUsers", fields: [enterpriseId], references: [id])
+  department                 Department?          @relation("DepartmentUsers", fields: [departmentId], references: [id])
+  createdProcesses           Process[]            @relation("ProcessCreator")
+  createdControls            CriticalControl[]    @relation("ControlCreator")
+  createdAssets              Asset[]              @relation("AssetCreator")
+  maturityAssessments        MaturityAssessment[] @relation("AssessmentCreator")
+  auditLogs                  AuditLog[]
+  verificationLogs           VerificationLog[]    @relation("VerificationUser")
+  riskAlerts                 RiskAlert[]          @relation("AlertAssignee")
+  createdCanvasVersions      CanvasVersion[]      @relation("CanvasVersionCreator")
   createdCanvasCollaborators CanvasCollaborator[] @relation("CanvasCollaborator")
-  createdCanvasExports CanvasExport[] @relation("CanvasExportCreator")
-  createdCanvasTemplates CanvasTemplate[] @relation("TemplateCreator")
+  createdCanvasExports       CanvasExport[]       @relation("CanvasExportCreator")
+  createdCanvasTemplates     CanvasTemplate[]     @relation("TemplateCreator")
 
   @@map("users")
 }
@@ -81,20 +81,20 @@ model Enterprise {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  addresses   EnterpriseAddress[]
-  facilities  Facility[]
-  businessUnits BusinessUnit[]
-  users       User[]     @relation("EnterpriseUsers")
-  processes   Process[]
-  assets      Asset[]
-  bowtieModels BowtieModel[]
-  businessCanvases BusinessCanvas[] @relation("EnterpriseBusinessCanvases")
+  addresses        EnterpriseAddress[]
+  facilities       Facility[]
+  businessUnits    BusinessUnit[]
+  users            User[]              @relation("EnterpriseUsers")
+  processes        Process[]
+  assets           Asset[]
+  bowtieModels     BowtieModel[]
+  businessCanvases BusinessCanvas[]    @relation("EnterpriseBusinessCanvases")
 
   @@map("enterprises")
 }
 
 model EnterpriseAddress {
-  id           String    @id @default(cuid())
+  id           String      @id @default(cuid())
   enterpriseId String
   type         AddressType
   street       String
@@ -102,88 +102,88 @@ model EnterpriseAddress {
   city         String
   state        String
   postcode     String
-  country      String    @default("Australia")
-  isPrimary    Boolean   @default(false)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  country      String      @default("Australia")
+  isPrimary    Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
   // Relationships
-  enterprise   Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  enterprise Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
 
   @@map("enterprise_addresses")
 }
 
 model Facility {
-  id           String    @id @default(cuid())
+  id           String         @id @default(cuid())
   enterpriseId String
   name         String
-  code         String    @unique // Facility code (e.g., HL001)
+  code         String         @unique // Facility code (e.g., HL001)
   description  String?
   type         FacilityType
   status       FacilityStatus @default(ACTIVE)
-  location     String?   // Geographic location
-  coordinates  String?   // GPS coordinates
-  capacity     String?   // Production capacity
+  location     String? // Geographic location
+  coordinates  String? // GPS coordinates
+  capacity     String? // Production capacity
   startDate    DateTime? // Operational start date
-  isActive     Boolean   @default(true)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
   // Relationships
-  enterprise   Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
-  businessUnits BusinessUnit[]
-  assets       Asset[]
-  processes    Process[]
+  enterprise       Enterprise       @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  businessUnits    BusinessUnit[]
+  assets           Asset[]
+  processes        Process[]
   businessCanvases BusinessCanvas[] @relation("FacilityBusinessCanvases")
 
   @@map("facilities")
 }
 
 model BusinessUnit {
-  id           String    @id @default(cuid())
+  id           String             @id @default(cuid())
   enterpriseId String
   facilityId   String?
   name         String
-  code         String    @unique // Business unit code (e.g., MINING, PROCESSING)
+  code         String             @unique // Business unit code (e.g., MINING, PROCESSING)
   description  String?
   type         BusinessUnitType
   status       BusinessUnitStatus @default(ACTIVE)
-  manager      String?   // Business unit manager name
-  budget       Decimal?  // Annual budget
-  isActive     Boolean   @default(true)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  manager      String? // Business unit manager name
+  budget       Decimal? // Annual budget
+  isActive     Boolean            @default(true)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 
   // Relationships
-  enterprise   Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
-  facility     Facility?  @relation(fields: [facilityId], references: [id])
-  departments  Department[]
-  assets       Asset[]
-  processes    Process[]
+  enterprise       Enterprise       @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  facility         Facility?        @relation(fields: [facilityId], references: [id])
+  departments      Department[]
+  assets           Asset[]
+  processes        Process[]
   businessCanvases BusinessCanvas[] @relation("BusinessUnitBusinessCanvases")
 
   @@map("business_units")
 }
 
 model Department {
-  id            String    @id @default(cuid())
+  id             String           @id @default(cuid())
   businessUnitId String
-  name          String
-  code          String    @unique // Department code (e.g., MINING_OP, PROCESSING_MAINT)
-  description   String?
-  type          DepartmentType
-  status        DepartmentStatus @default(ACTIVE)
-  manager       String?   // Department manager name
-  employeeCount Int?      // Number of employees
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  name           String
+  code           String           @unique // Department code (e.g., MINING_OP, PROCESSING_MAINT)
+  description    String?
+  type           DepartmentType
+  status         DepartmentStatus @default(ACTIVE)
+  manager        String? // Department manager name
+  employeeCount  Int? // Number of employees
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
   // Relationships
-  businessUnit  BusinessUnit @relation(fields: [businessUnitId], references: [id], onDelete: Cascade)
-  users         User[]     @relation("DepartmentUsers")
-  assets        Asset[]
-  processes     Process[]
+  businessUnit BusinessUnit @relation(fields: [businessUnitId], references: [id], onDelete: Cascade)
+  users        User[]       @relation("DepartmentUsers")
+  assets       Asset[]
+  processes    Process[]
 
   @@map("departments")
 }
@@ -268,21 +268,21 @@ enum DepartmentStatus {
 // ============================================================================
 
 model BusinessCanvas {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   name        String
   description String?
-  version     String   @default("1.0")
-  isActive    Boolean  @default(true)
+  version     String       @default("1.0")
+  isActive    Boolean      @default(true)
   status      CanvasStatus @default(DRAFT)
-  editMode    EditMode @default(SINGLE_USER)
-  autoSave    Boolean  @default(true)
-  lastSaved   DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  editMode    EditMode     @default(SINGLE_USER)
+  autoSave    Boolean      @default(true)
+  lastSaved   DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   // Enterprise context
-  enterpriseId String?
-  facilityId   String?
+  enterpriseId   String?
+  facilityId     String?
   businessUnitId String?
 
   // Canvas hierarchy (for parent-child relationships between canvases)
@@ -290,46 +290,46 @@ model BusinessCanvas {
 
   // Enhanced Metadata Fields
   // Legal & Registration
-  legalName        String?
-  abn              String?
-  acn              String?
+  legalName String?
+  abn       String?
+  acn       String?
 
   // Industry Classification
-  industry         String?  // MANDATORY
-  sector           String?  // Legacy single sector field
-  sectors          String[] // Multi-sector support
-  sectorTypes      String[] // Sector type classifications
-  primarySector    String?  // Primary sector code (e.g., "COAL", "PRODUCTION")
-  businessType     BusinessType?
+  industry      String? // MANDATORY
+  sector        String? // Legacy single sector field
+  sectors       String[] // Multi-sector support
+  sectorTypes   String[] // Sector type classifications
+  primarySector String? // Primary sector code (e.g., "COAL", "PRODUCTION")
+  businessType  BusinessType?
 
   // Geographic & Regional
-  regional         RegionalClassification?
-  primaryLocation  String?
-  coordinates      String?
+  regional        RegionalClassification?
+  primaryLocation String?
+  coordinates     String?
 
   // Facility & Operations
-  facilityType     FacilityType?
+  facilityType       FacilityType?
   operationalStreams String[] // Array of operational streams
 
   // Strategic & Financial
-  strategicObjective    String?
-  valueProposition      String?
-  competitiveAdvantage  String?
-  annualRevenue         Decimal?
-  employeeCount         Int?
+  strategicObjective   String?
+  valueProposition     String?
+  competitiveAdvantage String?
+  annualRevenue        Decimal?
+  employeeCount        Int?
 
   // Risk & Compliance
-  riskProfile           RiskProfile?
+  riskProfile            RiskProfile?
   complianceRequirements String[]
-  regulatoryFramework   String[]
+  regulatoryFramework    String[]
 
   // Relationships
-  enterprise   Enterprise? @relation("EnterpriseBusinessCanvases", fields: [enterpriseId], references: [id])
-  facility     Facility? @relation("FacilityBusinessCanvases", fields: [facilityId], references: [id])
-  businessUnit BusinessUnit? @relation("BusinessUnitBusinessCanvases", fields: [businessUnitId], references: [id])
-  parentCanvas BusinessCanvas? @relation("CanvasHierarchy", fields: [parentCanvasId], references: [id])
+  enterprise    Enterprise?      @relation("EnterpriseBusinessCanvases", fields: [enterpriseId], references: [id])
+  facility      Facility?        @relation("FacilityBusinessCanvases", fields: [facilityId], references: [id])
+  businessUnit  BusinessUnit?    @relation("BusinessUnitBusinessCanvases", fields: [businessUnitId], references: [id])
+  parentCanvas  BusinessCanvas?  @relation("CanvasHierarchy", fields: [parentCanvasId], references: [id])
   childCanvases BusinessCanvas[] @relation("CanvasHierarchy")
-  
+
   // Canvas content
   valuePropositions ValueProposition[]
   customerSegments  CustomerSegment[]
@@ -341,17 +341,20 @@ model BusinessCanvas {
   channels          Channel[]
 
   // Version control and collaboration
-  versions          CanvasVersion[]
-  collaborators     CanvasCollaborator[]
-  sharingSettings   CanvasSharingSetting[]
-  exportHistory     CanvasExport[]
-  templateSource    CanvasTemplate? @relation("TemplateSource", fields: [templateId], references: [id])
-  templateId        String?
+  versions        CanvasVersion[]
+  collaborators   CanvasCollaborator[]
+  sharingSettings CanvasSharingSetting[]
+  exportHistory   CanvasExport[]
+  templateSource  CanvasTemplate?        @relation("TemplateSource", fields: [templateId], references: [id])
+  templateId      String?
 
   // Business Canvas Framework Associations
-  frameworkOperationalStreams  BusinessCanvasOperationalStreams[]
+  frameworkOperationalStreams   BusinessCanvasOperationalStreams[]
   frameworkComplianceFrameworks BusinessCanvasComplianceFrameworks[]
-  frameworkFacilityTypes     BusinessCanvasFacilityTypes[]
+  frameworkFacilityTypes        BusinessCanvasFacilityTypes[]
+
+  // Enhanced relationships
+  patternApplications PatternApplication[]
 
   @@map("business_canvases")
 }
@@ -364,39 +367,43 @@ model BusinessCanvas {
 model Industry {
   id          String   @id @default(cuid())
   code        String   @unique // e.g., "MINING_METALS", "OIL_GAS"
-  name        String   // e.g., "Mining & Metals", "Oil & Gas"
+  name        String // e.g., "Mining & Metals", "Oil & Gas"
   description String?
-  category    String?  // e.g., "EXTRACTIVE", "MANUFACTURING", "SERVICES"
+  category    String? // e.g., "EXTRACTIVE", "MANUFACTURING", "SERVICES"
   isActive    Boolean  @default(true)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  sectors     Sector[]
-  facilityTypes IndustryFacilityTypes[]
-  operationalStreams IndustryOperationalStreams[]
-  complianceFrameworks IndustryComplianceFramework[]
+  sectors                           Sector[]
+  facilityTypes                     IndustryFacilityTypes[]
+  operationalStreams                IndustryOperationalStreams[]
+  complianceFrameworks              IndustryComplianceFramework[]
+  facilityTypeAssociations          IndustryFacilityTypeAssociation[]
+  operationalStreamAssociations     IndustryOperationalStreamAssociation[]
+  complianceRequirementAssociations IndustryComplianceRequirementAssociation[]
+  regulatoryFrameworkAssociations   IndustryRegulatoryFrameworkAssociation[]
 
   @@map("industries")
 }
 
 // Industry-specific facility types
 model IndustryFacilityTypes {
-  id          String   @id @default(cuid())
-  facilityTypeCode String   // e.g., "OPEN_PIT_MINE", "UNDERGROUND_MINE", "REFINERY"
-  facilityTypeName String   // e.g., "Open Pit Mine", "Underground Mine", "Refinery"
-  description String?
-  category    String   // e.g., "EXTRACTION", "PROCESSING", "INFRASTRUCTURE", "SUPPORT"
-  riskProfile String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
-  industryId  String
-  isActive    Boolean  @default(true)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String   @id @default(cuid())
+  facilityTypeCode String // e.g., "OPEN_PIT_MINE", "UNDERGROUND_MINE", "REFINERY"
+  facilityTypeName String // e.g., "Open Pit Mine", "Underground Mine", "Refinery"
+  description      String?
+  category         String // e.g., "EXTRACTION", "PROCESSING", "INFRASTRUCTURE", "SUPPORT"
+  riskProfile      String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  industryId       String
+  isActive         Boolean  @default(true)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  industry    Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  industry                   Industry                      @relation(fields: [industryId], references: [id], onDelete: Cascade)
   businessCanvasAssociations BusinessCanvasFacilityTypes[]
 
   @@unique([industryId, facilityTypeCode])
@@ -406,10 +413,10 @@ model IndustryFacilityTypes {
 // Sector master table
 model Sector {
   id          String   @id @default(cuid())
-  code        String   // e.g., "COPPER", "GOLD", "AEROSPACE"
-  name        String   // e.g., "Copper Mining", "Gold Mining", "Aerospace"
+  code        String // e.g., "COPPER", "GOLD", "AEROSPACE"
+  name        String // e.g., "Copper Mining", "Gold Mining", "Aerospace"
   description String?
-  category    String   // e.g., "COMMODITY", "VALUE_CHAIN", "BUSINESS_MODEL", "SUPPORT_SERVICES"
+  category    String // e.g., "COMMODITY", "VALUE_CHAIN", "BUSINESS_MODEL", "SUPPORT_SERVICES"
   riskProfile String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
   industryId  String
   isActive    Boolean  @default(true)
@@ -418,27 +425,208 @@ model Sector {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  industry    Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  industry                          Industry                                   @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  operationalStreamAssociations     IndustryOperationalStreamAssociation[]
+  complianceRequirementAssociations IndustryComplianceRequirementAssociation[]
+  regulatoryFrameworkAssociations   IndustryRegulatoryFrameworkAssociation[]
 
   @@unique([industryId, code])
   @@map("sectors")
 }
 
-// Industry Operational Streams mapping
-model IndustryOperationalStreams {
+// ============================================================================
+// MASTER TABLES (Common Elements)
+// ============================================================================
+
+// Master table for all facility types
+model FacilityTypeMaster {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g., "OPEN_PIT_MINE", "REFINERY"
+  name        String // e.g., "Open Pit Mine", "Refinery"
+  description String?
+  category    String // e.g., "EXTRACTION", "PROCESSING", "INFRASTRUCTURE", "SUPPORT"
+  riskProfile String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  industryAssociations       IndustryFacilityTypeAssociation[]
+  businessCanvasAssociations BusinessCanvasFacilityTypes[]
+
+  @@map("facility_types")
+}
+
+// Master table for all operational streams
+model OperationalStream {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g., "OPEN_PIT_MINING", "SAFETY_SYSTEMS"
+  name        String // e.g., "Open Pit Mining", "Safety Systems"
+  description String?
+  category    String // e.g., "EXTRACTION", "PROCESSING", "SAFETY", "ENVIRONMENTAL"
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  industryAssociations       IndustryOperationalStreamAssociation[]
+  businessCanvasAssociations BusinessCanvasOperationalStreams[]
+
+  @@map("operational_streams")
+}
+
+// Master table for all compliance requirements
+model ComplianceRequirement {
+  id           String   @id @default(cuid())
+  code         String   @unique // e.g., "WHS_ACT_2011", "ENVIRONMENTAL_PROTECTION_ACT"
+  name         String // e.g., "WHS Act 2011", "Environmental Protection Act"
+  description  String?
+  category     String // e.g., "FEDERAL", "STATE", "INDUSTRY", "INTERNATIONAL"
+  jurisdiction String // e.g., "AUSTRALIA", "INTERNATIONAL"
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relationships
+  industryAssociations       IndustryComplianceRequirementAssociation[]
+  businessCanvasAssociations BusinessCanvasComplianceFrameworks[]
+
+  @@map("compliance_requirements")
+}
+
+// Master table for all regulatory frameworks
+model RegulatoryFramework {
+  id           String   @id @default(cuid())
+  code         String   @unique // e.g., "ISO_14001", "ICMM_FRAMEWORK"
+  name         String // e.g., "ISO 14001 Environmental Management", "ICMM Framework"
+  description  String?
+  category     String // e.g., "ISO", "INDUSTRY", "INTERNATIONAL"
+  jurisdiction String // e.g., "INTERNATIONAL", "AUSTRALIA"
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relationships
+  industryAssociations       IndustryRegulatoryFrameworkAssociation[]
+  businessCanvasAssociations BusinessCanvasComplianceFrameworks[]
+
+  @@map("regulatory_frameworks")
+}
+
+// ============================================================================
+// ASSOCIATION TABLES (Industry-Specific Relationships)
+// ============================================================================
+
+// Industry-Facility Type associations with customization
+model IndustryFacilityTypeAssociation {
+  id                String   @id @default(cuid())
+  industryId        String
+  facilityTypeId    String
+  isApplicable      Boolean  @default(true)
+  riskProfile       String? // Override default risk profile
+  customName        String? // Industry-specific name override
+  customDescription String? // Industry-specific description
+  sortOrder         Int      @default(0)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relationships
+  industry     Industry           @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  facilityType FacilityTypeMaster @relation(fields: [facilityTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([industryId, facilityTypeId])
+  @@map("industry_facility_type_associations")
+}
+
+// Industry-Operational Stream associations with customization
+model IndustryOperationalStreamAssociation {
+  id                  String   @id @default(cuid())
+  industryId          String
+  sectorId            String? // Optional sector-specific association
+  operationalStreamId String
+  isApplicable        Boolean  @default(true)
+  customName          String? // Industry-specific name override
+  customDescription   String? // Industry-specific description
+  sortOrder           Int      @default(0)
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relationships
+  industry          Industry          @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  sector            Sector?           @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  operationalStream OperationalStream @relation(fields: [operationalStreamId], references: [id], onDelete: Cascade)
+
+  @@unique([industryId, sectorId, operationalStreamId])
+  @@map("industry_operational_stream_associations")
+}
+
+// Industry-Compliance Requirement associations
+model IndustryComplianceRequirementAssociation {
+  id                      String   @id @default(cuid())
+  industryId              String
+  sectorId                String? // Optional sector-specific association
+  complianceRequirementId String
+  isApplicable            Boolean  @default(true)
+  priority                String? // HIGH, MEDIUM, LOW
+  customDescription       String? // Industry-specific description
+  sortOrder               Int      @default(0)
+  isActive                Boolean  @default(true)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  // Relationships
+  industry              Industry              @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  sector                Sector?               @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  complianceRequirement ComplianceRequirement @relation(fields: [complianceRequirementId], references: [id], onDelete: Cascade)
+
+  @@unique([industryId, sectorId, complianceRequirementId])
+  @@map("industry_compliance_requirement_associations")
+}
+
+// Industry-Regulatory Framework associations
+model IndustryRegulatoryFrameworkAssociation {
   id                    String   @id @default(cuid())
   industryId            String
-  sector                String
-  streamName            String
-  description           String?
-  category              String   // e.g., "EXTRACTION", "PROCESSING", "SAFETY", "ENVIRONMENTAL"
-  isActive              Boolean  @default(true)
+  sectorId              String? // Optional sector-specific association
+  regulatoryFrameworkId String
+  isApplicable          Boolean  @default(true)
+  priority              String? // HIGH, MEDIUM, LOW
+  customDescription     String? // Industry-specific description
   sortOrder             Int      @default(0)
+  isActive              Boolean  @default(true)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
   // Relationships
-  industry              Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  industry            Industry            @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  sector              Sector?             @relation(fields: [sectorId], references: [id], onDelete: Cascade)
+  regulatoryFramework RegulatoryFramework @relation(fields: [regulatoryFrameworkId], references: [id], onDelete: Cascade)
+
+  @@unique([industryId, sectorId, regulatoryFrameworkId])
+  @@map("industry_regulatory_framework_associations")
+}
+
+// Industry Operational Streams mapping
+model IndustryOperationalStreams {
+  id          String   @id @default(cuid())
+  industryId  String
+  sector      String
+  streamName  String
+  description String?
+  category    String // e.g., "EXTRACTION", "PROCESSING", "SAFETY", "ENVIRONMENTAL"
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  industry                   Industry                           @relation(fields: [industryId], references: [id], onDelete: Cascade)
   businessCanvasAssociations BusinessCanvasOperationalStreams[]
 
   @@unique([industryId, sector, streamName])
@@ -447,21 +635,21 @@ model IndustryOperationalStreams {
 
 // Industry Compliance Framework mapping
 model IndustryComplianceFramework {
-  id                    String   @id @default(cuid())
-  industryId            String
-  sector                String
-  frameworkName         String
-  description           String?
-  category              String   // e.g., "FEDERAL", "STATE", "INDUSTRY", "INTERNATIONAL"
-  complianceRequirements Json     // Array of compliance requirements
-  regulatoryFramework   Json     // Object with Federal, State, Industry arrays
-  isActive              Boolean  @default(true)
-  sortOrder             Int      @default(0)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                     String   @id @default(cuid())
+  industryId             String
+  sector                 String
+  frameworkName          String
+  description            String?
+  category               String // e.g., "FEDERAL", "STATE", "INDUSTRY", "INTERNATIONAL"
+  complianceRequirements Json // Array of compliance requirements
+  regulatoryFramework    Json // Object with Federal, State, Industry arrays
+  isActive               Boolean  @default(true)
+  sortOrder              Int      @default(0)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
   // Relationships
-  industry              Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  industry                   Industry                             @relation(fields: [industryId], references: [id], onDelete: Cascade)
   businessCanvasAssociations BusinessCanvasComplianceFrameworks[]
 
   @@unique([industryId, sector, frameworkName])
@@ -470,17 +658,17 @@ model IndustryComplianceFramework {
 
 // Version control for canvases
 model CanvasVersion {
-  id              String         @id @default(cuid())
+  id               String   @id @default(cuid())
   businessCanvasId String
-  versionNumber   String
-  description     String?
-  changes         Json? // Store detailed change information
-  createdById     String
-  createdAt       DateTime       @default(now())
+  versionNumber    String
+  description      String?
+  changes          Json? // Store detailed change information
+  createdById      String
+  createdAt        DateTime @default(now())
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
-  createdBy       User           @relation("CanvasVersionCreator", fields: [createdById], references: [id])
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  createdBy      User           @relation("CanvasVersionCreator", fields: [createdById], references: [id])
 
   @@unique([businessCanvasId, versionNumber])
   @@map("canvas_versions")
@@ -488,19 +676,19 @@ model CanvasVersion {
 
 // Collaboration support
 model CanvasCollaborator {
-  id              String         @id @default(cuid())
+  id               String           @id @default(cuid())
   businessCanvasId String
-  userId          String
-  role            CollaboratorRole @default(VIEWER)
-  permissions     Json? // Store specific permissions
-  lastActivity    DateTime?
-  isActive        Boolean        @default(true)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  userId           String
+  role             CollaboratorRole @default(VIEWER)
+  permissions      Json? // Store specific permissions
+  lastActivity     DateTime?
+  isActive         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
-  user            User           @relation("CanvasCollaborator", fields: [userId], references: [id])
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  user           User           @relation("CanvasCollaborator", fields: [userId], references: [id])
 
   @@unique([businessCanvasId, userId])
   @@map("canvas_collaborators")
@@ -508,185 +696,185 @@ model CanvasCollaborator {
 
 // Sharing settings
 model CanvasSharingSetting {
-  id              String         @id @default(cuid())
+  id               String      @id @default(cuid())
   businessCanvasId String
-  type            SharingType
-  value           String // URL, email, or other sharing identifier
-  permissions     Json? // Store sharing permissions
-  expiresAt       DateTime?
-  isActive        Boolean        @default(true)
-  createdAt       DateTime       @default(now())
+  type             SharingType
+  value            String // URL, email, or other sharing identifier
+  permissions      Json? // Store sharing permissions
+  expiresAt        DateTime?
+  isActive         Boolean     @default(true)
+  createdAt        DateTime    @default(now())
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
 
   @@map("canvas_sharing_settings")
 }
 
 // Export history
 model CanvasExport {
-  id              String         @id @default(cuid())
+  id               String       @id @default(cuid())
   businessCanvasId String
-  format          ExportFormat
-  fileName        String
-  fileSize        Int?
-  exportedById    String
-  metadata        Json? // Store export metadata
-  createdAt       DateTime       @default(now())
+  format           ExportFormat
+  fileName         String
+  fileSize         Int?
+  exportedById     String
+  metadata         Json? // Store export metadata
+  createdAt        DateTime     @default(now())
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
-  exportedBy      User           @relation("CanvasExportCreator", fields: [exportedById], references: [id])
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  exportedBy     User           @relation("CanvasExportCreator", fields: [exportedById], references: [id])
 
   @@map("canvas_exports")
 }
 
 // Canvas templates
 model CanvasTemplate {
-  id          String   @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
   description String?
   category    TemplateCategory
   tags        String[] // Array of tags
   thumbnail   String? // URL to thumbnail image
-  canvas      Json     // Store the template canvas structure
-  usageCount  Int      @default(0)
-  rating      Float    @default(0)
-  isPublic    Boolean  @default(false)
+  canvas      Json // Store the template canvas structure
+  usageCount  Int              @default(0)
+  rating      Float            @default(0)
+  isPublic    Boolean          @default(false)
   createdById String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
   // Relationships
-  createdBy   User     @relation("TemplateCreator", fields: [createdById], references: [id])
+  createdBy       User             @relation("TemplateCreator", fields: [createdById], references: [id])
   derivedCanvases BusinessCanvas[] @relation("TemplateSource")
 
   @@map("canvas_templates")
 }
 
 model ValueProposition {
-  id              String         @id @default(cuid())
+  id               String   @id @default(cuid())
   businessCanvasId String
-  description     String
-  priority        Priority       @default(MEDIUM)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  description      String
+  priority         Priority @default(MEDIUM)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
 
   @@map("value_propositions")
 }
 
 model CustomerSegment {
-  id              String         @id @default(cuid())
+  id               String   @id @default(cuid())
   businessCanvasId String
-  name            String
-  description     String?
-  size            Int?
-  priority        Priority       @default(MEDIUM)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  name             String
+  description      String?
+  size             Int?
+  priority         Priority @default(MEDIUM)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
 
   @@map("customer_segments")
 }
 
 model RevenueStream {
-  id              String         @id @default(cuid())
+  id               String   @id @default(cuid())
   businessCanvasId String
-  type            String
-  description     String?
-  estimatedValue  Float?
-  frequency       String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  type             String
+  description      String?
+  estimatedValue   Float?
+  frequency        String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
 
   @@map("revenue_streams")
 }
 
 model Partnership {
-  id              String         @id @default(cuid())
+  id               String   @id @default(cuid())
   businessCanvasId String
-  name            String
-  type            String?
-  description     String?
-  value           String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  name             String
+  type             String?
+  description      String?
+  value            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
 
   @@map("partnerships")
 }
 
 model Resource {
-  id              String         @id @default(cuid())
+  id               String       @id @default(cuid())
   businessCanvasId String
-  name            String
-  type            ResourceType
-  description     String?
-  availability    String?
-  cost            Float?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  name             String
+  type             ResourceType
+  description      String?
+  availability     String?
+  cost             Float?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
 
   @@map("resources")
 }
 
 model Activity {
-  id              String         @id @default(cuid())
+  id               String   @id @default(cuid())
   businessCanvasId String
-  name            String
-  description     String?
-  priority        Priority       @default(MEDIUM)
-  cost            Float?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  name             String
+  description      String?
+  priority         Priority @default(MEDIUM)
+  cost             Float?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
 
   @@map("activities")
 }
 
 model CostStructure {
-  id              String         @id @default(cuid())
+  id               String   @id @default(cuid())
   businessCanvasId String
-  description     String
-  category        String?
-  amount          Float?
-  frequency       String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  description      String
+  category         String?
+  amount           Float?
+  frequency        String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
 
   @@map("cost_structures")
 }
 
 model Channel {
-  id              String         @id @default(cuid())
+  id               String   @id @default(cuid())
   businessCanvasId String
-  type            String
-  description     String?
-  effectiveness   String?
-  cost            Float?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  type             String
+  description      String?
+  effectiveness    String?
+  cost             Float?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  businessCanvas  BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
 
   @@map("channels")
 }
@@ -702,86 +890,86 @@ model OperatingModel {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  valueChains     ValueChain[]
-  serviceModels   ServiceModel[]
-  experienceModels ExperienceModel[]
-  capabilityModels CapabilityModel[]
+  valueChains         ValueChain[]
+  serviceModels       ServiceModel[]
+  experienceModels    ExperienceModel[]
+  capabilityModels    CapabilityModel[]
   operatingPrinciples OperatingPrinciple[]
 
   @@map("operating_models")
 }
 
 model ValueChain {
-  id              String        @id @default(cuid())
+  id               String   @id @default(cuid())
   operatingModelId String
-  name            String
-  description     String?
-  sequence        Int
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  name             String
+  description      String?
+  sequence         Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  operatingModel  OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
 
   @@map("value_chains")
 }
 
 model ServiceModel {
-  id              String        @id @default(cuid())
+  id               String   @id @default(cuid())
   operatingModelId String
-  name            String
-  description     String?
-  type            String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  name             String
+  description      String?
+  type             String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  operatingModel  OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
 
   @@map("service_models")
 }
 
 model ExperienceModel {
-  id              String        @id @default(cuid())
+  id               String   @id @default(cuid())
   operatingModelId String
-  name            String
-  description     String?
-  touchpoints     String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  name             String
+  description      String?
+  touchpoints      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  operatingModel  OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
 
   @@map("experience_models")
 }
 
 model CapabilityModel {
-  id              String        @id @default(cuid())
+  id               String        @id @default(cuid())
   operatingModelId String
-  name            String
-  description     String?
-  maturityLevel   MaturityLevel @default(INITIAL)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  name             String
+  description      String?
+  maturityLevel    MaturityLevel @default(INITIAL)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   // Relationships
-  operatingModel  OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
 
   @@map("capability_models")
 }
 
 model OperatingPrinciple {
-  id              String        @id @default(cuid())
+  id               String   @id @default(cuid())
   operatingModelId String
-  name            String
-  description     String?
-  priority        Priority      @default(MEDIUM)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  name             String
+  description      String?
+  priority         Priority @default(MEDIUM)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  operatingModel  OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
 
   @@map("operating_principles")
 }
@@ -791,30 +979,30 @@ model OperatingPrinciple {
 // ============================================================================
 
 model CriticalControl {
-  id              String   @id @default(cuid())
-  name            String
-  description     String?
-  controlCategory ControlCategory @default(SUPPORTING)
-  isCritical      Boolean  @default(false)
+  id                    String           @id @default(cuid())
+  name                  String
+  description           String?
+  controlCategory       ControlCategory  @default(SUPPORTING)
+  isCritical            Boolean          @default(false)
   verificationFrequency String? // e.g., "Daily", "Weekly", "Monthly"
-  riskCategoryId  String?
-  controlTypeId   String?
-  effectivenessId String?
-  complianceStatus ComplianceStatus @default(COMPLIANT)
-  priority        Priority @default(MEDIUM)
-  createdById     String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  riskCategoryId        String?
+  controlTypeId         String?
+  effectivenessId       String?
+  complianceStatus      ComplianceStatus @default(COMPLIANT)
+  priority              Priority         @default(MEDIUM)
+  createdById           String
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
 
   // Relationships
-  createdBy       User                @relation("ControlCreator", fields: [createdById], references: [id])
-  riskCategory    RiskCategory?       @relation(fields: [riskCategoryId], references: [id])
-  controlType     ControlType?        @relation(fields: [controlTypeId], references: [id])
-  effectiveness   ControlEffectiveness? @relation(fields: [effectivenessId], references: [id])
-  processes       ProcessControl[]
-  assets          AssetControl[]
+  createdBy        User                  @relation("ControlCreator", fields: [createdById], references: [id])
+  riskCategory     RiskCategory?         @relation(fields: [riskCategoryId], references: [id])
+  controlType      ControlType?          @relation(fields: [controlTypeId], references: [id])
+  effectiveness    ControlEffectiveness? @relation(fields: [effectivenessId], references: [id])
+  processes        ProcessControl[]
+  assets           AssetControl[]
   verificationLogs VerificationLog[]
-  bowtieModels    BowtieModel[]
+  bowtieModels     BowtieModel[]
 
   @@map("critical_controls")
 }
@@ -828,7 +1016,7 @@ model RiskCategory {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  controls    CriticalControl[]
+  controls CriticalControl[]
 
   @@map("risk_categories")
 }
@@ -842,76 +1030,76 @@ model ControlType {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  controls    CriticalControl[]
+  controls CriticalControl[]
 
   @@map("control_types")
 }
 
 model ControlEffectiveness {
   id          String   @id @default(cuid())
-  rating      String   // "Effective", "Needs Attention", "Critical"
+  rating      String // "Effective", "Needs Attention", "Critical"
   description String?
   score       Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  controls    CriticalControl[]
+  controls CriticalControl[]
 
   @@map("control_effectiveness")
 }
 
 model VerificationLog {
-  id          String   @id @default(cuid())
+  id          String             @id @default(cuid())
   controlId   String
   status      VerificationStatus
   submittedBy String
-  submittedAt DateTime @default(now())
+  submittedAt DateTime           @default(now())
   notes       String?
   evidence    String? // URL or reference to evidence
 
   // Relationships
-  control     CriticalControl @relation(fields: [controlId], references: [id], onDelete: Cascade)
-  user        User            @relation("VerificationUser", fields: [submittedBy], references: [id])
+  control CriticalControl @relation(fields: [controlId], references: [id], onDelete: Cascade)
+  user    User            @relation("VerificationUser", fields: [submittedBy], references: [id])
 
   @@map("verification_logs")
 }
 
 // Bowtie Analysis
 model BowtieModel {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  topEventId  String?
+  id           String       @id @default(cuid())
+  name         String
+  description  String?
+  topEventId   String?
   linkedRiskId String?
   capabilityId String?
-  createdBy   String
-  status      BowtieStatus @default(DRAFT)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdBy    String
+  status       BowtieStatus @default(DRAFT)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
   // Relationships
-  enterprise  Enterprise? @relation(fields: [enterpriseId], references: [id])
-  enterpriseId String?
-  topEvent    TopEvent? @relation(fields: [topEventId], references: [id])
-  threats     Threat[]
-  consequences Consequence[]
+  enterprise         Enterprise?         @relation(fields: [enterpriseId], references: [id])
+  enterpriseId       String?
+  topEvent           TopEvent?           @relation(fields: [topEventId], references: [id])
+  threats            Threat[]
+  consequences       Consequence[]
   preventiveControls PreventiveControl[]
   mitigatingControls MitigatingControl[]
-  bowtieNodes BowtieNode[]
-  controls    CriticalControl[]
+  bowtieNodes        BowtieNode[]
+  controls           CriticalControl[]
 
   @@map("bowtie_models")
 }
 
 model TopEvent {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   title       String
   description String?
   severity    RiskSeverity
   likelihood  RiskLikelihood @default(MEDIUM)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
   // Relationships
   bowtieModels BowtieModel[]
@@ -920,92 +1108,92 @@ model TopEvent {
 }
 
 model Threat {
-  id              String   @id @default(cuid())
-  bowtieModelId   String
-  title           String
-  description     String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  bowtieModelId String
+  title         String
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relationships
-  bowtieModel     BowtieModel @relation(fields: [bowtieModelId], references: [id], onDelete: Cascade)
+  bowtieModel        BowtieModel         @relation(fields: [bowtieModelId], references: [id], onDelete: Cascade)
   preventiveControls PreventiveControl[]
 
   @@map("threats")
 }
 
 model Consequence {
-  id              String   @id @default(cuid())
-  bowtieModelId   String
-  title           String
-  linkedBmcBlock  String? // Links to BMC elements
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  bowtieModelId  String
+  title          String
+  linkedBmcBlock String? // Links to BMC elements
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relationships
-  bowtieModel     BowtieModel @relation(fields: [bowtieModelId], references: [id], onDelete: Cascade)
+  bowtieModel        BowtieModel         @relation(fields: [bowtieModelId], references: [id], onDelete: Cascade)
   mitigatingControls MitigatingControl[]
 
   @@map("consequences")
 }
 
 model PreventiveControl {
-  id              String   @id @default(cuid())
-  bowtieModelId   String
-  title           String
-  description     String?
-  type            ControlCategory @default(SUPPORTING)
-  linkedProcessId String?
-  linkedPlaybookId String?
+  id                 String             @id @default(cuid())
+  bowtieModelId      String
+  title              String
+  description        String?
+  type               ControlCategory    @default(SUPPORTING)
+  linkedProcessId    String?
+  linkedPlaybookId   String?
   linkedCapabilityId String?
   verificationStatus VerificationStatus @default(UNVERIFIED)
-  verificationDate DateTime?
-  threatId        String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  verificationDate   DateTime?
+  threatId           String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   // Relationships
-  bowtieModel     BowtieModel @relation(fields: [bowtieModelId], references: [id], onDelete: Cascade)
-  threat          Threat? @relation(fields: [threatId], references: [id])
+  bowtieModel BowtieModel @relation(fields: [bowtieModelId], references: [id], onDelete: Cascade)
+  threat      Threat?     @relation(fields: [threatId], references: [id])
 
   @@map("preventive_controls")
 }
 
 model MitigatingControl {
-  id              String   @id @default(cuid())
-  bowtieModelId   String
-  title           String
-  description     String?
-  type            ControlCategory @default(SUPPORTING)
-  linkedProcessId String?
-  linkedPlaybookId String?
+  id                 String             @id @default(cuid())
+  bowtieModelId      String
+  title              String
+  description        String?
+  type               ControlCategory    @default(SUPPORTING)
+  linkedProcessId    String?
+  linkedPlaybookId   String?
   linkedCapabilityId String?
   verificationStatus VerificationStatus @default(UNVERIFIED)
-  verificationDate DateTime?
-  consequenceId   String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  verificationDate   DateTime?
+  consequenceId      String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   // Relationships
-  bowtieModel     BowtieModel @relation(fields: [bowtieModelId], references: [id], onDelete: Cascade)
-  consequence     Consequence? @relation(fields: [consequenceId], references: [id])
+  bowtieModel BowtieModel  @relation(fields: [bowtieModelId], references: [id], onDelete: Cascade)
+  consequence Consequence? @relation(fields: [consequenceId], references: [id])
 
   @@map("mitigating_controls")
 }
 
 model BowtieNode {
-  id            String   @id @default(cuid())
+  id            String           @id @default(cuid())
   bowtieModelId String
   type          BowtieNodeType
-  refId         String   // Links to actual data entity
-  x             Int      // Position on canvas
-  y             Int      // Position on canvas
+  refId         String // Links to actual data entity
+  x             Int // Position on canvas
+  y             Int // Position on canvas
   status        BowtieNodeStatus @default(LIVE)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
   // Relationships
-  bowtieModel   BowtieModel @relation(fields: [bowtieModelId], references: [id], onDelete: Cascade)
+  bowtieModel BowtieModel @relation(fields: [bowtieModelId], references: [id], onDelete: Cascade)
 
   @@map("bowtie_nodes")
 }
@@ -1015,14 +1203,14 @@ model BowtieNode {
 // ============================================================================
 
 model RiskSignal {
-  id          String   @id @default(cuid())
-  sourceType  String   // "control", "process", "asset", "verification"
+  id          String       @id @default(cuid())
+  sourceType  String // "control", "process", "asset", "verification"
   sourceId    String
   severity    RiskSeverity
   description String
-  detectedAt  DateTime @default(now())
+  detectedAt  DateTime     @default(now())
   location    String?
-  isResolved  Boolean  @default(false)
+  isResolved  Boolean      @default(false)
   resolvedAt  DateTime?
 
   // Relationships
@@ -1033,30 +1221,30 @@ model RiskSignal {
 }
 
 model RiskPropagation {
-  id              String   @id @default(cuid())
-  sourceEntityId  String
-  targetEntityId  String
+  id               String   @id @default(cuid())
+  sourceEntityId   String
+  targetEntityId   String
   propagationScore Float
-  propagationPath String? // JSON path of propagation
-  calculatedAt    DateTime @default(now())
+  propagationPath  String? // JSON path of propagation
+  calculatedAt     DateTime @default(now())
 
   // Relationships
-  riskSignal      RiskSignal @relation("SignalSource", fields: [sourceEntityId], references: [id])
-  riskThreshold   RiskThreshold? @relation(fields: [thresholdId], references: [id])
-  thresholdId     String?
+  riskSignal    RiskSignal     @relation("SignalSource", fields: [sourceEntityId], references: [id])
+  riskThreshold RiskThreshold? @relation(fields: [thresholdId], references: [id])
+  thresholdId   String?
 
   @@map("risk_propagations")
 }
 
 model RiskThreshold {
-  id            String   @id @default(cuid())
-  entityType    String   // "control", "process", "capability", "strategic"
-  thresholdType String   // "failure_rate", "effectiveness", "maturity"
+  id             String   @id @default(cuid())
+  entityType     String // "control", "process", "capability", "strategic"
+  thresholdType  String // "failure_rate", "effectiveness", "maturity"
   thresholdValue Float
-  alertMessage  String
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  alertMessage   String
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Relationships
   riskPropagations RiskPropagation[]
@@ -1066,19 +1254,19 @@ model RiskThreshold {
 }
 
 model RiskAlert {
-  id            String   @id @default(cuid())
-  riskSignalId  String
-  thresholdId   String?
-  status        AlertStatus @default(ACTIVE)
-  assignedTo    String?
-  createdAt     DateTime @default(now())
-  resolvedAt    DateTime?
+  id              String      @id @default(cuid())
+  riskSignalId    String
+  thresholdId     String?
+  status          AlertStatus @default(ACTIVE)
+  assignedTo      String?
+  createdAt       DateTime    @default(now())
+  resolvedAt      DateTime?
   resolutionNotes String?
 
   // Relationships
-  riskSignal    RiskSignal @relation(fields: [riskSignalId], references: [id])
-  threshold     RiskThreshold? @relation(fields: [thresholdId], references: [id])
-  assignee      User? @relation("AlertAssignee", fields: [assignedTo], references: [id])
+  riskSignal RiskSignal     @relation(fields: [riskSignalId], references: [id])
+  threshold  RiskThreshold? @relation(fields: [thresholdId], references: [id])
+  assignee   User?          @relation("AlertAssignee", fields: [assignedTo], references: [id])
 
   @@map("risk_alerts")
 }
@@ -1086,9 +1274,9 @@ model RiskAlert {
 model RiskInsight {
   id          String   @id @default(cuid())
   entityId    String
-  entityType  String   // "process", "capability", "strategic"
+  entityType  String // "process", "capability", "strategic"
   riskScore   Float
-  insightType String   // "trend", "threshold", "anomaly"
+  insightType String // "trend", "threshold", "anomaly"
   narrative   String
   generatedAt DateTime @default(now())
 
@@ -1100,37 +1288,37 @@ model RiskInsight {
 // ============================================================================
 
 model Process {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   name        String
   description String?
-  version     String   @default("1.0")
+  version     String        @default("1.0")
   status      ProcessStatus @default(DRAFT)
-  priority    Priority @default(MEDIUM)
+  priority    Priority      @default(MEDIUM)
   createdById String
-  
+
   // Enterprise relationships
-  enterpriseId String?
-  facilityId   String?
+  enterpriseId   String?
+  facilityId     String?
   businessUnitId String?
-  departmentId String?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  departmentId   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relationships
-  createdBy       User           @relation("ProcessCreator", fields: [createdById], references: [id])
-  enterprise      Enterprise?    @relation(fields: [enterpriseId], references: [id])
-  facility        Facility?      @relation(fields: [facilityId], references: [id])
-  businessUnit    BusinessUnit?  @relation(fields: [businessUnitId], references: [id])
-  department      Department?    @relation(fields: [departmentId], references: [id])
-  steps           ProcessStep[]
-  inputs          ProcessInput[]
-  outputs         ProcessOutput[]
-  metrics         ProcessMetric[]
-  risks           ProcessRisk[]
-  controls        ProcessControl[]
-  playbooks       ProcessPlaybook[]
-  maturityScores  ProcessMaturityScore[]
+  createdBy      User                   @relation("ProcessCreator", fields: [createdById], references: [id])
+  enterprise     Enterprise?            @relation(fields: [enterpriseId], references: [id])
+  facility       Facility?              @relation(fields: [facilityId], references: [id])
+  businessUnit   BusinessUnit?          @relation(fields: [businessUnitId], references: [id])
+  department     Department?            @relation(fields: [departmentId], references: [id])
+  steps          ProcessStep[]
+  inputs         ProcessInput[]
+  outputs        ProcessOutput[]
+  metrics        ProcessMetric[]
+  risks          ProcessRisk[]
+  controls       ProcessControl[]
+  playbooks      ProcessPlaybook[]
+  maturityScores ProcessMaturityScore[]
 
   @@map("processes")
 }
@@ -1147,7 +1335,7 @@ model ProcessStep {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  process     Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+  process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
 
   @@map("process_steps")
 }
@@ -1163,7 +1351,7 @@ model ProcessInput {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  process     Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+  process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
 
   @@map("process_inputs")
 }
@@ -1179,30 +1367,30 @@ model ProcessOutput {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  process     Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+  process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
 
   @@map("process_outputs")
 }
 
 model ProcessMetric {
-  id          String   @id @default(cuid())
-  processId   String
-  name        String
-  value       Float
-  unit        String?
-  target      Float?
-  frequency   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  processId String
+  name      String
+  value     Float
+  unit      String?
+  target    Float?
+  frequency String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relationships
-  process     Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+  process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
 
   @@map("process_metrics")
 }
 
 model ProcessRisk {
-  id          String      @id @default(cuid())
+  id          String         @id @default(cuid())
   processId   String
   name        String
   description String?
@@ -1210,31 +1398,31 @@ model ProcessRisk {
   likelihood  RiskLikelihood @default(MEDIUM)
   impact      RiskImpact     @default(MEDIUM)
   mitigation  String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
   // Relationships
-  process     Process     @relation(fields: [processId], references: [id], onDelete: Cascade)
+  process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
 
   @@map("process_risks")
 }
 
 // Playbook Management
 model Playbook {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   name        String
   description String?
-  version     String   @default("1.0")
+  version     String         @default("1.0")
   status      PlaybookStatus @default(DRAFT)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
   // Relationships
-  procedures      Procedure[]
+  procedures        Procedure[]
   trainingMaterials TrainingMaterial[]
-  bestPractices   BestPractice[]
-  improvements    Improvement[]
-  processes       ProcessPlaybook[]
+  bestPractices     BestPractice[]
+  improvements      Improvement[]
+  processes         ProcessPlaybook[]
 
   @@map("playbooks")
 }
@@ -1249,23 +1437,23 @@ model Procedure {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  playbook    Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  playbook Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
 
   @@map("procedures")
 }
 
 model TrainingMaterial {
-  id          String   @id @default(cuid())
-  playbookId  String
-  title       String
-  type        String?
-  content     String?
-  url         String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  playbookId String
+  title      String
+  type       String?
+  content    String?
+  url        String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   // Relationships
-  playbook    Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  playbook Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
 
   @@map("training_materials")
 }
@@ -1280,23 +1468,23 @@ model BestPractice {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  playbook    Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  playbook Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
 
   @@map("best_practices")
 }
 
 model Improvement {
-  id          String   @id @default(cuid())
+  id          String            @id @default(cuid())
   playbookId  String
   name        String
   description String?
   status      ImprovementStatus @default(PROPOSED)
-  priority    Priority @default(MEDIUM)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  priority    Priority          @default(MEDIUM)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 
   // Relationships
-  playbook    Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  playbook Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
 
   @@map("improvements")
 }
@@ -1312,178 +1500,178 @@ model MaturityAssessment {
   updatedAt   DateTime @updatedAt
 
   // Relationships
-  createdBy       User                @relation("AssessmentCreator", fields: [createdById], references: [id])
-  capabilityScores CapabilityScore[]
+  createdBy           User                 @relation("AssessmentCreator", fields: [createdById], references: [id])
+  capabilityScores    CapabilityScore[]
   improvementRoadmaps ImprovementRoadmap[]
-  benchmarks     Benchmark[]
-  progress       Progress[]
+  benchmarks          Benchmark[]
+  progress            Progress[]
 
   @@map("maturity_assessments")
 }
 
 model CapabilityScore {
-  id                  String   @id @default(cuid())
+  id                   String   @id @default(cuid())
   maturityAssessmentId String
-  capability          String
-  score               Int
-  maxScore            Int      @default(5)
-  description         String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  capability           String
+  score                Int
+  maxScore             Int      @default(5)
+  description          String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   // Relationships
-  maturityAssessment  MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
+  maturityAssessment MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
 
   @@map("capability_scores")
 }
 
 model ImprovementRoadmap {
-  id                  String   @id @default(cuid())
+  id                   String        @id @default(cuid())
   maturityAssessmentId String
-  name                String
-  description         String?
-  priority            Priority @default(MEDIUM)
-  targetDate          DateTime?
-  status              RoadmapStatus @default(PLANNED)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  name                 String
+  description          String?
+  priority             Priority      @default(MEDIUM)
+  targetDate           DateTime?
+  status               RoadmapStatus @default(PLANNED)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
 
   // Relationships
-  maturityAssessment  MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
+  maturityAssessment MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
 
   @@map("improvement_roadmaps")
 }
 
 model Benchmark {
-  id                  String   @id @default(cuid())
+  id                   String   @id @default(cuid())
   maturityAssessmentId String
-  metric              String
-  value               Float
-  industry            String?
-  description         String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  metric               String
+  value                Float
+  industry             String?
+  description          String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   // Relationships
-  maturityAssessment  MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
+  maturityAssessment MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
 
   @@map("benchmarks")
 }
 
 model Progress {
-  id                  String   @id @default(cuid())
+  id                   String         @id @default(cuid())
   maturityAssessmentId String
-  milestone           String
-  status              ProgressStatus @default(IN_PROGRESS)
-  completion          Float    @default(0) // percentage
-  notes               String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  milestone            String
+  status               ProgressStatus @default(IN_PROGRESS)
+  completion           Float          @default(0) // percentage
+  notes                String?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
 
   // Relationships
-  maturityAssessment  MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
+  maturityAssessment MaturityAssessment @relation(fields: [maturityAssessmentId], references: [id], onDelete: Cascade)
 
   @@map("progress")
 }
 
 // Asset Management
 model Asset {
-  id          String   @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
   description String?
   type        AssetType
   location    String?
-  status      AssetStatus @default(OPERATIONAL)
+  status      AssetStatus      @default(OPERATIONAL)
   criticality AssetCriticality @default(MEDIUM)
   createdById String
-  
+
   // Enterprise relationships
-  enterpriseId String?
-  facilityId   String?
+  enterpriseId   String?
+  facilityId     String?
   businessUnitId String?
-  departmentId String?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  departmentId   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relationships
-  createdBy       User          @relation("AssetCreator", fields: [createdById], references: [id])
-  enterprise      Enterprise?   @relation(fields: [enterpriseId], references: [id])
-  facility        Facility?     @relation(fields: [facilityId], references: [id])
-  businessUnit    BusinessUnit? @relation(fields: [businessUnitId], references: [id])
-  department      Department?   @relation(fields: [departmentId], references: [id])
-  controls        AssetControl[]
-  risks           AssetRisk[]
-  protections     AssetProtection[]
-  monitors        AssetMonitor[]
-  optimisations   AssetOptimisation[]
+  createdBy     User                @relation("AssetCreator", fields: [createdById], references: [id])
+  enterprise    Enterprise?         @relation(fields: [enterpriseId], references: [id])
+  facility      Facility?           @relation(fields: [facilityId], references: [id])
+  businessUnit  BusinessUnit?       @relation(fields: [businessUnitId], references: [id])
+  department    Department?         @relation(fields: [departmentId], references: [id])
+  controls      AssetControl[]
+  risks         AssetRisk[]
+  protections   AssetProtection[]
+  monitors      AssetMonitor[]
+  optimisations AssetOptimisation[]
 
   @@map("assets")
 }
 
 model AssetRisk {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   assetId     String
   name        String
   description String?
   severity    RiskSeverity
   likelihood  RiskLikelihood @default(MEDIUM)
   mitigation  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
   // Relationships
-  asset       Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   @@map("asset_risks")
 }
 
 model AssetProtection {
-  id          String   @id @default(cuid())
-  assetId     String
-  name        String
-  measure     String?
-  type        String?
+  id            String   @id @default(cuid())
+  assetId       String
+  name          String
+  measure       String?
+  type          String?
   effectiveness String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relationships
-  asset       Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   @@map("asset_protections")
 }
 
 model AssetMonitor {
-  id          String   @id @default(cuid())
-  assetId     String
-  name        String
-  type        String?
-  status      MonitorStatus @default(ACTIVE)
-  frequency   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String        @id @default(cuid())
+  assetId   String
+  name      String
+  type      String?
+  status    MonitorStatus @default(ACTIVE)
+  frequency String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   // Relationships
-  asset       Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   @@map("asset_monitors")
 }
 
 model AssetOptimisation {
-  id          String   @id @default(cuid())
+  id          String             @id @default(cuid())
   assetId     String
   name        String
   opportunity String?
   benefit     String?
   cost        Float?
-  priority    Priority @default(MEDIUM)
+  priority    Priority           @default(MEDIUM)
   status      OptimisationStatus @default(PROPOSED)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 
   // Relationships
-  asset       Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   @@map("asset_optimisations")
 }
@@ -1497,8 +1685,8 @@ model ProcessControl {
   controlId String
 
   // Relationships
-  process   Process        @relation(fields: [processId], references: [id], onDelete: Cascade)
-  control   CriticalControl @relation(fields: [controlId], references: [id], onDelete: Cascade)
+  process Process         @relation(fields: [processId], references: [id], onDelete: Cascade)
+  control CriticalControl @relation(fields: [controlId], references: [id], onDelete: Cascade)
 
   @@id([processId, controlId])
   @@map("process_controls")
@@ -1509,8 +1697,8 @@ model AssetControl {
   controlId String
 
   // Relationships
-  asset     Asset          @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  control   CriticalControl @relation(fields: [controlId], references: [id], onDelete: Cascade)
+  asset   Asset           @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  control CriticalControl @relation(fields: [controlId], references: [id], onDelete: Cascade)
 
   @@id([assetId, controlId])
   @@map("asset_controls")
@@ -1521,22 +1709,22 @@ model ProcessPlaybook {
   playbookId String
 
   // Relationships
-  process    Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
-  playbook   Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  process  Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+  playbook Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
 
   @@id([processId, playbookId])
   @@map("process_playbooks")
 }
 
 model ProcessMaturityScore {
-  processId String
+  processId  String
   capability String
   score      Int
   maxScore   Int      @default(5)
   assessedAt DateTime @default(now())
 
   // Relationships
-  process    Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+  process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
 
   @@id([processId, capability])
   @@map("process_maturity_scores")
@@ -1556,7 +1744,7 @@ model AuditLog {
   timestamp DateTime @default(now())
 
   // Relationships
-  user      User     @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@map("audit_logs")
 }
@@ -1807,49 +1995,108 @@ enum RegionalClassification {
 
 // Business Canvas Framework Associations
 model BusinessCanvasOperationalStreams {
-  id                    String         @id @default(cuid())
-  businessCanvasId      String
-  operationalStreamId   String
-  isAutoApplied         Boolean        @default(true) // Whether this was auto-applied or manually added
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
+  id                  String   @id @default(cuid())
+  businessCanvasId    String
+  operationalStreamId String
+  isAutoApplied       Boolean  @default(true) // Whether this was auto-applied or manually added
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   // Relationships
-  businessCanvas        BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
-  operationalStream     IndustryOperationalStreams @relation(fields: [operationalStreamId], references: [id], onDelete: Cascade)
+  businessCanvas               BusinessCanvas              @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  operationalStream            OperationalStream           @relation(fields: [operationalStreamId], references: [id], onDelete: Cascade)
+  IndustryOperationalStreams   IndustryOperationalStreams? @relation(fields: [industryOperationalStreamsId], references: [id])
+  industryOperationalStreamsId String?
 
   @@unique([businessCanvasId, operationalStreamId])
   @@map("business_canvas_operational_streams")
 }
 
 model BusinessCanvasComplianceFrameworks {
-  id                    String         @id @default(cuid())
+  id                    String   @id @default(cuid())
   businessCanvasId      String
   complianceFrameworkId String
-  isAutoApplied         Boolean        @default(true) // Whether this was auto-applied or manually added
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
+  isAutoApplied         Boolean  @default(true) // Whether this was auto-applied or manually added
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   // Relationships
-  businessCanvas        BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
-  complianceFramework   IndustryComplianceFramework @relation(fields: [complianceFrameworkId], references: [id], onDelete: Cascade)
+  businessCanvas                BusinessCanvas               @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  complianceFramework           ComplianceRequirement        @relation(fields: [complianceFrameworkId], references: [id], onDelete: Cascade)
+  RegulatoryFramework           RegulatoryFramework?         @relation(fields: [regulatoryFrameworkId], references: [id])
+  regulatoryFrameworkId         String?
+  IndustryComplianceFramework   IndustryComplianceFramework? @relation(fields: [industryComplianceFrameworkId], references: [id])
+  industryComplianceFrameworkId String?
 
   @@unique([businessCanvasId, complianceFrameworkId])
   @@map("business_canvas_compliance_frameworks")
 }
 
 model BusinessCanvasFacilityTypes {
-  id                    String         @id @default(cuid())
-  businessCanvasId      String
-  facilityTypeId        String
-  isAutoApplied         Boolean        @default(true) // Whether this was auto-applied or manually added
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
+  id               String   @id @default(cuid())
+  businessCanvasId String
+  facilityTypeId   String
+  isAutoApplied    Boolean  @default(true) // Whether this was auto-applied or manually added
+  assignmentConfidence Decimal? @db.Decimal(3,2) // Confidence score for auto-assignment
+  assignmentMethod String?  // 'manual', 'auto', 'pattern'
+  patternId        String?  // Reference to the pattern that assigned this
+  rejectedAt       DateTime? // When this was rejected by user
+  rejectionReason  String?  // Reason for rejection
+  canReapply       Boolean  @default(true) // Whether this can be reapplied
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relationships
-  businessCanvas        BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
-  facilityType          IndustryFacilityTypes @relation(fields: [facilityTypeId], references: [id], onDelete: Cascade)
+  businessCanvas          BusinessCanvas         @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  facilityType            FacilityTypeMaster     @relation(fields: [facilityTypeId], references: [id], onDelete: Cascade)
+  IndustryFacilityTypes   IndustryFacilityTypes? @relation(fields: [industryFacilityTypesId], references: [id])
+  industryFacilityTypesId String?
+  pattern                 AssignmentPattern?     @relation(fields: [patternId], references: [id])
 
   @@unique([businessCanvasId, facilityTypeId])
   @@map("business_canvas_facility_types")
+}
+
+// ============================================================================
+// PATTERN-BASED ASSIGNMENT SYSTEM
+// ============================================================================
+
+model AssignmentPattern {
+  id                String   @id @default(cuid())
+  patternType       String   // 'facility', 'operational', 'compliance', 'regulatory'
+  industryCode      String
+  sectorCodes       String[] // Array of sector codes
+  locationPatterns  Json?    // Location-based patterns (state, region, jurisdiction)
+  assignmentData    Json     // The actual assignments (facility types, streams, etc.)
+  confidenceScore   Decimal  @db.Decimal(3,2) @default(0.8)
+  usageCount        Int      @default(0)
+  successRate       Decimal  @db.Decimal(3,2) @default(0.8)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relationships
+  businessCanvasFacilityTypes BusinessCanvasFacilityTypes[]
+  patternApplications         PatternApplication[]
+
+  @@index([industryCode, sectorCodes])
+  @@index([patternType, confidenceScore])
+  @@map("assignment_patterns")
+}
+
+model PatternApplication {
+  id                    String   @id @default(cuid())
+  canvasId              String
+  patternId             String
+  appliedAssignments    Json     // What was actually applied
+  userAcceptanceRate    Decimal  @db.Decimal(3,2) @default(1.0) // How often user accepts vs rejects
+  appliedAt             DateTime @default(now())
+
+  // Relationships
+  businessCanvas BusinessCanvas    @relation(fields: [canvasId], references: [id], onDelete: Cascade)
+  pattern        AssignmentPattern @relation(fields: [patternId], references: [id], onDelete: Cascade)
+
+  @@index([canvasId])
+  @@index([patternId])
+  @@map("pattern_applications")
 }

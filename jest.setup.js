@@ -11,35 +11,39 @@
 
 import '@testing-library/jest-dom';
 import { testIds, isValidTestId } from './lib/testSelectors';
+import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 
-// Custom matchers for test ID validation
+// Extend Jest matchers
 expect.extend({
   toHaveValidTestId(received, testId) {
     const pass = received.getAttribute('data-testid') === testId && isValidTestId(testId);
     return {
       pass,
-      message: () => `expected element to have valid test ID "${testId}"`,
+      message: () => `expected element ${pass ? 'not ' : ''}to have valid test ID "${testId}"`,
     };
   },
+
   toHaveValidTestIdAttribute(received) {
     const testId = received.getAttribute('data-testid');
     const pass = testId && isValidTestId(testId);
     return {
       pass,
-      message: () => `expected element to have valid test ID attribute, got "${testId}"`,
+      message: () => `expected element ${pass ? 'not ' : ''}to have valid test ID attribute`,
     };
   },
+
   toBeAustralianBusinessData(received) {
     // Validate Australian business data patterns
     const hasValidABN = received.abn && /^\d{11}$/.test(received.abn);
-    const hasValidACN = !received.acn || /^\d{9}$/.test(received.acn);
+    const hasValidACN = received.acn && /^\d{9}$/.test(received.acn);
     const hasValidLocation = received.primaryLocation && received.primaryLocation.includes('Australia');
     const hasValidIndustry = received.industry && ['MINING', 'OIL_GAS', 'MANUFACTURING'].includes(received.industry);
     
     const pass = hasValidABN && hasValidACN && hasValidLocation && hasValidIndustry;
     return {
       pass,
-      message: () => `expected data to be valid Australian business data`,
+      message: () => `expected data ${pass ? 'not ' : ''}to be valid Australian business data`,
     };
   },
 });
@@ -380,25 +384,24 @@ global.testUtils = {
   },
 
   // Real-time editing testing utilities
-  simulateRealTimeEditing: async (component, changes) => {
-    const { user } = require('@testing-library/user-event');
-    const userEvent = user.setup();
+  simulateRealTimeEditing: async (changes) => {
+    const user = userEvent.setup();
 
     for (const change of changes) {
       const { type, target, value } = change;
       
       switch (type) {
         case 'input':
-          await userEvent.type(screen.getByTestId(target), value);
+          await user.type(screen.getByTestId(target), value);
           break;
         case 'select':
-          await userEvent.selectOptions(screen.getByTestId(target), value);
+          await user.selectOptions(screen.getByTestId(target), value);
           break;
         case 'click':
-          await userEvent.click(screen.getByTestId(target));
+          await user.click(screen.getByTestId(target));
           break;
         case 'clear':
-          await userEvent.clear(screen.getByTestId(target));
+          await user.clear(screen.getByTestId(target));
           break;
       }
 
@@ -409,21 +412,20 @@ global.testUtils = {
 
   // Drag-and-drop testing utilities
   simulateDragAndDrop: async (source, target) => {
-    const { user } = require('@testing-library/user-event');
-    const userEvent = user.setup();
+    const user = userEvent.setup();
 
     const sourceElement = screen.getByTestId(source);
     const targetElement = screen.getByTestId(target);
 
     // Simulate drag start
-    await userEvent.hover(sourceElement);
-    await userEvent.keyboard('{Space}');
+    await user.hover(sourceElement);
+    await user.keyboard('{Space}');
 
     // Simulate drag over target
-    await userEvent.hover(targetElement);
+    await user.hover(targetElement);
 
     // Simulate drop
-    await userEvent.keyboard('{Space}');
+    await user.keyboard('{Space}');
   },
 
   // Complex form validation utilities

@@ -37,7 +37,8 @@ import {
   Gauge,
   Target,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Workflow
 } from 'lucide-react'
 
 interface EnterpriseInfo {
@@ -290,18 +291,27 @@ export function EnterpriseContext({ className = '', showDetails = false }: Enter
         {/* Operational Streams */}
         {showDetails && (
           <div className="space-y-2">
-            <div className="text-xs font-medium text-muted-foreground">Operational Streams</div>
-            <div className="space-y-1">
+            <div className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+              <Workflow className="h-3 w-3" />
+              Operational Streams
+            </div>
+            <div className="flex flex-wrap gap-1">
               {operationalStreams.map((stream) => (
-                <div key={stream.name} className="flex items-center justify-between text-xs">
-                  <span>{stream.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 rounded-full text-xs ${getStreamStatusColor(stream.status)}`}>
-                      {stream.performance}%
-                    </span>
-                    {getStreamStatusIcon(stream.status)}
-                  </div>
-                </div>
+                <Badge
+                  key={stream.name}
+                  variant="stream"
+                  className={`text-xs flex items-center gap-1 ${
+                    stream.status === 'on-target' 
+                      ? 'bg-green-100 text-green-800' 
+                      : stream.status === 'below-target'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}
+                >
+                  <Workflow className="h-2 w-2" />
+                  {stream.name}
+                  <span className="ml-1 font-medium">{stream.performance}%</span>
+                </Badge>
               ))}
             </div>
           </div>

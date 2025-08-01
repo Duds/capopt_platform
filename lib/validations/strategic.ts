@@ -56,53 +56,58 @@ export const channelSchema = z.object({
   cost: z.number().optional()
 })
 
-// Business Canvas main schema
+// Enhanced business canvas schema with framework hierarchy support
 export const businessCanvasSchema = z.object({
-  name: z.string().min(1, 'Canvas name is required').max(255),
-  description: z.string().optional(),
-  version: z.string().optional(),
-  isActive: z.boolean().optional(),
-  status: z.enum(['DRAFT', 'REVIEW', 'PUBLISHED', 'ARCHIVED']).optional(),
-  editMode: z.enum(['SINGLE_USER', 'MULTI_USER', 'READ_ONLY']).optional(),
-  autoSave: z.boolean().optional(),
-  enterpriseId: z.string().optional(),
-  facilityId: z.string().optional(),
-  businessUnitId: z.string().optional(),
-  parentCanvasId: z.string().nullable().optional().transform(val => val === '' || (typeof val === 'string' && val.trim() === '') ? null : val),
-  templateId: z.string().optional(),
-  
-  // Enhanced metadata fields
+  name: z.string().min(1, 'Business name is required').max(255),
   legalName: z.string().optional(),
   abn: z.string().optional(),
   acn: z.string().optional(),
+  businessType: z.string().optional(),
   industry: z.string().optional(),
   sector: z.string().optional(),
   sectors: z.array(z.string()).optional(),
-  sectorTypes: z.array(z.string()).optional(),
-  businessType: z.enum(['CORPORATION', 'PARTNERSHIP', 'SOLE_TRADER', 'TRUST', 'JOINT_VENTURE', 'SUBSIDIARY']).optional(),
-  regional: z.enum(['METROPOLITAN', 'REGIONAL', 'REMOTE', 'RURAL', 'COASTAL', 'INLAND']).optional(),
+  regional: z.string().optional(),
   primaryLocation: z.string().optional(),
-  coordinates: z.string().optional(),
-  facilityType: z.enum(['MINE', 'PROCESSING_PLANT', 'REFINERY', 'SMELTER', 'WAREHOUSE', 'OFFICE', 'LABORATORY', 'WORKSHOP', 'POWER_STATION', 'WATER_TREATMENT', 'WASTE_MANAGEMENT']).optional(),
+  facilityTypes: z.array(z.string()).min(1, 'At least one facility type must be selected'), // Changed from facilityType: z.string()
   operationalStreams: z.array(z.string()).optional(),
   strategicObjective: z.string().optional(),
   valueProposition: z.string().optional(),
   competitiveAdvantage: z.string().optional(),
   annualRevenue: z.number().optional(),
   employeeCount: z.number().optional(),
-  riskProfile: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).optional(),
+  riskProfile: z.string().optional(),
   complianceRequirements: z.array(z.string()).optional(),
   regulatoryFramework: z.array(z.string()).optional(),
-  
-  // Canvas content
-  valuePropositions: z.array(valuePropositionSchema).optional(),
-  customerSegments: z.array(customerSegmentSchema).optional(),
-  revenueStreams: z.array(revenueStreamSchema).optional(),
-  partnerships: z.array(partnershipSchema).optional(),
-  resources: z.array(resourceSchema).optional(),
-  activities: z.array(activitySchema).optional(),
-  costStructures: z.array(costStructureSchema).optional(),
-  channels: z.array(channelSchema).optional()
+  parentCanvasId: z.string().optional(),
+  enterpriseId: z.string().optional(),
+  facilityId: z.string().optional(),
+  businessUnitId: z.string().optional()
+})
+
+// Framework application schema
+export const frameworkApplicationSchema = z.object({
+  canvasId: z.string().min(1, 'Canvas ID is required'),
+  frameworks: z.object({
+    operationalStreams: z.array(z.string()).optional(),
+    complianceFrameworks: z.array(z.string()).optional(),
+    facilityTypes: z.array(z.string()).optional()
+  })
+})
+
+// Industry creation schema
+export const industrySchema = z.object({
+  code: z.string().min(1, 'Industry code is required').max(50),
+  name: z.string().min(1, 'Industry name is required').max(255),
+  description: z.string().optional(),
+  category: z.enum(['EXTRACTIVE', 'MANUFACTURING', 'SERVICES', 'OTHER']).optional(),
+  sectors: z.array(z.object({
+    code: z.string().min(1, 'Sector code is required').max(50),
+    name: z.string().min(1, 'Sector name is required').max(255),
+    description: z.string().optional(),
+    category: z.enum(['COMMODITY', 'VALUE_CHAIN', 'BUSINESS_MODEL', 'SUPPORT_SERVICES']).optional(),
+    riskProfile: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).optional(),
+    sortOrder: z.number().optional()
+  })).optional()
 })
 
 // Operating Model component schemas
@@ -210,4 +215,8 @@ export type MaturityAssessmentInput = z.infer<typeof maturityAssessmentSchema>
 export type CapabilityScoreInput = z.infer<typeof capabilityScoreSchema>
 export type ImprovementRoadmapInput = z.infer<typeof improvementRoadmapSchema>
 export type BenchmarkInput = z.infer<typeof benchmarkSchema>
-export type ProgressInput = z.infer<typeof progressSchema> 
+export type ProgressInput = z.infer<typeof progressSchema>
+
+// Framework hierarchy types
+export type FrameworkApplicationInput = z.infer<typeof frameworkApplicationSchema>
+export type IndustryInput = z.infer<typeof industrySchema> 
