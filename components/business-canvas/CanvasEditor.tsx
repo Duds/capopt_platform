@@ -156,12 +156,6 @@ export function CanvasEditor({
   // Pattern assignment effect
   useEffect(() => {
     if (currentIndustryCode && currentSectorCodes.length > 0 && formData.primaryLocation) {
-      console.log('🔧 Triggering pattern assignment for:', {
-        industry: currentIndustryCode,
-        sectors: currentSectorCodes,
-        location: formData.primaryLocation
-      })
-      
       assignPatterns({
         industry: currentIndustryCode,
         sectors: currentSectorCodes,
@@ -176,8 +170,6 @@ export function CanvasEditor({
   // Apply pattern assignment when available
   useEffect(() => {
     if (patternAssignment) {
-      console.log('🎯 Applying pattern assignment:', patternAssignment)
-      
       setFormData(prev => ({
         ...prev,
         facilityTypes: [...new Set([...prev.facilityTypes, ...(patternAssignment.facilityTypes || [])])],
@@ -189,40 +181,25 @@ export function CanvasEditor({
   }, [patternAssignment])
 
   const handleIndustryChange = (industryName: string) => {
-    console.log('🔍 INDUSTRY CHANGE DEBUG - New industry name:', industryName)
-    
-    // Clear pattern assignment when industry changes
-    clearAssignment()
-    
-    setFormData(prev => ({
-      ...prev,
-      industry: industryName, // Store the display name
-      sectors: [], // Reset sectors when industry changes
-      facilityTypes: [], // Reset facility types when industry changes
-      operationalStreams: [], // Reset operational streams
-      complianceRequirements: [], // Reset compliance requirements
-      regulatoryFramework: [] // Reset regulatory framework
-    }))
+    const industryData = industries.find(ind => ind.name === industryName)
+    if (industryData) {
+      handleInputChange('industry', industryData.code)
+    }
   }
 
   // Convert database sectors (string[]) to UI sectors (SectorSelection[])
   const convertSectorsToUI = useCallback((sectors: string[]): SectorSelection[] => {
-    console.log('🔍 SECTOR CONVERSION DEBUG - Input sectors:', sectors)
-    console.log('🔍 SECTOR CONVERSION DEBUG - Industries available:', industries.length)
     
     if (!sectors || sectors.length === 0) {
-      console.log('🔍 SECTOR CONVERSION DEBUG - No sectors to convert')
       return []
     }
     
     // Get all sectors from the database to find their categories
     const allSectors = industries.flatMap(industry => industry.sectors)
-    console.log('🔍 SECTOR CONVERSION DEBUG - All sectors from industries:', allSectors.map(s => ({ code: s.code, category: s.category })))
     
     const convertedSectors = sectors.map((sectorCode, index) => {
       // Find the sector in the database to get its category
       const sectorData = allSectors.find(s => s.code === sectorCode)
-      console.log('🔍 SECTOR CONVERSION DEBUG - Converting sector:', sectorCode, 'found:', !!sectorData, 'category:', sectorData?.category)
       
       return {
         sectorCode,
@@ -231,16 +208,13 @@ export function CanvasEditor({
       }
     })
     
-    console.log('🔍 SECTOR CONVERSION DEBUG - Converted sectors:', convertedSectors)
     return convertedSectors
   }, [industries])
 
   // Initialize form data for edit mode
   useEffect(() => {
-    console.log('🔍 DATA LOADING DEBUG - Mode:', mode, 'CanvasData:', canvasData, 'Industries loaded:', industries.length > 0)
     
     if (mode === 'edit' && canvasData && industries.length > 0) {
-      console.log('🔍 DATA LOADING DEBUG - Loading edit data:', canvasData)
       
       // Convert string values to numbers where needed
       const annualRevenue = typeof canvasData.annualRevenue === 'string' 
@@ -251,14 +225,10 @@ export function CanvasEditor({
         ? parseInt(canvasData.employeeCount)
         : canvasData.employeeCount || 0
       
-      console.log('🔍 DATA LOADING DEBUG - Converted numbers:', { annualRevenue, employeeCount })
-      
       // Convert database sectors to UI format
       const sectors = Array.isArray(canvasData.sectors) 
         ? convertSectorsToUI(canvasData.sectors)
         : []
-      
-      console.log('🔍 DATA LOADING DEBUG - Converted sectors:', sectors)
       
       // Use enterprise context to populate missing fields
       const getDefaultValue = (field: string, canvasValue: any, enterpriseValue?: any) => {
@@ -274,7 +244,6 @@ export function CanvasEditor({
       
       // Map enterprise industry to display name
       const mapIndustryToDisplay = (industryCode: string) => {
-        console.log('🔍 INDUSTRY MAPPING DEBUG - Input industryCode:', industryCode)
         
         // Map database enum values to display names
         const industryMap: { [key: string]: string } = {
@@ -297,7 +266,6 @@ export function CanvasEditor({
         }
         
         const displayName = industryMap[industryCode] || industryCode
-        console.log('🔍 INDUSTRY MAPPING DEBUG - Mapped to:', displayName)
         return displayName
       }
       
@@ -323,23 +291,14 @@ export function CanvasEditor({
         regulatoryFramework: canvasData.regulatoryFramework || []
       }
       
-      console.log('🔍 DATA LOADING DEBUG - Setting form data:', formDataToSet)
-      console.log('🔍 DATA LOADING DEBUG - Form data keys:', Object.keys(formDataToSet))
-      console.log('🔍 DATA LOADING DEBUG - Name value:', formDataToSet.name)
-      console.log('🔍 DATA LOADING DEBUG - Industry value:', formDataToSet.industry)
-      console.log('🔍 DATA LOADING DEBUG - Business type value:', formDataToSet.businessType)
       setFormData(formDataToSet)
     } else if (mode === 'edit' && canvasData && industries.length === 0) {
-      console.log('🔍 DATA LOADING DEBUG - Waiting for industries to load...')
     } else if (mode === 'edit' && !canvasData) {
-      console.log('🔍 DATA LOADING DEBUG - No canvas data provided for edit mode')
     } else if (mode === 'create') {
-      console.log('🔍 DATA LOADING DEBUG - Create mode, marking as loaded')
     }
   }, [mode, canvasData, industries, convertSectorsToUI])
 
   const handleInputChange = (field: keyof BusinessInformation, value: any) => {
-    console.log('🔍 INPUT CHANGE DEBUG - Field:', field, 'Value:', value, 'Type:', typeof value)
     
     setFormData(prev => ({ ...prev, [field]: value }))
     
@@ -361,63 +320,38 @@ export function CanvasEditor({
 
   // Handle sector changes with automatic pattern assignment
   const handleSectorsChange = async (newSectors: SectorSelection[]) => {
-    console.log('🔍 SECTORS CHANGE DEBUG - New sectors:', newSectors)
-    
     // Only proceed if we have both industry and sectors
     if (!formData.industry || newSectors.length === 0) {
-      console.log('🔍 SECTORS CHANGE DEBUG - Missing industry or sectors, skipping pattern assignment')
       return
     }
-    
+
     try {
-      // Get industry code from the existing currentIndustryCode variable
       const industryCode = currentIndustryCode || formData.industry
       const sectorCodes = newSectors.map(s => s.sectorCode)
       
-      console.log('🔍 SECTORS CHANGE DEBUG - Triggering pattern assignment for:', {
-        industry: formData.industry,
-        industryCode,
-        sectorCodes
-      })
-      
       // Use the existing pattern assignment system
       assignPatterns({
-        industry: industryCode,
+        industry: formData.industry,
         sectors: sectorCodes,
         location: formData.primaryLocation || '',
-        businessSize: formData.employeeCount > 1000 ? 'LARGE' : 
-                     formData.employeeCount > 100 ? 'MEDIUM' : 'SMALL',
+        businessSize: formData.employeeCount > 1000 ? 'LARGE' : formData.employeeCount > 100 ? 'MEDIUM' : 'SMALL',
         riskProfile: formData.riskProfile || 'MEDIUM'
       })
-      
     } catch (error) {
-      console.error('🔍 SECTORS CHANGE DEBUG - Error in pattern assignment:', error)
+      // Handle pattern assignment errors gracefully
     }
   }
 
   const validateStep = (step: number): boolean => {
     const errors: ValidationErrors = {}
 
-    console.log('🔍 VALIDATION DEBUG - Validating step:', step)
-    console.log('🔍 VALIDATION DEBUG - Current form data:', formData)
-    console.log('🔍 VALIDATION DEBUG - Canvas data available:', !!canvasData)
-
     // If data is not loaded yet, don't validate
     if (mode === 'edit' && !canvasData) {
-      console.log('🔍 VALIDATION DEBUG - Data not loaded yet, skipping validation')
       return true
     }
 
     switch (step) {
       case 1:
-        console.log('🔍 VALIDATION DEBUG - Step 1 validation:')
-        console.log('  - name:', formData.name, 'trimmed:', formData.name.trim(), 'empty:', !formData.name.trim())
-        console.log('  - legalName:', formData.legalName, 'trimmed:', formData.legalName.trim(), 'empty:', !formData.legalName.trim())
-        console.log('  - businessType:', formData.businessType, 'empty:', !formData.businessType)
-        console.log('  - industry:', formData.industry, 'empty:', !formData.industry)
-        console.log('  - regional:', formData.regional, 'empty:', !formData.regional)
-        console.log('  - primaryLocation:', formData.primaryLocation, 'trimmed:', formData.primaryLocation.trim(), 'empty:', !formData.primaryLocation.trim())
-        
         if (!formData.name || !formData.name.trim()) errors.name = 'Business name is required'
         if (!formData.legalName || !formData.legalName.trim()) errors.legalName = 'Legal entity name is required'
         if (!formData.businessType || !formData.businessType.trim()) errors.businessType = 'Business type is required'
@@ -427,39 +361,19 @@ export function CanvasEditor({
         break
 
       case 2:
-        console.log('🔍 VALIDATION DEBUG - Step 2 validation:')
-        console.log('  - facilityTypes:', formData.facilityTypes, 'length:', formData.facilityTypes.length, 'empty:', formData.facilityTypes.length === 0)
-        console.log('  - sectors:', formData.sectors, 'length:', formData.sectors.length, 'empty:', formData.sectors.length === 0)
-        console.log('  - sectors type:', typeof formData.sectors, 'isArray:', Array.isArray(formData.sectors))
-        console.log('  - sectors details:', JSON.stringify(formData.sectors, null, 2))
-        
         if (!formData.facilityTypes || formData.facilityTypes.length === 0) errors.facilityTypes = 'At least one facility type must be selected'
         if (!formData.sectors || formData.sectors.length === 0) errors.sectors = 'At least one sector must be selected'
         break
 
       case 3:
-        console.log('🔍 VALIDATION DEBUG - Step 3 validation:')
-        console.log('  - strategicObjective:', formData.strategicObjective, 'trimmed:', formData.strategicObjective.trim(), 'empty:', !formData.strategicObjective.trim())
-        console.log('  - annualRevenue:', formData.annualRevenue, 'type:', typeof formData.annualRevenue, '<=0:', formData.annualRevenue <= 0)
-        console.log('  - employeeCount:', formData.employeeCount, 'type:', typeof formData.employeeCount, '<=0:', formData.employeeCount <= 0)
-        
         if (!formData.strategicObjective || !formData.strategicObjective.trim()) errors.strategicObjective = 'Strategic objective is required'
         if (!formData.annualRevenue || isNaN(formData.annualRevenue) || formData.annualRevenue <= 0) errors.annualRevenue = 'Annual revenue must be greater than 0'
         if (!formData.employeeCount || isNaN(formData.employeeCount) || formData.employeeCount <= 0) errors.employeeCount = 'Employee count must be greater than 0'
         break
 
       case 4:
-        console.log('🔍 VALIDATION DEBUG - Step 4 validation:')
-        console.log('  - riskProfile:', formData.riskProfile, 'empty:', !formData.riskProfile)
-        
         if (!formData.riskProfile || !formData.riskProfile.trim()) errors.riskProfile = 'Risk profile is required'
         break
-    }
-
-    if (Object.keys(errors).length > 0) {
-      console.log('🔍 VALIDATION DEBUG - Validation errors for step', step, ':', errors)
-    } else {
-      console.log('🔍 VALIDATION DEBUG - Step', step, 'validation passed')
     }
 
     setValidationErrors(errors)
@@ -577,9 +491,6 @@ export function CanvasEditor({
         facilityTypes: formData.facilityTypes.map(type => mapDisplayToEnum(type, 'facility-types'))
       }
 
-      console.log('🔍 SUBMISSION DEBUG - Original form data:', formData)
-      console.log('🔍 SUBMISSION DEBUG - Submission data:', submissionData)
-      
       onSubmit(submissionData)
     }
   }
@@ -589,10 +500,6 @@ export function CanvasEditor({
   }
 
   const renderStep1 = () => {
-    console.log('🔍 RENDER DEBUG - Step 1 form data:', formData)
-    console.log('🔍 RENDER DEBUG - Name field value:', formData.name)
-    console.log('🔍 RENDER DEBUG - Industry field value:', formData.industry)
-    console.log('🔍 RENDER DEBUG - Business type field value:', formData.businessType)
     
     return (
       <div className="space-y-6">
@@ -704,14 +611,6 @@ export function CanvasEditor({
           </div>
         </div>
         
-        {/* Debug info */}
-        <div className="p-4 bg-gray-100 rounded-lg text-xs">
-          <p><strong>Debug Info:</strong></p>
-          <p>Business Type: "{formData.businessType}"</p>
-          <p>Industry: "{formData.industry}"</p>
-          <p>Regional: "{formData.regional}"</p>
-          <p>Primary Location: "{formData.primaryLocation}"</p>
-        </div>
       </div>
     )
   }
@@ -919,15 +818,6 @@ export function CanvasEditor({
         />
       </div>
       
-      {/* Debug info */}
-      <div className="p-4 bg-gray-100 rounded-lg text-xs">
-        <p><strong>Debug Info:</strong></p>
-        <p>Strategic Objective: "{formData.strategicObjective}"</p>
-        <p>Value Proposition: "{formData.valueProposition}"</p>
-        <p>Competitive Advantage: "{formData.competitiveAdvantage}"</p>
-        <p>Annual Revenue: {formData.annualRevenue} (type: {typeof formData.annualRevenue})</p>
-        <p>Employee Count: {formData.employeeCount} (type: {typeof formData.employeeCount})</p>
-      </div>
     </div>
   )
 
@@ -955,11 +845,6 @@ export function CanvasEditor({
         </AlertDescription>
       </Alert>
       
-      {/* Debug info */}
-      <div className="p-4 bg-gray-100 rounded-lg text-xs">
-        <p><strong>Debug Info:</strong></p>
-        <p>Risk Profile: "{formData.riskProfile}"</p>
-      </div>
     </div>
   )
 
