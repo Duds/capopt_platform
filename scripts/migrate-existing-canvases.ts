@@ -39,7 +39,8 @@ export async function migrateExistingCanvases() {
       updateData.businessType = 'CORPORATION';
       updateData.regional = 'METROPOLITAN';
       updateData.riskProfile = 'MEDIUM';
-      updateData.digitalMaturity = 'BASIC';
+      updateData.complianceRequirements = ['ISO 14001', 'OHSAS 18001'];
+      updateData.regulatoryFramework = ['WHS Act', 'Mining Act'];
 
       // Initialize arrays
       updateData.operationalStreams = [];

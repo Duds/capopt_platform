@@ -68,7 +68,7 @@ import {
   GitBranch
 } from 'lucide-react'
 import { controlsApi, processesApi, assetsApi, formatDate, getStatusColor, getPriorityColor } from '@/lib/api'
-import { CanvasVisualization } from '@/components/business-canvas/canvas-visualization'
+import { BusinessModelCanvas } from '@/components/business-canvas/BusinessModelCanvas'
 import { BusinessModel } from '@/components/business-canvas/types'
 import { defaultBusinessModel } from '@/components/business-canvas/utils'
 import { EnterpriseContext } from '@/components/navigation/enterprise-context'
@@ -635,7 +635,7 @@ export default function CapOptPlatform() {
 
                 {activeLayer === "business-canvas" && (
                   <div className="space-y-6">
-                    <CanvasVisualization 
+                    <BusinessModelCanvas 
                       businessModel={businessModel} 
                       onUpdate={setBusinessModel} 
                       isEditing={isEditing}

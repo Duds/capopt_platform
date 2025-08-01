@@ -68,7 +68,6 @@ employeeCount: Int?
 
 // Risk & Compliance
 riskProfile: RiskProfile?
-digitalMaturity: DigitalMaturityLevel?
 complianceRequirements: String[]
 regulatoryFramework: String[]
 ```

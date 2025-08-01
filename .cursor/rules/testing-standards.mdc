@@ -1,73 +1,148 @@
 ---
-description: Testing standards and requirements including unit, integration, and E2E testing strategies, testing tools, coverage requirements, and best practices. Apply when working with test files, implementing testing, or reviewing test coverage.
-
+description: Testing standards and requirements - Defines unit, integration, and E2E testing strategies, coverage requirements, AI-aware development patterns, schema-driven testing, and quality assurance standards for comprehensive test coverage.
+alwaysApply: false
 ---
-
 # Testing Standards and Requirements
 
 ## Testing Philosophy
-- **Test-driven development (TDD)** encouraged for complex features
+- **AI-aware testing** with schema-driven development
+- **Test ID consistency** across all components and tests
 - **Comprehensive coverage** required for all business logic
 - **Quality over quantity** - focus on meaningful tests
 - **Automated testing** integrated into CI/CD pipeline
 - **Testing is documentation** - tests should explain expected behavior
+- **Australian business context** - realistic test data for local market
 
-## Testing Pyramid
+## Testing Architecture
 
-### Unit Tests (Foundation - 70%)
-- **Test individual functions** and methods
-- **Mock external dependencies** (databases, APIs, services)
-- **Fast execution** (< 100ms per test)
-- **High coverage** of business logic
-- **Isolated testing** of components
+### Test Strategy Layers
+| Layer | Toolset | Target | Coverage |
+|-------|---------|--------|----------|
+| **Unit** | Jest + @testing-library/react | Components, pure logic, hooks | 70% |
+| **Integration** | Jest + Prisma + seeded DB | Pages, API handlers, DB I/O | 20% |
+| **API Route** | supertest + node-mocks-http | `/api/*` endpoints | 20% |
+| **E2E** | Playwright | Full stack + UI interaction | 10% |
+| **Schema** | ERD + PlantUML + Markdown | Authoritative structure reference | - |
 
-### Integration Tests (Middle - 20%)
-- **Test component interactions** and API endpoints
-- **Use test databases** for data persistence
-- **Test authentication** and authorization flows
-- **Validate data flow** between components
-- **Test error handling** and edge cases
+### Core Testing Stack
+```json
+{
+  "devDependencies": {
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/user-event": "^14.5.2",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "playwright": "^1.42.1",
+    "supertest": "^7.0.0",
+    "@types/supertest": "^6.0.2",
+    "msw": "^2.2.3",
+    "@faker-js/faker": "^9.0.0"
+  }
+}
+```
 
-### End-to-End Tests (Top - 10%)
-- **Test complete user workflows**
-- **Use real browser** or headless browser
-- **Test critical user journeys**
-- **Validate system integration**
-- **Test performance** under realistic conditions
+## AI-Aware Testing Standards
 
-## Frontend Testing Standards
+### Schema-Driven Development
+- **ALWAYS** reference Prisma schema before creating components, tests, or API handlers
+- **NEVER** create props, fields, or state not justified by the schema
+- **ALWAYS** align test data with seed files in `/prisma/seed/`
+- **NEVER** use invented test data - use schema-conformant mocks
 
-### Component Testing
+### Test ID Consistency
+- **NEVER** hardcode `data-testid` values in components
+- **ALWAYS** import test IDs from `lib/testSelectors.ts`
+- **NEVER** create new test IDs without adding them to the central file
+- **ALWAYS** use the pattern `test-{entity}-{action/component}`
+
+### Component Development Template
 ```typescript
-// Component test template
-import { render, screen, fireEvent } from '@testing-library/react';
+/**
+ * @component ComponentName
+ * @schema EntityName { field1, field2, field3 }
+ * @testIds from `lib/testSelectors.ts`
+ * @seed from `/prisma/seed/entity/`
+ * @note Do not use inline data-testid
+ */
+
+import { entityTestIds } from '@/lib/testSelectors';
+
+export const ComponentName = ({ entity }: { entity: Entity }) => {
+  return (
+    <div data-testid={entityTestIds.entityCard}>
+      <h3>{entity.field1}</h3>
+      <button data-testid={entityTestIds.entityEditButton}>Edit</button>
+    </div>
+  );
+};
+```
+
+### Test Development Template
+```typescript
+/**
+ * @test ComponentName.test.tsx
+ * @schema EntityName
+ * @testIds from `lib/testSelectors.ts`
+ * @seed from `/prisma/seed/entity/`
+ */
+
+import { render, screen } from '@testing-library/react';
+import { entityTestIds } from '@/lib/testSelectors';
 import { ComponentName } from './ComponentName';
 
 describe('ComponentName', () => {
-  it('should render correctly', () => {
-    render(<ComponentName prop1="value" />);
-    expect(screen.getByText('Expected Text')).toBeInTheDocument();
-  });
-
-  it('should handle user interactions', () => {
-    render(<ComponentName prop1="value" />);
-    fireEvent.click(screen.getByRole('button'));
-    expect(screen.getByText('Updated Text')).toBeInTheDocument();
-  });
-
-  it('should handle error states', () => {
-    render(<ComponentName prop1="value" error={true} />);
-    expect(screen.getByText('Error Message')).toBeInTheDocument();
+  it('should render entity data correctly', () => {
+    const mockEntity = global.testUtils.createMockEntity();
+    
+    render(<ComponentName entity={mockEntity} />);
+    
+    expect(screen.getByTestId(entityTestIds.entityCard)).toBeInTheDocument();
+    expect(screen.getByText(mockEntity.field1)).toBeInTheDocument();
   });
 });
 ```
 
-### Testing Requirements
+## Frontend Testing Standards
+
+### Component Testing Requirements
 - **Test component rendering** with different props
 - **Test user interactions** (clicks, form submissions, etc.)
 - **Test error states** and loading states
 - **Test accessibility** features (ARIA labels, keyboard navigation)
 - **Test responsive behavior** on different screen sizes
+- **Test complex interactions** (hierarchy operations, bulk operations, real-time editing)
+- **Test Australian business data** validation
+
+### Complex Component Testing Patterns
+```typescript
+// Hierarchy operations testing
+describe('Canvas Hierarchy Operations', () => {
+  it('should handle parent-child relationships correctly', async () => {
+    const canvasWithChildren = global.testUtils.createCanvasHierarchy(3, 2);
+    // Test hierarchy operations
+  });
+});
+
+// Bulk operations testing
+describe('Bulk Operations', () => {
+  it('should handle multiple canvas operations', async () => {
+    const multipleCanvases = global.testUtils.createMultipleCanvases(10);
+    // Test bulk operations
+  });
+});
+
+// Real-time editing testing
+describe('Real-time Editing', () => {
+  it('should handle auto-save functionality', async () => {
+    const changes = [
+      { type: 'input', target: canvasTestIds.inputCanvasName, value: 'Updated Name' }
+    ];
+    await global.testUtils.simulateRealTimeEditing(screen, changes);
+  });
+});
+```
 
 ### Testing Tools
 - **React Testing Library** for component testing
@@ -75,190 +150,430 @@ describe('ComponentName', () => {
 - **MSW (Mock Service Worker)** for API mocking
 - **@testing-library/jest-dom** for custom matchers
 - **@testing-library/user-event** for user interactions
+- **Custom test utilities** in `jest.setup.js` for complex scenarios
 
 ## Backend Testing Standards
 
-### API Testing
+### API Testing Requirements
 ```typescript
-// API test template
+/**
+ * @api /api/entity/[id]/route.ts
+ * @schema EntityName
+ * @validation from `lib/validations/entity.ts`
+ * @testIds from `lib/testSelectors.ts`
+ */
+
 import request from 'supertest';
-import { app } from '../app';
+import { GET, POST, PATCH } from '@/app/api/entity/[id]/route';
 
-describe('API Endpoint', () => {
-  it('should return data successfully', async () => {
-    const response = await request(app)
-      .get('/api/v1/resource')
-      .set('Authorization', 'Bearer token')
-      .expect(200);
-
-    expect(response.body.success).toBe(true);
-    expect(response.body.data).toBeDefined();
-  });
-
-  it('should handle validation errors', async () => {
-    const response = await request(app)
-      .post('/api/v1/resource')
-      .send({ invalid: 'data' })
-      .expect(400);
-
-    expect(response.body.success).toBe(false);
-    expect(response.body.error.code).toBe('VALIDATION_ERROR');
+describe('Entity API', () => {
+  it('should handle complex include clauses correctly', async () => {
+    const req = createMockRequest('GET', '/api/entity?include=related1,related2');
+    const res = createMockResponse();
+    
+    await GET(req, res);
+    
+    expect(prisma.entity.findMany).toHaveBeenCalledWith({
+      where: {},
+      include: { related1: true, related2: true }
+    });
   });
 });
 ```
 
-### Service Testing
+### API Testing Patterns
+- **Complex query testing** with include clauses and filtering
+- **Enterprise context filtering** (enterpriseId, facilityId, businessUnitId)
+- **Validation schema testing** with Zod schemas
+- **Error handling testing** for various scenarios
+- **Authentication and authorization** testing
+- **Performance testing** for large datasets
+
+## E2E Testing Standards
+
+### Playwright Configuration
 ```typescript
-// Service test template
-import { UserService } from './UserService';
-import { mockUserRepository } from './__mocks__/UserRepository';
-
-jest.mock('./UserRepository');
-
-describe('UserService', () => {
-  let userService: UserService;
-
-  beforeEach(() => {
-    userService = new UserService();
-    jest.clearAllMocks();
-  });
-
-  it('should create user successfully', async () => {
-    const userData = { name: 'John', email: 'john@example.com' };
-    mockUserRepository.create.mockResolvedValue({ id: '1', ...userData });
-
-    const result = await userService.createUser(userData);
-
-    expect(result.id).toBe('1');
-    expect(mockUserRepository.create).toHaveBeenCalledWith(userData);
-  });
+// playwright.config.ts
+export default defineConfig({
+  testDir: './tests/e2e',
+  use: {
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
+  },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+  ],
 });
 ```
 
-### Testing Requirements
-- **Test all API endpoints** with various scenarios
-- **Test authentication** and authorization
-- **Test validation** and error handling
-- **Test database operations** with test database
-- **Test external service integrations** with mocks
+### E2E Testing Requirements
+- **Test complete user workflows** from login to completion
+- **Test critical user journeys** for each major feature
+- **Test responsive behavior** across different devices
+- **Test accessibility** with screen readers
+- **Test performance** under realistic conditions
+- **Test Australian business scenarios** with realistic data
 
-## Database Testing
+## Test Data Standards
 
-### Test Database Setup
-- **Use separate test database** for integration tests
-- **Reset database state** between tests
-- **Use database transactions** for test isolation
-- **Seed test data** for consistent test scenarios
-- **Clean up test data** after tests complete
+### Australian Business Context
+- **Realistic ABN/ACN** numbers (11 digits for ABN, 9 for ACN)
+- **Australian locations** and addresses
+- **Australian industry sectors** (mining, manufacturing, etc.)
+- **Australian business types** and structures
+- **Australian compliance requirements** (WHS, ISO standards)
 
-### Migration Testing
-- **Test all database migrations** in test environment
-- **Validate migration rollbacks** work correctly
-- **Test data integrity** after migrations
-- **Test performance** impact of migrations
+### Mock Data Factories
+```typescript
+// Use global.testUtils for consistent mock data
+const mockUser = global.testUtils.createMockUser();
+const mockCanvas = global.testUtils.createMockCanvas();
+const mockEnterprise = global.testUtils.createMockEnterprise();
+const mockProcess = global.testUtils.createMockProcess();
+const mockControl = global.testUtils.createMockControl();
+const mockAsset = global.testUtils.createMockAsset();
+```
 
-## Performance Testing
+## Quality Assurance
 
-### Load Testing
-- **Test API endpoints** under load
-- **Validate response times** under stress
-- **Test database performance** with large datasets
-- **Monitor memory usage** and resource consumption
-- **Test concurrent user scenarios**
+### Test Coverage Requirements
+- **Minimum 70% coverage** for unit tests
+- **Minimum 20% coverage** for integration tests
+- **Minimum 10% coverage** for E2E tests
+- **100% coverage** for critical business logic
+- **100% coverage** for authentication and authorization
 
-### Frontend Performance
-- **Test component rendering** performance
-- **Validate bundle size** and loading times
-- **Test image optimization** and lazy loading
-- **Monitor Core Web Vitals** metrics
+### Test Validation
+- **Test ID validation** using `npm run lint:test-ids`
+- **Schema validation** using `npm run validate:schema`
+- **Test data validation** for Australian business context
+- **Accessibility validation** for all components
+- **Performance validation** for critical paths
 
-## Security Testing
+### CI/CD Integration
+```bash
+# Test commands
+npm run test:unit              # Run unit tests
+npm run test:integration       # Run integration tests
+npm run test:e2e               # Run E2E tests
+npm run test:coverage          # Generate coverage report
+npm run lint:test-ids          # Validate test IDs
+npm run validate:schema        # Validate schema alignment
+```
 
-### Authentication Testing
-- **Test login/logout flows**
-- **Validate token expiration** and refresh
-- **Test password security** (hashing, validation)
-- **Test session management**
-
-### Authorization Testing
-- **Test role-based access control**
-- **Validate permission checks**
-- **Test API endpoint security**
-- **Test data access controls**
-
-## Test Coverage Requirements
-
-### Minimum Coverage Targets
-- **Unit Tests:** 80% line coverage
-- **Integration Tests:** 70% API endpoint coverage
-- **E2E Tests:** Critical user journey coverage
-
-### Coverage Exclusions
-- **Generated code** (Prisma client, etc.)
-- **Configuration files**
-- **Test files themselves**
-- **Third-party library code**
-
-## Testing Best Practices
+## Best Practices
 
 ### Test Organization
-- **Group related tests** in describe blocks
+- **Group tests by feature** or component
 - **Use descriptive test names** that explain the scenario
-- **Follow AAA pattern** (Arrange, Act, Assert)
 - **Keep tests independent** and isolated
-- **Use meaningful test data**
+- **Use setup and teardown** for common test data
+- **Mock external dependencies** consistently
 
-### Test Data Management
-- **Use factories** for creating test data
-- **Avoid hardcoded values** in tests
-- **Use realistic test scenarios**
-- **Clean up test data** after tests
-- **Use database transactions** for isolation
+### Test Maintenance
+- **Update tests when schema changes**
+- **Refactor tests when components change**
+- **Keep test data aligned** with seed files
+- **Regular test ID validation** to prevent drift
+- **Document complex test scenarios**
 
-### Continuous Integration
-- **Run tests automatically** on every commit
-- **Fail builds** on test failures
-- **Generate coverage reports** in CI
-- **Run performance tests** in staging environment
-- **Automate security testing** in pipeline
+### Performance Considerations
+- **Fast test execution** (< 100ms per unit test)
+- **Efficient mock data generation**
+- **Parallel test execution** where possible
+- **Minimal database operations** in unit tests
+- **Realistic but lightweight** E2E test data
 
-## Testing Tools and Configuration
 
-### Frontend Testing Stack
-- **Jest** - Test runner and assertion library
-- **React Testing Library** - Component testing utilities
-- **MSW** - API mocking for integration tests
-- **Playwright** - E2E testing framework
-- **@testing-library/jest-dom** - Custom matchers
 
-### Backend Testing Stack
-- **Jest** - Test runner and assertion library
-- **Supertest** - HTTP assertion library
-- **Prisma** - Database testing utilities
-- **MSW** - API mocking for external services
-- **Faker.js** - Test data generation
+```
 
-### Configuration
-```javascript
-// jest.config.js
-module.exports = {
-  testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.{ts,tsx}',
-  ],
-  coverageThreshold: {
-    global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
-    },
-  },
+
+# Testing Standards and Requirements
+
+## Testing Philosophy
+- **AI-aware testing** with schema-driven development
+- **Test ID consistency** across all components and tests
+- **Comprehensive coverage** required for all business logic
+- **Quality over quantity** - focus on meaningful tests
+- **Automated testing** integrated into CI/CD pipeline
+- **Testing is documentation** - tests should explain expected behavior
+- **Australian business context** - realistic test data for local market
+
+## Testing Architecture
+
+### Test Strategy Layers
+| Layer | Toolset | Target | Coverage |
+|-------|---------|--------|----------|
+| **Unit** | Jest + @testing-library/react | Components, pure logic, hooks | 70% |
+| **Integration** | Jest + Prisma + seeded DB | Pages, API handlers, DB I/O | 20% |
+| **API Route** | supertest + node-mocks-http | `/api/*` endpoints | 20% |
+| **E2E** | Playwright | Full stack + UI interaction | 10% |
+| **Schema** | ERD + PlantUML + Markdown | Authoritative structure reference | - |
+
+### Core Testing Stack
+```json
+{
+  "devDependencies": {
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/user-event": "^14.5.2",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "playwright": "^1.42.1",
+    "supertest": "^7.0.0",
+    "@types/supertest": "^6.0.2",
+    "msw": "^2.2.3",
+    "@faker-js/faker": "^9.0.0"
+  }
+}
+```
+
+## AI-Aware Testing Standards
+
+### Schema-Driven Development
+- **ALWAYS** reference Prisma schema before creating components, tests, or API handlers
+- **NEVER** create props, fields, or state not justified by the schema
+- **ALWAYS** align test data with seed files in `/prisma/seed/`
+- **NEVER** use invented test data - use schema-conformant mocks
+
+### Test ID Consistency
+- **NEVER** hardcode `data-testid` values in components
+- **ALWAYS** import test IDs from `lib/testSelectors.ts`
+- **NEVER** create new test IDs without adding them to the central file
+- **ALWAYS** use the pattern `test-{entity}-{action/component}`
+
+### Component Development Template
+```typescript
+/**
+ * @component ComponentName
+ * @schema EntityName { field1, field2, field3 }
+ * @testIds from `lib/testSelectors.ts`
+ * @seed from `/prisma/seed/entity/`
+ * @note Do not use inline data-testid
+ */
+
+import { entityTestIds } from '@/lib/testSelectors';
+
+export const ComponentName = ({ entity }: { entity: Entity }) => {
+  return (
+    <div data-testid={entityTestIds.entityCard}>
+      <h3>{entity.field1}</h3>
+      <button data-testid={entityTestIds.entityEditButton}>Edit</button>
+    </div>
+  );
 };
 ```
+
+### Test Development Template
+```typescript
+/**
+ * @test ComponentName.test.tsx
+ * @schema EntityName
+ * @testIds from `lib/testSelectors.ts`
+ * @seed from `/prisma/seed/entity/`
+ */
+
+import { render, screen } from '@testing-library/react';
+import { entityTestIds } from '@/lib/testSelectors';
+import { ComponentName } from './ComponentName';
+
+describe('ComponentName', () => {
+  it('should render entity data correctly', () => {
+    const mockEntity = global.testUtils.createMockEntity();
+    
+    render(<ComponentName entity={mockEntity} />);
+    
+    expect(screen.getByTestId(entityTestIds.entityCard)).toBeInTheDocument();
+    expect(screen.getByText(mockEntity.field1)).toBeInTheDocument();
+  });
+});
+```
+
+## Frontend Testing Standards
+
+### Component Testing Requirements
+- **Test component rendering** with different props
+- **Test user interactions** (clicks, form submissions, etc.)
+- **Test error states** and loading states
+- **Test accessibility** features (ARIA labels, keyboard navigation)
+- **Test responsive behavior** on different screen sizes
+- **Test complex interactions** (hierarchy operations, bulk operations, real-time editing)
+- **Test Australian business data** validation
+
+### Complex Component Testing Patterns
+```typescript
+// Hierarchy operations testing
+describe('Canvas Hierarchy Operations', () => {
+  it('should handle parent-child relationships correctly', async () => {
+    const canvasWithChildren = global.testUtils.createCanvasHierarchy(3, 2);
+    // Test hierarchy operations
+  });
+});
+
+// Bulk operations testing
+describe('Bulk Operations', () => {
+  it('should handle multiple canvas operations', async () => {
+    const multipleCanvases = global.testUtils.createMultipleCanvases(10);
+    // Test bulk operations
+  });
+});
+
+// Real-time editing testing
+describe('Real-time Editing', () => {
+  it('should handle auto-save functionality', async () => {
+    const changes = [
+      { type: 'input', target: canvasTestIds.inputCanvasName, value: 'Updated Name' }
+    ];
+    await global.testUtils.simulateRealTimeEditing(screen, changes);
+  });
+});
+```
+
+### Testing Tools
+- **React Testing Library** for component testing
+- **Jest** for test runner and assertions
+- **MSW (Mock Service Worker)** for API mocking
+- **@testing-library/jest-dom** for custom matchers
+- **@testing-library/user-event** for user interactions
+- **Custom test utilities** in `jest.setup.js` for complex scenarios
+
+## Backend Testing Standards
+
+### API Testing Requirements
+```typescript
+/**
+ * @api /api/entity/[id]/route.ts
+ * @schema EntityName
+ * @validation from `lib/validations/entity.ts`
+ * @testIds from `lib/testSelectors.ts`
+ */
+
+import request from 'supertest';
+import { GET, POST, PATCH } from '@/app/api/entity/[id]/route';
+
+describe('Entity API', () => {
+  it('should handle complex include clauses correctly', async () => {
+    const req = createMockRequest('GET', '/api/entity?include=related1,related2');
+    const res = createMockResponse();
+    
+    await GET(req, res);
+    
+    expect(prisma.entity.findMany).toHaveBeenCalledWith({
+      where: {},
+      include: { related1: true, related2: true }
+    });
+  });
+});
+```
+
+### API Testing Patterns
+- **Complex query testing** with include clauses and filtering
+- **Enterprise context filtering** (enterpriseId, facilityId, businessUnitId)
+- **Validation schema testing** with Zod schemas
+- **Error handling testing** for various scenarios
+- **Authentication and authorization** testing
+- **Performance testing** for large datasets
+
+## E2E Testing Standards
+
+### Playwright Configuration
+```typescript
+// playwright.config.ts
+export default defineConfig({
+  testDir: './tests/e2e',
+  use: {
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
+  },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+  ],
+});
+```
+
+### E2E Testing Requirements
+- **Test complete user workflows** from login to completion
+- **Test critical user journeys** for each major feature
+- **Test responsive behavior** across different devices
+- **Test accessibility** with screen readers
+- **Test performance** under realistic conditions
+- **Test Australian business scenarios** with realistic data
+
+## Test Data Standards
+
+### Australian Business Context
+- **Realistic ABN/ACN** numbers (11 digits for ABN, 9 for ACN)
+- **Australian locations** and addresses
+- **Australian industry sectors** (mining, manufacturing, etc.)
+- **Australian business types** and structures
+- **Australian compliance requirements** (WHS, ISO standards)
+
+### Mock Data Factories
+```typescript
+// Use global.testUtils for consistent mock data
+const mockUser = global.testUtils.createMockUser();
+const mockCanvas = global.testUtils.createMockCanvas();
+const mockEnterprise = global.testUtils.createMockEnterprise();
+const mockProcess = global.testUtils.createMockProcess();
+const mockControl = global.testUtils.createMockControl();
+const mockAsset = global.testUtils.createMockAsset();
+```
+
+## Quality Assurance
+
+### Test Coverage Requirements
+- **Minimum 70% coverage** for unit tests
+- **Minimum 20% coverage** for integration tests
+- **Minimum 10% coverage** for E2E tests
+- **100% coverage** for critical business logic
+- **100% coverage** for authentication and authorization
+
+### Test Validation
+- **Test ID validation** using `npm run lint:test-ids`
+- **Schema validation** using `npm run validate:schema`
+- **Test data validation** for Australian business context
+- **Accessibility validation** for all components
+- **Performance validation** for critical paths
+
+### CI/CD Integration
+```bash
+# Test commands
+npm run test:unit              # Run unit tests
+npm run test:integration       # Run integration tests
+npm run test:e2e               # Run E2E tests
+npm run test:coverage          # Generate coverage report
+npm run lint:test-ids          # Validate test IDs
+npm run validate:schema        # Validate schema alignment
+```
+
+## Best Practices
+
+### Test Organization
+- **Group tests by feature** or component
+- **Use descriptive test names** that explain the scenario
+- **Keep tests independent** and isolated
+- **Use setup and teardown** for common test data
+- **Mock external dependencies** consistently
+
+### Test Maintenance
+- **Update tests when schema changes**
+- **Refactor tests when components change**
+- **Keep test data aligned** with seed files
+- **Regular test ID validation** to prevent drift
+- **Document complex test scenarios**
+
+### Performance Considerations
+- **Fast test execution** (< 100ms per unit test)
+- **Efficient mock data generation**
+- **Parallel test execution** where possible
+- **Minimal database operations** in unit tests
+- **Realistic but lightweight** E2E test data
 
 
 

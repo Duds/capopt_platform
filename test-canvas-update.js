@@ -39,11 +39,10 @@ const testCanvasUpdate = async () => {
       valueProposition: 'Test value prop',
       competitiveAdvantage: 'Test advantage',
       annualRevenue: 1000000,
-      employeeCount: 100,
+      employeeCount: 150,
       riskProfile: 'MEDIUM',
-      digitalMaturity: 'BASIC',
-      complianceRequirements: ['Test Requirement'],
-      regulatoryFramework: ['Test Framework']
+      complianceRequirements: ['ISO 14001', 'OHSAS 18001'],
+      regulatoryFramework: ['WHS Act', 'Mining Act']
     }
     
     console.log('📤 Sending update data:', JSON.stringify(updateData, null, 2))

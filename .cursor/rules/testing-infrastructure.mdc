@@ -1,0 +1,658 @@
+---
+description: Testing infrastructure reference and quick-start guide - Provides commands, patterns, and troubleshooting for Jest, Testing Library, Playwright, test ID validation, mock data factories, and complex testing scenarios with Australian business context.
+alwaysApply: false
+---
+# Testing Infrastructure Reference
+
+## Quick Start Commands
+
+### Test Execution
+```bash
+# Run all tests
+npm run test
+
+# Run specific test types
+npm run test:unit              # Unit tests only
+npm run test:integration       # Integration tests only
+npm run test:e2e               # E2E tests only
+
+# Development mode
+npm run test:watch             # Watch mode for development
+npm run test:coverage          # Generate coverage report
+
+# Validation
+npm run lint:test-ids          # Validate test ID consistency
+npm run validate:schema        # Validate schema alignment
+```
+
+### Test Setup
+```bash
+# Reset test database
+npm run db:reset
+
+# Run full test setup
+npm run test:setup
+
+# CI/CD pipeline
+npm run test:ci
+```
+
+## Key Files and Their Purpose
+
+### Core Testing Files
+- **`jest.config.js`** - Jest configuration with Next.js integration
+- **`jest.setup.js`** - Global test setup, custom matchers, mock utilities
+- **`lib/testSelectors.ts`** - Centralized test ID constants
+- **`playwright.config.ts`** - E2E testing configuration
+- **`scripts/lint-test-ids.ts`** - Test ID validation script
+
+### Test Directories
+- **`tests/unit/`** - Unit tests for components and utilities
+- **`tests/integration/`** - Integration tests for API routes
+- **`tests/e2e/`** - End-to-end user journey tests
+- **`docs/schema-docs/`** - Schema documentation for testing reference
+
+### Documentation
+- **`docs/testing-strategy.md`** - Comprehensive testing strategy guide
+- **`docs/gap-analysis-report.md`** - Analysis of testing strategy vs. real implementation
+
+## Test ID Management
+
+### Adding New Test IDs
+1. **Add to `lib/testSelectors.ts`**:
+```typescript
+export const entityTestIds = {
+  entityCard: 'test-entity-card',
+  entityForm: 'test-entity-form',
+  entitySaveButton: 'test-entity-save-button',
+  // ... other test IDs
+} as const;
+```
+
+2. **Import in components**:
+```typescript
+import { entityTestIds } from '@/lib/testSelectors';
+
+export const EntityComponent = () => (
+  <div data-testid={entityTestIds.entityCard}>
+    {/* component content */}
+  </div>
+);
+```
+
+3. **Use in tests**:
+```typescript
+import { entityTestIds } from '@/lib/testSelectors';
+
+test('should render entity card', () => {
+  render(<EntityComponent />);
+  expect(screen.getByTestId(entityTestIds.entityCard)).toBeInTheDocument();
+});
+```
+
+### Validation
+```bash
+npm run lint:test-ids          # Check for hardcoded test IDs
+npm run lint:test-ids:fix      # Auto-fix where possible
+```
+
+## Mock Data Factories
+
+### Available Factories
+```typescript
+// User data
+const mockUser = global.testUtils.createMockUser();
+
+// Business data
+const mockCanvas = global.testUtils.createMockCanvas();
+const mockEnterprise = global.testUtils.createMockEnterprise();
+const mockProcess = global.testUtils.createMockProcess();
+const mockControl = global.testUtils.createMockControl();
+const mockAsset = global.testUtils.createMockAsset();
+
+// Complex scenarios
+const hierarchy = global.testUtils.createCanvasHierarchy(3, 2);
+const multipleItems = global.testUtils.createMultipleCanvases(10);
+```
+
+### Australian Business Context
+All mock data includes:
+- **Realistic ABN/ACN** numbers
+- **Australian locations** and addresses
+- **Australian industry sectors** (mining, manufacturing, etc.)
+- **Australian business types** and structures
+- **Australian compliance requirements** (WHS, ISO standards)
+
+## Testing Patterns
+
+### Component Testing Template
+```typescript
+/**
+ * @test ComponentName.test.tsx
+ * @schema EntityName
+ * @testIds from `lib/testSelectors.ts`
+ * @seed from `/prisma/seed/entity/`
+ */
+
+import { render, screen } from '@testing-library/react';
+import { entityTestIds } from '@/lib/testSelectors';
+import { ComponentName } from './ComponentName';
+
+describe('ComponentName', () => {
+  it('should render entity data correctly', () => {
+    const mockEntity = global.testUtils.createMockEntity();
+    
+    render(<ComponentName entity={mockEntity} />);
+    
+    expect(screen.getByTestId(entityTestIds.entityCard)).toBeInTheDocument();
+    expect(screen.getByText(mockEntity.field1)).toBeInTheDocument();
+  });
+});
+```
+
+### API Testing Template
+```typescript
+/**
+ * @test entity.test.ts
+ * @schema EntityName API endpoints
+ * @testIds from `lib/testSelectors.ts`
+ * @seed from `/prisma/seed/entity/`
+ */
+
+import { GET, POST, PATCH } from '@/app/api/entity/route';
+
+describe('Entity API', () => {
+  it('should handle complex queries correctly', async () => {
+    const req = createMockRequest('GET', '/api/entity?include=related1,related2');
+    const res = createMockResponse();
+    
+    await GET(req, res);
+    
+    expect(prisma.entity.findMany).toHaveBeenCalledWith({
+      where: {},
+      include: { related1: true, related2: true }
+    });
+  });
+});
+```
+
+### Complex Testing Scenarios
+
+#### Hierarchy Operations
+```typescript
+describe('Hierarchy Operations', () => {
+  it('should handle parent-child relationships', async () => {
+    const hierarchy = global.testUtils.createCanvasHierarchy(3, 2);
+    // Test hierarchy operations
+  });
+});
+```
+
+#### Bulk Operations
+```typescript
+describe('Bulk Operations', () => {
+  it('should handle multiple items', async () => {
+    const items = global.testUtils.createMultipleCanvases(10);
+    // Test bulk operations
+  });
+});
+```
+
+#### Real-time Editing
+```typescript
+describe('Real-time Editing', () => {
+  it('should handle auto-save', async () => {
+    const changes = [
+      { type: 'input', target: canvasTestIds.inputCanvasName, value: 'Updated Name' }
+    ];
+    await global.testUtils.simulateRealTimeEditing(screen, changes);
+  });
+});
+```
+
+## Custom Matchers
+
+### Test ID Validation
+```typescript
+// Check if element has valid test ID
+expect(element).toHaveValidTestId('test-entity-card');
+
+// Check if element has valid test ID attribute
+expect(element).toHaveValidTestIdAttribute();
+```
+
+### Australian Business Data
+```typescript
+// Validate Australian business data
+expect(data).toBeAustralianBusinessData();
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### Test ID Validation Fails
+```bash
+# Check for hardcoded test IDs
+npm run lint:test-ids
+
+# Look for patterns like:
+# ❌ data-testid="hardcoded-value"
+# ✅ data-testid={entityTestIds.entityCard}
+```
+
+#### Mock Data Issues
+```typescript
+// Ensure you're using the factory functions
+const mockUser = global.testUtils.createMockUser(); // ✅
+const mockUser = { id: 'test', name: 'Test' }; // ❌
+```
+
+#### Schema Alignment Issues
+```bash
+# Validate schema alignment
+npm run validate:schema
+
+# Check schema documentation
+docs/schema-docs/entity.schema.md
+```
+
+#### Authentication Mock Issues
+```typescript
+// The auth system is mocked in jest.setup.js
+// Use the custom auth hook, not NextAuth
+import { useAuth } from '@/hooks/use-auth'; // ✅
+import { useSession } from 'next-auth/react'; // ❌
+```
+
+### Performance Optimization
+
+#### Fast Test Execution
+- **Unit tests**: < 100ms per test
+- **Integration tests**: < 500ms per test
+- **E2E tests**: < 5s per test
+
+#### Memory Management
+```typescript
+// Clean up after tests
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
+// Use beforeEach for setup
+beforeEach(() => {
+  // Setup test data
+});
+```
+
+## Integration with Development Workflow
+
+### Pre-commit Hooks
+```bash
+# Add to package.json scripts
+"pre-commit": "npm run lint:test-ids && npm run test:unit"
+```
+
+### CI/CD Pipeline
+```yaml
+# Example GitHub Actions
+- name: Run Tests
+  run: |
+    npm run test:ci
+    npm run lint:test-ids
+    npm run validate:schema
+```
+
+### IDE Integration
+- **VS Code**: Install Jest extension for inline test results
+- **Cursor**: Use AI-aware testing rules for code generation
+- **Debugging**: Use `npm run test:watch` for interactive debugging
+
+## Best Practices Checklist
+
+### Before Writing Tests
+- [ ] Check schema documentation in `docs/schema-docs/`
+- [ ] Review existing test patterns in `tests/`
+- [ ] Ensure test IDs are in `lib/testSelectors.ts`
+- [ ] Use appropriate mock data factories
+
+### While Writing Tests
+- [ ] Follow the testing pyramid (70% unit, 20% integration, 10% E2E)
+- [ ] Use descriptive test names that explain the scenario
+- [ ] Test both success and error cases
+- [ ] Validate Australian business context where applicable
+- [ ] Ensure accessibility testing for UI components
+
+### After Writing Tests
+- [ ] Run test ID validation: `npm run lint:test-ids`
+- [ ] Check test coverage: `npm run test:coverage`
+- [ ] Validate schema alignment: `npm run validate:schema`
+- [ ] Update documentation if needed
+- [ ] Review test performance and optimize if necessary
+# Testing Infrastructure Reference
+
+## Quick Start Commands
+
+### Test Execution
+```bash
+# Run all tests
+npm run test
+
+# Run specific test types
+npm run test:unit              # Unit tests only
+npm run test:integration       # Integration tests only
+npm run test:e2e               # E2E tests only
+
+# Development mode
+npm run test:watch             # Watch mode for development
+npm run test:coverage          # Generate coverage report
+
+# Validation
+npm run lint:test-ids          # Validate test ID consistency
+npm run validate:schema        # Validate schema alignment
+```
+
+### Test Setup
+```bash
+# Reset test database
+npm run db:reset
+
+# Run full test setup
+npm run test:setup
+
+# CI/CD pipeline
+npm run test:ci
+```
+
+## Key Files and Their Purpose
+
+### Core Testing Files
+- **`jest.config.js`** - Jest configuration with Next.js integration
+- **`jest.setup.js`** - Global test setup, custom matchers, mock utilities
+- **`lib/testSelectors.ts`** - Centralized test ID constants
+- **`playwright.config.ts`** - E2E testing configuration
+- **`scripts/lint-test-ids.ts`** - Test ID validation script
+
+### Test Directories
+- **`tests/unit/`** - Unit tests for components and utilities
+- **`tests/integration/`** - Integration tests for API routes
+- **`tests/e2e/`** - End-to-end user journey tests
+- **`docs/schema-docs/`** - Schema documentation for testing reference
+
+### Documentation
+- **`docs/testing-strategy.md`** - Comprehensive testing strategy guide
+- **`docs/gap-analysis-report.md`** - Analysis of testing strategy vs. real implementation
+
+## Test ID Management
+
+### Adding New Test IDs
+1. **Add to `lib/testSelectors.ts`**:
+```typescript
+export const entityTestIds = {
+  entityCard: 'test-entity-card',
+  entityForm: 'test-entity-form',
+  entitySaveButton: 'test-entity-save-button',
+  // ... other test IDs
+} as const;
+```
+
+2. **Import in components**:
+```typescript
+import { entityTestIds } from '@/lib/testSelectors';
+
+export const EntityComponent = () => (
+  <div data-testid={entityTestIds.entityCard}>
+    {/* component content */}
+  </div>
+);
+```
+
+3. **Use in tests**:
+```typescript
+import { entityTestIds } from '@/lib/testSelectors';
+
+test('should render entity card', () => {
+  render(<EntityComponent />);
+  expect(screen.getByTestId(entityTestIds.entityCard)).toBeInTheDocument();
+});
+```
+
+### Validation
+```bash
+npm run lint:test-ids          # Check for hardcoded test IDs
+npm run lint:test-ids:fix      # Auto-fix where possible
+```
+
+## Mock Data Factories
+
+### Available Factories
+```typescript
+// User data
+const mockUser = global.testUtils.createMockUser();
+
+// Business data
+const mockCanvas = global.testUtils.createMockCanvas();
+const mockEnterprise = global.testUtils.createMockEnterprise();
+const mockProcess = global.testUtils.createMockProcess();
+const mockControl = global.testUtils.createMockControl();
+const mockAsset = global.testUtils.createMockAsset();
+
+// Complex scenarios
+const hierarchy = global.testUtils.createCanvasHierarchy(3, 2);
+const multipleItems = global.testUtils.createMultipleCanvases(10);
+```
+
+### Australian Business Context
+All mock data includes:
+- **Realistic ABN/ACN** numbers
+- **Australian locations** and addresses
+- **Australian industry sectors** (mining, manufacturing, etc.)
+- **Australian business types** and structures
+- **Australian compliance requirements** (WHS, ISO standards)
+
+## Testing Patterns
+
+### Component Testing Template
+```typescript
+/**
+ * @test ComponentName.test.tsx
+ * @schema EntityName
+ * @testIds from `lib/testSelectors.ts`
+ * @seed from `/prisma/seed/entity/`
+ */
+
+import { render, screen } from '@testing-library/react';
+import { entityTestIds } from '@/lib/testSelectors';
+import { ComponentName } from './ComponentName';
+
+describe('ComponentName', () => {
+  it('should render entity data correctly', () => {
+    const mockEntity = global.testUtils.createMockEntity();
+    
+    render(<ComponentName entity={mockEntity} />);
+    
+    expect(screen.getByTestId(entityTestIds.entityCard)).toBeInTheDocument();
+    expect(screen.getByText(mockEntity.field1)).toBeInTheDocument();
+  });
+});
+```
+
+### API Testing Template
+```typescript
+/**
+ * @test entity.test.ts
+ * @schema EntityName API endpoints
+ * @testIds from `lib/testSelectors.ts`
+ * @seed from `/prisma/seed/entity/`
+ */
+
+import { GET, POST, PATCH } from '@/app/api/entity/route';
+
+describe('Entity API', () => {
+  it('should handle complex queries correctly', async () => {
+    const req = createMockRequest('GET', '/api/entity?include=related1,related2');
+    const res = createMockResponse();
+    
+    await GET(req, res);
+    
+    expect(prisma.entity.findMany).toHaveBeenCalledWith({
+      where: {},
+      include: { related1: true, related2: true }
+    });
+  });
+});
+```
+
+### Complex Testing Scenarios
+
+#### Hierarchy Operations
+```typescript
+describe('Hierarchy Operations', () => {
+  it('should handle parent-child relationships', async () => {
+    const hierarchy = global.testUtils.createCanvasHierarchy(3, 2);
+    // Test hierarchy operations
+  });
+});
+```
+
+#### Bulk Operations
+```typescript
+describe('Bulk Operations', () => {
+  it('should handle multiple items', async () => {
+    const items = global.testUtils.createMultipleCanvases(10);
+    // Test bulk operations
+  });
+});
+```
+
+#### Real-time Editing
+```typescript
+describe('Real-time Editing', () => {
+  it('should handle auto-save', async () => {
+    const changes = [
+      { type: 'input', target: canvasTestIds.inputCanvasName, value: 'Updated Name' }
+    ];
+    await global.testUtils.simulateRealTimeEditing(screen, changes);
+  });
+});
+```
+
+## Custom Matchers
+
+### Test ID Validation
+```typescript
+// Check if element has valid test ID
+expect(element).toHaveValidTestId('test-entity-card');
+
+// Check if element has valid test ID attribute
+expect(element).toHaveValidTestIdAttribute();
+```
+
+### Australian Business Data
+```typescript
+// Validate Australian business data
+expect(data).toBeAustralianBusinessData();
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### Test ID Validation Fails
+```bash
+# Check for hardcoded test IDs
+npm run lint:test-ids
+
+# Look for patterns like:
+# ❌ data-testid="hardcoded-value"
+# ✅ data-testid={entityTestIds.entityCard}
+```
+
+#### Mock Data Issues
+```typescript
+// Ensure you're using the factory functions
+const mockUser = global.testUtils.createMockUser(); // ✅
+const mockUser = { id: 'test', name: 'Test' }; // ❌
+```
+
+#### Schema Alignment Issues
+```bash
+# Validate schema alignment
+npm run validate:schema
+
+# Check schema documentation
+docs/schema-docs/entity.schema.md
+```
+
+#### Authentication Mock Issues
+```typescript
+// The auth system is mocked in jest.setup.js
+// Use the custom auth hook, not NextAuth
+import { useAuth } from '@/hooks/use-auth'; // ✅
+import { useSession } from 'next-auth/react'; // ❌
+```
+
+### Performance Optimization
+
+#### Fast Test Execution
+- **Unit tests**: < 100ms per test
+- **Integration tests**: < 500ms per test
+- **E2E tests**: < 5s per test
+
+#### Memory Management
+```typescript
+// Clean up after tests
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
+// Use beforeEach for setup
+beforeEach(() => {
+  // Setup test data
+});
+```
+
+## Integration with Development Workflow
+
+### Pre-commit Hooks
+```bash
+# Add to package.json scripts
+"pre-commit": "npm run lint:test-ids && npm run test:unit"
+```
+
+### CI/CD Pipeline
+```yaml
+# Example GitHub Actions
+- name: Run Tests
+  run: |
+    npm run test:ci
+    npm run lint:test-ids
+    npm run validate:schema
+```
+
+### IDE Integration
+- **VS Code**: Install Jest extension for inline test results
+- **Cursor**: Use AI-aware testing rules for code generation
+- **Debugging**: Use `npm run test:watch` for interactive debugging
+
+## Best Practices Checklist
+
+### Before Writing Tests
+- [ ] Check schema documentation in `docs/schema-docs/`
+- [ ] Review existing test patterns in `tests/`
+- [ ] Ensure test IDs are in `lib/testSelectors.ts`
+- [ ] Use appropriate mock data factories
+
+### While Writing Tests
+- [ ] Follow the testing pyramid (70% unit, 20% integration, 10% E2E)
+- [ ] Use descriptive test names that explain the scenario
+- [ ] Test both success and error cases
+- [ ] Validate Australian business context where applicable
+- [ ] Ensure accessibility testing for UI components
+
+### After Writing Tests
+- [ ] Run test ID validation: `npm run lint:test-ids`
+- [ ] Check test coverage: `npm run test:coverage`
+- [ ] Validate schema alignment: `npm run validate:schema`
+- [ ] Update documentation if needed
+- [ ] Review test performance and optimize if necessary

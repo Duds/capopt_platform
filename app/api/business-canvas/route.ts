@@ -165,7 +165,6 @@ export async function POST(request: NextRequest) {
     if (validatedData.annualRevenue !== undefined) data.annualRevenue = validatedData.annualRevenue
     if (validatedData.employeeCount !== undefined) data.employeeCount = validatedData.employeeCount
     if (validatedData.riskProfile !== undefined) data.riskProfile = validatedData.riskProfile
-    if (validatedData.digitalMaturity !== undefined) data.digitalMaturity = validatedData.digitalMaturity
     if (validatedData.complianceRequirements !== undefined) data.complianceRequirements = validatedData.complianceRequirements
     if (validatedData.regulatoryFramework !== undefined) data.regulatoryFramework = validatedData.regulatoryFramework
 

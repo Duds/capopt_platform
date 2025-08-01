@@ -48,11 +48,10 @@ const testFormUpdate = async () => {
       valueProposition: 'Test value proposition updated',
       competitiveAdvantage: 'Test competitive advantage updated',
       annualRevenue: 999999999,
-      employeeCount: 999,
-      riskProfile: 'HIGH',
-      digitalMaturity: 'ADVANCED',
-      complianceRequirements: ['Test Requirement 1', 'Test Requirement 2'],
-      regulatoryFramework: ['Test Framework 1', 'Test Framework 2']
+      employeeCount: 150,
+      riskProfile: 'MEDIUM',
+      complianceRequirements: ['ISO 14001', 'OHSAS 18001'],
+      regulatoryFramework: ['WHS Act', 'Mining Act']
     }
     
     console.log('📤 Sending form data:', JSON.stringify(formData, null, 2))

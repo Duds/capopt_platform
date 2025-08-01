@@ -320,7 +320,6 @@ model BusinessCanvas {
 
   // Risk & Compliance
   riskProfile           RiskProfile?
-  digitalMaturity       DigitalMaturityLevel?
   complianceRequirements String[]
   regulatoryFramework   String[]
 
@@ -370,8 +369,32 @@ model Industry {
 
   // Relationships
   sectors     Sector[]
+  facilityTypes IndustryFacilityTypes[]
+  operationalStreams IndustryOperationalStreams[]
+  complianceFrameworks IndustryComplianceFramework[]
 
   @@map("industries")
+}
+
+// Industry-specific facility types
+model IndustryFacilityTypes {
+  id          String   @id @default(cuid())
+  facilityTypeCode String   // e.g., "OPEN_PIT_MINE", "UNDERGROUND_MINE", "REFINERY"
+  facilityTypeName String   // e.g., "Open Pit Mine", "Underground Mine", "Refinery"
+  description String?
+  category    String   // e.g., "EXTRACTION", "PROCESSING", "INFRASTRUCTURE", "SUPPORT"
+  riskProfile String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  industryId  String
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  industry    Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+
+  @@unique([industryId, facilityTypeCode])
+  @@map("industry_facility_types")
 }
 
 // Sector master table
@@ -397,30 +420,43 @@ model Sector {
 
 // Industry Operational Streams mapping
 model IndustryOperationalStreams {
-  id                String   @id @default(cuid())
-  industry          String
-  sector            String
-  operationalStreams Json     // Array of operational streams
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  industryId            String
+  sector                String
+  streamName            String
+  description           String?
+  category              String   // e.g., "EXTRACTION", "PROCESSING", "SAFETY", "ENVIRONMENTAL"
+  isActive              Boolean  @default(true)
+  sortOrder             Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
-  @@unique([industry, sector])
+  // Relationships
+  industry              Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+
+  @@unique([industryId, sector, streamName])
   @@map("industry_operational_streams")
 }
 
 // Industry Compliance Framework mapping
 model IndustryComplianceFramework {
   id                    String   @id @default(cuid())
-  industry              String
+  industryId            String
   sector                String
+  frameworkName         String
+  description           String?
+  category              String   // e.g., "FEDERAL", "STATE", "INDUSTRY", "INTERNATIONAL"
   complianceRequirements Json     // Array of compliance requirements
   regulatoryFramework   Json     // Object with Federal, State, Industry arrays
   isActive              Boolean  @default(true)
+  sortOrder             Int      @default(0)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
-  @@unique([industry, sector])
+  // Relationships
+  industry              Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+
+  @@unique([industryId, sector, frameworkName])
   @@map("industry_compliance_frameworks")
 }
 
@@ -1741,13 +1777,6 @@ enum RiskProfile {
   MEDIUM
   HIGH
   CRITICAL
-}
-
-enum DigitalMaturityLevel {
-  BASIC
-  INTERMEDIATE
-  ADVANCED
-  LEADING
 }
 
 enum BusinessType {

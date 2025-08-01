@@ -57,7 +57,6 @@ All canvases were missing the following metadata categories:
 
 #### 6. Risk & Compliance
 - `riskProfile` - Required enum value
-- `digitalMaturity` - Required enum value
 - `complianceRequirements` - Required array with at least one item
 - `regulatoryFramework` - Required array with at least one item
 
@@ -124,7 +123,6 @@ employeeCount: 450
 #### Risk & Compliance
 ```typescript
 riskProfile: 'HIGH'
-digitalMaturity: 'ADVANCED'
 complianceRequirements: [
   'Work Health and Safety Act 2011',
   'Environment Protection and Biodiversity Conservation Act 1999',

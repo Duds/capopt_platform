@@ -37,11 +37,12 @@ const SYNTHETIC_DATA = {
   
   // Financial information
   annualRevenue: 150000000, // $150M AUD
-  employeeCount: 450,
+  employeeCount: 150,
   
   // Risk and compliance
-  riskProfile: 'HIGH',
-  digitalMaturity: 'ADVANCED',
+  riskProfile: 'MEDIUM',
+  complianceRequirements: ['ISO 14001', 'OHSAS 18001'],
+  regulatoryFramework: ['WHS Act', 'Mining Act'],
   
   // Operational streams for different canvas types
   operationalStreams: {
@@ -50,24 +51,7 @@ const SYNTHETIC_DATA = {
     copper: ['Copper Mining', 'Copper Processing', 'Copper Refining', 'Copper Marketing', 'Copper Logistics'],
     uranium: ['Uranium Mining', 'Uranium Processing', 'Uranium Enrichment', 'Nuclear Safety', 'Regulatory Compliance'],
     precious: ['Gold Mining', 'Silver Mining', 'Precious Metal Processing', 'Bullion Management', 'Market Operations']
-  },
-  
-  // Compliance and regulatory frameworks
-  complianceRequirements: [
-    'Work Health and Safety Act 2011',
-    'Environment Protection and Biodiversity Conservation Act 1999',
-    'Mining Act 1978 (WA)',
-    'Radiation Safety Act 1975',
-    'Dangerous Goods Safety Act 2004'
-  ],
-  
-  regulatoryFramework: [
-    'ISO 14001 Environmental Management',
-    'ISO 45001 Occupational Health and Safety',
-    'ICMM Sustainable Development Framework',
-    'Australian Mining Industry Code of Practice',
-    'Western Australia Mining Regulations'
-  ]
+  }
 }
 
 // Sector mappings for different canvas types
@@ -165,7 +149,6 @@ async function populateCanvasMetadata() {
         
         // Risk & Compliance
         riskProfile: SYNTHETIC_DATA.riskProfile,
-        digitalMaturity: SYNTHETIC_DATA.digitalMaturity,
         complianceRequirements: SYNTHETIC_DATA.complianceRequirements,
         regulatoryFramework: SYNTHETIC_DATA.regulatoryFramework
       }
@@ -185,7 +168,8 @@ async function populateCanvasMetadata() {
       console.log(`      - Regional: ${updateData.regional}`)
       console.log(`      - Facility Type: ${updateData.facilityType}`)
       console.log(`      - Risk Profile: ${updateData.riskProfile}`)
-      console.log(`      - Digital Maturity: ${updateData.digitalMaturity}`)
+      console.log(`      - Compliance Requirements: ${updateData.complianceRequirements.join(', ')}`)
+      console.log(`      - Regulatory Framework: ${updateData.regulatoryFramework.join(', ')}`)
       
       updatedCount++
     }

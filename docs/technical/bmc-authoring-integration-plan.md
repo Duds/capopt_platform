@@ -60,7 +60,7 @@ interface BusinessCanvas {
 
 #### **Component Structure:**
 ```typescript
-<BMCAuthoringHeader
+<CanvasAuthoringHeader
   currentCanvasId={selectedCanvasId}
   onCanvasChange={handleCanvasChange}
   onSave={handleSave}
@@ -133,7 +133,7 @@ const {
 - [x] Enhanced validation schemas
 
 #### **Component Layer:**
-- [x] BMCAuthoringHeader component implemented
+- [x] CanvasAuthoringHeader component implemented
 - [x] Enhanced BMC page with integration
 - [x] Template selection and loading
 - [x] Enterprise context display
@@ -214,7 +214,7 @@ erDiagram
 ### **Component Architecture:**
 ```
 BMC Page
-├── BMCAuthoringHeader
+├── CanvasAuthoringHeader
 │   ├── CanvasSelector
 │   ├── EnterpriseContext
 │   ├── VersionControl

@@ -54,7 +54,7 @@ export interface CanvasSection {
   isImplemented: boolean
 }
 
-export interface CanvasVisualizationProps {
+export interface BusinessModelCanvasProps {
   businessModel: BusinessModel
   onUpdate: (updatedModel: BusinessModel) => void
   isEditing?: boolean

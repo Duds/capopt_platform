@@ -41,7 +41,6 @@ const REQUIRED_METADATA_FIELDS = {
   
   // Risk & Compliance
   riskProfile: 'enum',
-  digitalMaturity: 'enum',
   complianceRequirements: 'array',
   regulatoryFramework: 'array'
 }
@@ -51,8 +50,7 @@ const ENUM_VALUES = {
   businessType: ['CORPORATION', 'PARTNERSHIP', 'SOLE_TRADER', 'TRUST', 'JOINT_VENTURE', 'SUBSIDIARY'],
   regional: ['METROPOLITAN', 'REGIONAL', 'REMOTE', 'RURAL', 'COASTAL', 'INLAND'],
   facilityType: ['MINE', 'PROCESSING_PLANT', 'REFINERY', 'SMELTER', 'WAREHOUSE', 'OFFICE', 'LABORATORY', 'WORKSHOP', 'POWER_STATION', 'WATER_TREATMENT', 'WASTE_MANAGEMENT'],
-  riskProfile: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'],
-  digitalMaturity: ['BASIC', 'INTERMEDIATE', 'ADVANCED', 'LEADING']
+  riskProfile: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
 }
 
 async function auditCanvasMetadata() {

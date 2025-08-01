@@ -142,8 +142,8 @@ export class CanvasStatusValidator {
       { field: 'strategicObjective', label: 'Strategic Objective' },
       { field: 'valueProposition', label: 'Value Proposition' },
       { field: 'riskProfile', label: 'Risk Profile' },
-      { field: 'digitalMaturity', label: 'Digital Maturity Level' },
-      { field: 'complianceRequirements', label: 'Compliance Requirements' }
+      { field: 'complianceRequirements', label: 'Compliance Requirements' },
+      { field: 'regulatoryFramework', label: 'Regulatory Framework' },
     ]
 
     additionalFields.forEach(({ field, label }) => {

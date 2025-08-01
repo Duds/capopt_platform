@@ -17,6 +17,7 @@ This document establishes standardized naming conventions for all Business Canva
 | `CanvasForm` | `CanvasEditor` | Canvas creation/editing form |
 | `StatusChangeDialog` | `CanvasStatusDialog` | Status change modal |
 | `SectorMultiSelect` | `IndustrySectorSelector` | Industry/sector selection |
+| `BMCAuthoringHeader` | `CanvasAuthoringHeader` | Canvas authoring header with controls |
 
 ### 2. **Canvas Section Components**
 
@@ -158,6 +159,24 @@ interface CanvasEditorProps {
   onSubmit: (data: CanvasFormData) => void
   onCancel: () => void
 }
+
+interface CanvasAuthoringHeaderProps {
+  currentCanvasId?: string
+  onCanvasChange: (canvasId: string) => void
+  onSave: () => void
+  onExport: (format: string) => void
+  onShare: (settings: any) => void
+  onTemplateLoad: (templateId: string) => void
+  onNewCanvas: () => void
+  collaborationMode?: 'single' | 'multi'
+  enterpriseContext?: EnterpriseContext
+  collaborators?: CanvasCollaborator[]
+  versions?: CanvasVersion[]
+  templates?: CanvasTemplate[]
+  hasUnsavedChanges?: boolean
+  lastSaved?: string
+  conflicts?: any[]
+}
 ```
 
 ## Function and Method Naming
@@ -290,6 +309,7 @@ components/business-canvas/
 ├── CanvasHierarchyView.tsx          # Tree view component
 ├── CanvasEditor.tsx                 # Canvas editing form
 ├── CanvasStatusDialog.tsx           # Status change dialog
+├── CanvasAuthoringHeader.tsx        # Canvas authoring header with controls
 ├── IndustrySectorSelector.tsx       # Sector selection
 ├── sections/                        # Section components
 │   ├── ValuePropositionSection.tsx

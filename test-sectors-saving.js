@@ -55,7 +55,6 @@ const testSectorsSaving = async () => {
       annualRevenue: canvas.annualRevenue,
       employeeCount: canvas.employeeCount,
       riskProfile: canvas.riskProfile,
-      digitalMaturity: canvas.digitalMaturity,
       complianceRequirements: canvas.complianceRequirements,
       regulatoryFramework: canvas.regulatoryFramework
     }

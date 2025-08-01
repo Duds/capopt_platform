@@ -55,11 +55,10 @@ const testCanvasUpdateWithSectors = async () => {
       valueProposition: 'Test value prop with sectors',
       competitiveAdvantage: 'Test advantage with sectors',
       annualRevenue: 2000000,
-      employeeCount: 200,
-      riskProfile: 'HIGH',
-      digitalMaturity: 'ADVANCED',
-      complianceRequirements: ['Test Requirement 1', 'Test Requirement 2'],
-      regulatoryFramework: ['Test Framework 1', 'Test Framework 2']
+      employeeCount: 150,
+      riskProfile: 'MEDIUM',
+      complianceRequirements: ['ISO 14001', 'OHSAS 18001'],
+      regulatoryFramework: ['WHS Act', 'Mining Act']
     }
     
     console.log('📤 Sending update data with SectorSelection objects:')

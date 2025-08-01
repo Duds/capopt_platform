@@ -30,7 +30,6 @@ const SYNTHETIC_DATA = {
     annualRevenue: 150000000,
     employeeCount: 450,
     riskProfile: 'HIGH',
-    digitalMaturity: 'ADVANCED',
     complianceRequirements: ['Work Health and Safety Act 2011', 'Environment Protection and Biodiversity Conservation Act 1999', 'Mining Act 1978 (WA)', 'Radiation Safety Act 1975', 'Dangerous Goods Safety Act 2004'],
     regulatoryFramework: ['ISO 14001 Environmental Management', 'ISO 45001 Occupational Health and Safety', 'ICMM Sustainable Development Framework', 'Australian Mining Industry Code of Practice', 'Western Australia Mining Regulations']
   },
@@ -54,7 +53,6 @@ const SYNTHETIC_DATA = {
     annualRevenue: 800000000,
     employeeCount: 280,
     riskProfile: 'HIGH',
-    digitalMaturity: 'ADVANCED',
     complianceRequirements: ['Work Health and Safety Act 2011', 'Mining Act 1978 (WA)', 'Environment Protection and Biodiversity Conservation Act 1999', 'Water Management Act 2000'],
     regulatoryFramework: ['ISO 14001 Environmental Management', 'ISO 45001 Occupational Health and Safety', 'Mining Industry Code of Practice', 'Western Australia Mining Regulations']
   },
@@ -78,7 +76,6 @@ const SYNTHETIC_DATA = {
     annualRevenue: 2500000000,
     employeeCount: 320,
     riskProfile: 'HIGH',
-    digitalMaturity: 'ADVANCED',
     complianceRequirements: ['Work Health and Safety Act 2011', 'Environment Protection and Biodiversity Conservation Act 1999', 'Mining Act 1978 (WA)', 'Chemical Control Act 1984'],
     regulatoryFramework: ['ISO 14001 Environmental Management', 'ISO 45001 Occupational Health and Safety', 'LME Good Delivery Standards', 'Australian Mining Industry Code of Practice']
   },
@@ -102,7 +99,6 @@ const SYNTHETIC_DATA = {
     annualRevenue: 2300000000,
     employeeCount: 180,
     riskProfile: 'HIGH',
-    digitalMaturity: 'ADVANCED',
     complianceRequirements: ['Work Health and Safety Act 2011', 'Environment Protection and Biodiversity Conservation Act 1999', 'Mining Act 1978 (WA)', 'Security Legislation Amendment Act 2007'],
     regulatoryFramework: ['ISO 14001 Environmental Management', 'ISO 45001 Occupational Health and Safety', 'LBMA Good Delivery Standards', 'Australian Mining Industry Code of Practice']
   },
@@ -125,8 +121,7 @@ const SYNTHETIC_DATA = {
     competitiveAdvantage: 'Nuclear regulatory excellence, advanced processing technology, long-term contracts, and global nuclear fuel supply chain.',
     annualRevenue: 800000000,
     employeeCount: 150,
-    riskProfile: 'CRITICAL',
-    digitalMaturity: 'ADVANCED',
+    riskProfile: 'MEDIUM',
     complianceRequirements: ['Work Health and Safety Act 2011', 'Environment Protection and Biodiversity Conservation Act 1999', 'Mining Act 1978 (WA)', 'Nuclear Non-Proliferation Treaty', 'ARPANSA Act 1998'],
     regulatoryFramework: ['ISO 14001 Environmental Management', 'ISO 45001 Occupational Health and Safety', 'IAEA Nuclear Safety Standards', 'Australian Nuclear Safety Regulations']
   }
@@ -187,7 +182,6 @@ const populateCanvasMetadata = async () => {
           annualRevenue: data.annualRevenue,
           employeeCount: data.employeeCount,
           riskProfile: data.riskProfile,
-          digitalMaturity: data.digitalMaturity,
           complianceRequirements: data.complianceRequirements,
           regulatoryFramework: data.regulatoryFramework,
           lastSaved: new Date()

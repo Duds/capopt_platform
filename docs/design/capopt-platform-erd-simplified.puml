@@ -1,0 +1,563 @@
+@startuml CapOpt Platform - Simplified Entity Relationship Diagram
+
+!define RECTANGLE class
+
+' Color scheme for different layers
+!define STRATEGIC_COLOR #E3F2FD
+!define OPERATIONAL_COLOR #F3E5F5
+!define CONTROL_COLOR #FFF3E0
+!define ENTERPRISE_COLOR #E8F5E8
+
+' Enterprise Information System (Core)
+package "Enterprise Information System" ENTERPRISE_COLOR {
+  entity "Enterprise" as e {
+    * id: String (PK)
+    --
+    name: String
+    legalName: String
+    abn: String (UK)
+    industry: String
+    sector: String
+    isActive: Boolean
+  }
+
+  entity "Facility" as f {
+    * id: String (PK)
+    --
+    enterpriseId: String (FK)
+    name: String
+    code: String (UK)
+    type: FacilityType
+    status: FacilityStatus
+    location: String?
+    isActive: Boolean
+  }
+
+  entity "BusinessUnit" as bu {
+    * id: String (PK)
+    --
+    enterpriseId: String (FK)
+    facilityId: String? (FK)
+    name: String
+    code: String (UK)
+    type: BusinessUnitType
+    status: BusinessUnitStatus
+    isActive: Boolean
+  }
+
+  entity "Department" as d {
+    * id: String (PK)
+    --
+    businessUnitId: String (FK)
+    name: String
+    code: String (UK)
+    type: DepartmentType
+    status: DepartmentStatus
+    isActive: Boolean
+  }
+
+  entity "User" as u {
+    * id: String (PK)
+    --
+    email: String (UK)
+    name: String
+    role: UserRole
+    isActive: Boolean
+    --
+    enterpriseId: String? (FK)
+    departmentId: String? (FK)
+  }
+}
+
+' Strategic Layer
+package "Strategic Layer" STRATEGIC_COLOR {
+  entity "BusinessCanvas" as bc {
+    * id: String (PK)
+    --
+    name: String
+    description: String?
+    version: String
+    status: CanvasStatus
+    --
+    enterpriseId: String? (FK)
+    facilityId: String? (FK)
+    businessUnitId: String? (FK)
+    --
+    industry: String?
+    sector: String?
+    sectors: String[]
+    primarySector: String?
+    --
+    strategicObjective: String?
+    valueProposition: String?
+    annualRevenue: Decimal?
+    employeeCount: Int?
+  }
+
+  entity "OperatingModel" as om {
+    * id: String (PK)
+    --
+    name: String
+    description: String?
+    version: String
+    isActive: Boolean
+  }
+
+  entity "ValueProposition" as vp {
+    * id: String (PK)
+    --
+    businessCanvasId: String (FK)
+    description: String
+    priority: Priority
+  }
+
+  entity "CustomerSegment" as cs {
+    * id: String (PK)
+    --
+    businessCanvasId: String (FK)
+    name: String
+    description: String?
+    size: Int?
+    priority: Priority
+  }
+
+  entity "RevenueStream" as rs {
+    * id: String (PK)
+    --
+    businessCanvasId: String (FK)
+    type: String
+    description: String?
+    estimatedValue: Float?
+  }
+
+  entity "Partnership" as p {
+    * id: String (PK)
+    --
+    businessCanvasId: String (FK)
+    name: String
+    type: String?
+    description: String?
+  }
+
+  entity "Resource" as r {
+    * id: String (PK)
+    --
+    businessCanvasId: String (FK)
+    name: String
+    type: ResourceType
+    description: String?
+    cost: Float?
+  }
+
+  entity "Activity" as a {
+    * id: String (PK)
+    --
+    businessCanvasId: String (FK)
+    name: String
+    description: String?
+    priority: Priority
+    cost: Float?
+  }
+
+  entity "CostStructure" as cost {
+    * id: String (PK)
+    --
+    businessCanvasId: String (FK)
+    description: String
+    category: String?
+    amount: Float?
+  }
+
+  entity "Channel" as ch {
+    * id: String (PK)
+    --
+    businessCanvasId: String (FK)
+    type: String
+    description: String?
+    effectiveness: String?
+    cost: Float?
+  }
+}
+
+' Critical Control Theory Layer
+package "Critical Control Theory (CCT) Layer" CONTROL_COLOR {
+  entity "CriticalControl" as cc {
+    * id: String (PK)
+    --
+    name: String
+    description: String?
+    controlCategory: ControlCategory
+    isCritical: Boolean
+    complianceStatus: ComplianceStatus
+    priority: Priority
+    createdById: String (FK)
+    --
+    riskCategoryId: String? (FK)
+    controlTypeId: String? (FK)
+    effectivenessId: String? (FK)
+  }
+
+  entity "RiskCategory" as rc {
+    * id: String (PK)
+    --
+    name: String
+    description: String?
+    color: String?
+  }
+
+  entity "ControlType" as ct {
+    * id: String (PK)
+    --
+    name: String
+    description: String?
+    category: String?
+  }
+
+  entity "ControlEffectiveness" as ce {
+    * id: String (PK)
+    --
+    rating: String
+    description: String?
+    score: Int?
+  }
+
+  entity "VerificationLog" as vl {
+    * id: String (PK)
+    --
+    controlId: String (FK)
+    status: VerificationStatus
+    submittedBy: String (FK)
+    submittedAt: DateTime
+    notes: String?
+  }
+
+  entity "BowtieModel" as bm {
+    * id: String (PK)
+    --
+    name: String
+    description: String?
+    status: BowtieStatus
+    createdBy: String
+    --
+    enterpriseId: String? (FK)
+    topEventId: String? (FK)
+  }
+
+  entity "TopEvent" as te {
+    * id: String (PK)
+    --
+    title: String
+    description: String?
+    severity: RiskSeverity
+    likelihood: RiskLikelihood
+  }
+
+  entity "Threat" as t {
+    * id: String (PK)
+    --
+    bowtieModelId: String (FK)
+    title: String
+    description: String?
+  }
+
+  entity "Consequence" as c {
+    * id: String (PK)
+    --
+    bowtieModelId: String (FK)
+    title: String
+    linkedBmcBlock: String?
+  }
+
+  entity "PreventiveControl" as pc {
+    * id: String (PK)
+    --
+    bowtieModelId: String (FK)
+    title: String
+    description: String?
+    type: ControlCategory
+    verificationStatus: VerificationStatus
+    --
+    threatId: String? (FK)
+  }
+
+  entity "MitigatingControl" as mc {
+    * id: String (PK)
+    --
+    bowtieModelId: String (FK)
+    title: String
+    description: String?
+    type: ControlCategory
+    verificationStatus: VerificationStatus
+    --
+    consequenceId: String? (FK)
+  }
+}
+
+' Risk Propagation Engine
+package "Risk Propagation Engine" CONTROL_COLOR {
+  entity "RiskSignal" as rsig {
+    * id: String (PK)
+    --
+    sourceType: String
+    sourceId: String
+    severity: RiskSeverity
+    description: String
+    detectedAt: DateTime
+    isResolved: Boolean
+  }
+
+  entity "RiskPropagation" as rp {
+    * id: String (PK)
+    --
+    sourceEntityId: String (FK)
+    targetEntityId: String
+    propagationScore: Float
+    calculatedAt: DateTime
+    --
+    thresholdId: String? (FK)
+  }
+
+  entity "RiskThreshold" as rt {
+    * id: String (PK)
+    --
+    entityType: String
+    thresholdType: String
+    thresholdValue: Float
+    alertMessage: String
+    isActive: Boolean
+  }
+
+  entity "RiskAlert" as ra {
+    * id: String (PK)
+    --
+    riskSignalId: String (FK)
+    thresholdId: String? (FK)
+    status: AlertStatus
+    assignedTo: String? (FK)
+    createdAt: DateTime
+  }
+}
+
+' Operational Layer
+package "Operational Layer" OPERATIONAL_COLOR {
+  entity "Process" as proc {
+    * id: String (PK)
+    --
+    name: String
+    description: String?
+    version: String
+    status: ProcessStatus
+    priority: Priority
+    createdById: String (FK)
+    --
+    enterpriseId: String? (FK)
+    facilityId: String? (FK)
+    businessUnitId: String? (FK)
+    departmentId: String? (FK)
+  }
+
+  entity "ProcessStep" as ps {
+    * id: String (PK)
+    --
+    processId: String (FK)
+    name: String
+    description: String?
+    orderIndex: Int
+    duration: Int?
+    responsible: String?
+  }
+
+  entity "ProcessRisk" as pr {
+    * id: String (PK)
+    --
+    processId: String (FK)
+    name: String
+    description: String?
+    severity: RiskSeverity
+    likelihood: RiskLikelihood
+    impact: RiskImpact
+    mitigation: String?
+  }
+
+  entity "Playbook" as pb {
+    * id: String (PK)
+    --
+    name: String
+    description: String?
+    version: String
+    status: PlaybookStatus
+  }
+
+  entity "Procedure" as proc2 {
+    * id: String (PK)
+    --
+    playbookId: String (FK)
+    name: String
+    description: String?
+    steps: String?
+  }
+
+  entity "Asset" as asset {
+    * id: String (PK)
+    --
+    name: String
+    description: String?
+    type: AssetType
+    location: String?
+    status: AssetStatus
+    criticality: AssetCriticality
+    createdById: String (FK)
+    --
+    enterpriseId: String? (FK)
+    facilityId: String? (FK)
+    businessUnitId: String? (FK)
+    departmentId: String? (FK)
+  }
+
+  entity "AssetRisk" as ar {
+    * id: String (PK)
+    --
+    assetId: String (FK)
+    name: String
+    description: String?
+    severity: RiskSeverity
+    likelihood: RiskLikelihood
+    mitigation: String?
+  }
+
+  entity "MaturityAssessment" as ma {
+    * id: String (PK)
+    --
+    name: String
+    description: String?
+    framework: String?
+    createdById: String (FK)
+  }
+
+  entity "CapabilityScore" as caps {
+    * id: String (PK)
+    --
+    maturityAssessmentId: String (FK)
+    capability: String
+    score: Int
+    maxScore: Int
+    description: String?
+  }
+}
+
+' Cross-Entity Relationships
+package "Cross-Entity Relationships" {
+  entity "ProcessControl" as pc2 {
+    * processId: String (FK)
+    * controlId: String (FK)
+  }
+
+  entity "AssetControl" as ac {
+    * assetId: String (FK)
+    * controlId: String (FK)
+  }
+
+  entity "ProcessPlaybook" as pp {
+    * processId: String (FK)
+    * playbookId: String (FK)
+  }
+}
+
+' ============================================================================
+' CORE RELATIONSHIPS
+' ============================================================================
+
+' Enterprise Information System Relationships
+e ||--o{ f : "owns"
+e ||--o{ bu : "contains"
+e ||--o{ u : "employs"
+e ||--o{ proc : "has"
+e ||--o{ asset : "owns"
+e ||--o{ bm : "has"
+e ||--o{ bc : "has"
+
+f ||--o{ bu : "contains"
+f ||--o{ asset : "houses"
+f ||--o{ proc : "executes"
+f ||--o{ bc : "has"
+
+bu ||--o{ d : "contains"
+bu ||--o{ asset : "manages"
+bu ||--o{ proc : "executes"
+bu ||--o{ bc : "has"
+
+d ||--o{ u : "employs"
+d ||--o{ asset : "manages"
+d ||--o{ proc : "executes"
+
+' User Relationships
+u ||--o{ proc : "creates"
+u ||--o{ cc : "creates"
+u ||--o{ asset : "creates"
+u ||--o{ ma : "creates"
+u ||--o{ vl : "submits"
+u ||--o{ ra : "assigned_to"
+
+' Business Canvas Relationships
+bc ||--o{ vp : "contains"
+bc ||--o{ cs : "contains"
+bc ||--o{ rs : "contains"
+bc ||--o{ p : "contains"
+bc ||--o{ r : "contains"
+bc ||--o{ a : "contains"
+bc ||--o{ cost : "contains"
+bc ||--o{ ch : "contains"
+
+' Critical Control Relationships
+cc ||--o{ vl : "has_verifications"
+cc ||--o{ pc2 : "linked_to_processes"
+cc ||--o{ ac : "linked_to_assets"
+cc ||--o{ bm : "used_in"
+
+rc ||--o{ cc : "categorizes"
+ct ||--o{ cc : "types"
+ce ||--o{ cc : "measures"
+
+' Bowtie Model Relationships
+bm ||--o{ t : "has_threats"
+bm ||--o{ c : "has_consequences"
+bm ||--o{ pc : "has_preventive_controls"
+bm ||--o{ mc : "has_mitigating_controls"
+
+te ||--o{ bm : "analyzes"
+t ||--o{ pc : "prevented_by"
+c ||--o{ mc : "mitigated_by"
+
+' Risk Propagation Relationships
+rsig ||--o{ rp : "propagates_to"
+rsig ||--o{ ra : "triggers"
+
+rt ||--o{ rp : "defines"
+rt ||--o{ ra : "triggers"
+
+' Process Relationships
+proc ||--o{ ps : "has_steps"
+proc ||--o{ pr : "has_risks"
+proc ||--o{ pc2 : "has_controls"
+proc ||--o{ pp : "has_playbooks"
+
+' Playbook Relationships
+pb ||--o{ proc2 : "contains"
+pb ||--o{ pp : "used_by_processes"
+
+' Asset Relationships
+asset ||--o{ ar : "has_risks"
+asset ||--o{ ac : "has_controls"
+
+' Maturity Assessment Relationships
+ma ||--o{ caps : "has_scores"
+
+' Cross-Entity Relationships
+proc ||--o{ pc2 : "linked_to"
+cc ||--o{ pc2 : "linked_to"
+asset ||--o{ ac : "linked_to"
+cc ||--o{ ac : "linked_to"
+proc ||--o{ pp : "linked_to"
+pb ||--o{ pp : "linked_to"
+
+@enduml 

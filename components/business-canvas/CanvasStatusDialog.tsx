@@ -35,7 +35,7 @@ interface StatusChangeDialogProps {
   onStatusChange: (canvasId: string, newStatus: string, justification?: string) => Promise<void>
 }
 
-export function StatusChangeDialog({
+export function CanvasStatusDialog({
   isOpen,
   onOpenChange,
   canvas,

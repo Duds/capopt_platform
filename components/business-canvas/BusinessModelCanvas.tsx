@@ -64,20 +64,20 @@ import {
   Link,
   FileText
 } from 'lucide-react'
-import { CanvasVisualizationProps, BusinessModel, CanvasItem } from './types'
+import { BusinessModelCanvasProps, BusinessModel, CanvasItem } from './types'
 import { canvasSections, getPriorityColor } from './utils'
 import { useBusinessCanvas, BusinessCanvas as DBBusinessCanvas } from '@/hooks/use-business-canvas'
-import { CanvasTreeView } from './canvas-tree-view'
-import { CanvasForm } from './canvas-form'
+import { CanvasHierarchyView } from './CanvasHierarchyView'
+import { CanvasEditor } from './CanvasEditor'
 
-export function CanvasVisualization({ 
+export function BusinessModelCanvas({ 
   businessModel, 
   onUpdate, 
   isEditing = false,
   viewMode = 'canvas',
   onViewModeChange,
   onEditingChange
-}: CanvasVisualizationProps) {
+}: BusinessModelCanvasProps) {
   const [editingItem, setEditingItem] = useState<{ section: keyof BusinessModel; item: CanvasItem } | null>(null)
   const [newItem, setNewItem] = useState<{ section: keyof BusinessModel } | null>(null)
   const [selectedCanvas, setSelectedCanvas] = useState<string>('')
@@ -809,7 +809,6 @@ export function CanvasVisualization({
         annualRevenue: businessInfo.annualRevenue,
         employeeCount: businessInfo.employeeCount,
         riskProfile: businessInfo.riskProfile,
-        digitalMaturity: businessInfo.digitalMaturity,
         complianceRequirements: businessInfo.complianceRequirements,
         regulatoryFramework: businessInfo.regulatoryFramework
       }
@@ -1830,7 +1829,7 @@ export function CanvasVisualization({
 
       {/* Tree View */}
       {showTreeView && (
-        <CanvasTreeView
+        <CanvasHierarchyView
           canvases={treeData}
           onSelectCanvas={handleSelectCanvas}
           onAddChild={handleAddChild}
@@ -1855,8 +1854,8 @@ export function CanvasVisualization({
         />
       )}
 
-      {/* Canvas Form */}
-      <CanvasForm
+      {/* Canvas Editor */}
+      <CanvasEditor
         mode="create"
         onSubmit={handleCreateNewCanvas}
         enterpriseContext={null}

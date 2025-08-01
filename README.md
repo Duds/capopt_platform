@@ -95,6 +95,29 @@ The application uses Geoapify API for location validation and autocomplete. To s
 - `npm run db:generate` - Generate Prisma client
 - `npm run db:migrate` - Run database migrations
 
+## Testing
+
+This project uses a comprehensive AI-aware testing strategy. See [docs/testing-strategy.md](docs/testing-strategy.md) for full details.
+
+### Quick Test Commands
+
+```bash
+# Run all tests
+npm run test
+
+# Run specific test types
+npm run test:unit              # Unit tests
+npm run test:integration       # Integration tests  
+npm run test:e2e               # E2E tests
+
+# Validate test IDs and schema
+npm run lint:test-ids          # Check test ID consistency
+npm run validate:schema        # Validate schema alignment
+
+# Generate coverage report
+npm run test:coverage
+```
+
 ## Technology Stack
 
 - **Frontend**: Next.js 15+, React 18+, TypeScript, Tailwind CSS

@@ -1,267 +1,141 @@
-export const operationalStreamsData = [
-  // Mining Industry
-  {
-    industry: "Mining",
-    sector: "Coal Mining",
-    operationalStreams: [
-      "Open Cut Mining",
-      "Underground Mining",
-      "Coal Processing",
-      "Transport & Logistics",
-      "Environmental Management",
-      "Safety & Health",
-      "Rehabilitation",
-      "Water Management",
-      "Dust Control",
-      "Noise Management"
-    ]
-  },
-  {
-    industry: "Mining",
-    sector: "Metals Mining",
-    operationalStreams: [
-      "Open Pit Mining",
-      "Underground Mining",
-      "Ore Processing",
-      "Metallurgical Operations",
-      "Tailings Management",
-      "Water Management",
-      "Environmental Monitoring",
-      "Safety Systems",
-      "Equipment Maintenance",
-      "Quality Control"
-    ]
-  },
-  {
-    industry: "Mining",
-    sector: "Precious Metals",
-    operationalStreams: [
-      "Gold Mining",
-      "Silver Mining",
-      "Platinum Group Metals",
-      "Refining Operations",
-      "Security & Transport",
-      "Environmental Compliance",
-      "Assay Laboratory",
-      "Security Systems",
-      "Chain of Custody",
-      "Quality Assurance"
-    ]
-  },
-  {
-    industry: "Mining",
-    sector: "Uranium Mining",
-    operationalStreams: [
-      "Uranium Extraction",
-      "Radiation Safety",
-      "Nuclear Compliance",
-      "Transport Security",
-      "Environmental Monitoring",
-      "Regulatory Reporting",
-      "Radiation Monitoring",
-      "Waste Management",
-      "Security Clearances",
-      "International Safeguards"
-    ]
-  },
-  {
-    industry: "Mining",
-    sector: "Mineral Sands",
-    operationalStreams: [
-      "Dredge Mining",
-      "Dry Mining",
-      "Mineral Separation",
-      "Concentration",
-      "Environmental Management",
-      "Rehabilitation",
-      "Water Treatment",
-      "Dust Suppression",
-      "Equipment Maintenance",
-      "Quality Control"
-    ]
-  },
+import { PrismaClient } from '@prisma/client'
 
-  // Petrochemical Industry
-  {
-    industry: "Petrochemical",
-    sector: "Oil & Gas",
-    operationalStreams: [
-      "Exploration",
-      "Drilling Operations",
-      "Production",
-      "Refining",
-      "Distribution",
-      "Safety Management",
-      "Environmental Control",
-      "Pipeline Operations",
-      "Storage & Terminal",
-      "Emergency Response"
-    ]
-  },
-  {
-    industry: "Petrochemical",
-    sector: "Chemical Manufacturing",
-    operationalStreams: [
-      "Chemical Processing",
-      "Quality Control",
-      "Hazardous Materials",
-      "Environmental Control",
-      "Safety Systems",
-      "Waste Management",
-      "Process Optimization",
-      "Equipment Maintenance",
-      "Laboratory Testing",
-      "Regulatory Compliance"
-    ]
-  },
-  {
-    industry: "Petrochemical",
-    sector: "Petroleum Refining",
-    operationalStreams: [
-      "Crude Oil Processing",
-      "Distillation",
-      "Catalytic Cracking",
-      "Hydrotreating",
-      "Product Blending",
-      "Quality Assurance",
-      "Environmental Monitoring",
-      "Safety Systems",
-      "Equipment Maintenance",
-      "Energy Management"
-    ]
-  },
+export async function seedOperationalStreams(prisma: PrismaClient) {
+  console.log('🔄 Seeding operational streams...')
 
-  // Defence Industry
-  {
-    industry: "Defence",
-    sector: "Aerospace",
-    operationalStreams: [
-      "Aircraft Manufacturing",
-      "Component Production",
-      "Quality Assurance",
-      "Security Clearance",
-      "Export Controls",
-      "Testing & Certification",
-      "Design Engineering",
-      "Assembly Operations",
-      "Quality Control",
-      "Regulatory Compliance"
-    ]
-  },
-  {
-    industry: "Defence",
-    sector: "Electronics",
-    operationalStreams: [
-      "Electronic Manufacturing",
-      "Software Development",
-      "Cybersecurity",
-      "Quality Control",
-      "Security Protocols",
-      "Compliance Management",
-      "Testing & Validation",
-      "Documentation",
-      "Configuration Management",
-      "Change Control"
-    ]
-  },
-  {
-    industry: "Defence",
-    sector: "Maritime",
-    operationalStreams: [
-      "Shipbuilding",
-      "Naval Systems",
-      "Marine Engineering",
-      "Quality Assurance",
-      "Security Clearance",
-      "Testing & Trials",
-      "Maintenance & Repair",
-      "Safety Systems",
-      "Environmental Compliance",
-      "Regulatory Standards"
-    ]
-  },
-  {
-    industry: "Defence",
-    sector: "Land Systems",
-    operationalStreams: [
-      "Vehicle Manufacturing",
-      "Armament Systems",
-      "Communication Systems",
-      "Quality Assurance",
-      "Security Protocols",
-      "Testing & Validation",
-      "Maintenance Support",
-      "Training Systems",
-      "Documentation",
-      "Export Controls"
-    ]
-  },
+  const operationalStreamsData = [
+    // Mining & Metals Industry
+    {
+      industryCode: 'MINING_METALS',
+      streams: [
+        { sector: 'COPPER', streamName: 'Open Pit Mining', category: 'EXTRACTION' },
+        { sector: 'COPPER', streamName: 'Underground Mining', category: 'EXTRACTION' },
+        { sector: 'COPPER', streamName: 'Ore Processing', category: 'PROCESSING' },
+        { sector: 'COPPER', streamName: 'Concentrate Production', category: 'PROCESSING' },
+        { sector: 'COPPER', streamName: 'Smelting Operations', category: 'PROCESSING' },
+        { sector: 'COPPER', streamName: 'Refining Operations', category: 'PROCESSING' },
+        { sector: 'COPPER', streamName: 'Tailings Management', category: 'ENVIRONMENTAL' },
+        { sector: 'COPPER', streamName: 'Water Management', category: 'ENVIRONMENTAL' },
+        { sector: 'COPPER', streamName: 'Dust Control', category: 'ENVIRONMENTAL' },
+        { sector: 'COPPER', streamName: 'Safety Systems', category: 'SAFETY' },
+        
+        { sector: 'GOLD', streamName: 'Open Pit Mining', category: 'EXTRACTION' },
+        { sector: 'GOLD', streamName: 'Underground Mining', category: 'EXTRACTION' },
+        { sector: 'GOLD', streamName: 'Heap Leaching', category: 'PROCESSING' },
+        { sector: 'GOLD', streamName: 'Cyanidation', category: 'PROCESSING' },
+        { sector: 'GOLD', streamName: 'Gravity Concentration', category: 'PROCESSING' },
+        { sector: 'GOLD', streamName: 'Refining Operations', category: 'PROCESSING' },
+        { sector: 'GOLD', streamName: 'Security & Transport', category: 'SECURITY' },
+        { sector: 'GOLD', streamName: 'Assay Laboratory', category: 'QUALITY' },
+        { sector: 'GOLD', streamName: 'Chain of Custody', category: 'SECURITY' },
+        { sector: 'GOLD', streamName: 'Environmental Monitoring', category: 'ENVIRONMENTAL' },
+        
+        { sector: 'URANIUM', streamName: 'In-Situ Leaching', category: 'EXTRACTION' },
+        { sector: 'URANIUM', streamName: 'Open Pit Mining', category: 'EXTRACTION' },
+        { sector: 'URANIUM', streamName: 'Radiation Safety', category: 'SAFETY' },
+        { sector: 'URANIUM', streamName: 'Nuclear Compliance', category: 'COMPLIANCE' },
+        { sector: 'URANIUM', streamName: 'Transport Security', category: 'SECURITY' },
+        { sector: 'URANIUM', streamName: 'Radiation Monitoring', category: 'SAFETY' },
+        { sector: 'URANIUM', streamName: 'Waste Management', category: 'ENVIRONMENTAL' },
+        { sector: 'URANIUM', streamName: 'Security Clearances', category: 'SECURITY' },
+        { sector: 'URANIUM', streamName: 'International Safeguards', category: 'COMPLIANCE' },
+        
+        { sector: 'COAL', streamName: 'Open Cut Mining', category: 'EXTRACTION' },
+        { sector: 'COAL', streamName: 'Underground Mining', category: 'EXTRACTION' },
+        { sector: 'COAL', streamName: 'Coal Processing', category: 'PROCESSING' },
+        { sector: 'COAL', streamName: 'Transport & Logistics', category: 'LOGISTICS' },
+        { sector: 'COAL', streamName: 'Environmental Management', category: 'ENVIRONMENTAL' },
+        { sector: 'COAL', streamName: 'Rehabilitation', category: 'ENVIRONMENTAL' },
+        { sector: 'COAL', streamName: 'Dust Control', category: 'ENVIRONMENTAL' },
+        { sector: 'COAL', streamName: 'Noise Management', category: 'ENVIRONMENTAL' },
+        
+        { sector: 'IRON_ORE', streamName: 'Open Pit Mining', category: 'EXTRACTION' },
+        { sector: 'IRON_ORE', streamName: 'Ore Processing', category: 'PROCESSING' },
+        { sector: 'IRON_ORE', streamName: 'Beneficiation', category: 'PROCESSING' },
+        { sector: 'IRON_ORE', streamName: 'Pelletizing', category: 'PROCESSING' },
+        { sector: 'IRON_ORE', streamName: 'Transport & Logistics', category: 'LOGISTICS' },
+        { sector: 'IRON_ORE', streamName: 'Port Operations', category: 'LOGISTICS' },
+        { sector: 'IRON_ORE', streamName: 'Environmental Management', category: 'ENVIRONMENTAL' },
+        { sector: 'IRON_ORE', streamName: 'Rehabilitation', category: 'ENVIRONMENTAL' }
+      ]
+    },
 
-  // Manufacturing Industry
-  {
-    industry: "Manufacturing",
-    sector: "Heavy Equipment",
-    operationalStreams: [
-      "Equipment Manufacturing",
-      "Assembly Operations",
-      "Quality Control",
-      "Testing & Validation",
-      "Maintenance Services",
-      "Parts Supply",
-      "Technical Support",
-      "Documentation",
-      "Safety Systems",
-      "Environmental Compliance"
-    ]
-  },
-  {
-    industry: "Manufacturing",
-    sector: "Automotive",
-    operationalStreams: [
-      "Vehicle Assembly",
-      "Component Manufacturing",
-      "Quality Assurance",
-      "Supply Chain Management",
-      "Testing & Validation",
-      "Maintenance Services",
-      "Parts Distribution",
-      "Technical Support",
-      "Safety Systems",
-      "Environmental Standards"
-    ]
-  },
+    // Oil & Gas Industry
+    {
+      industryCode: 'OIL_GAS',
+      streams: [
+        { sector: 'EXPLORATION', streamName: 'Seismic Surveying', category: 'EXPLORATION' },
+        { sector: 'EXPLORATION', streamName: 'Drilling Operations', category: 'EXPLORATION' },
+        { sector: 'EXPLORATION', streamName: 'Well Testing', category: 'EXPLORATION' },
+        { sector: 'EXPLORATION', streamName: 'Reservoir Analysis', category: 'EXPLORATION' },
+        { sector: 'EXPLORATION', streamName: 'Environmental Assessment', category: 'ENVIRONMENTAL' },
+        
+        { sector: 'PRODUCTION', streamName: 'Well Operations', category: 'PRODUCTION' },
+        { sector: 'PRODUCTION', streamName: 'Production Optimization', category: 'PRODUCTION' },
+        { sector: 'PRODUCTION', streamName: 'Artificial Lift', category: 'PRODUCTION' },
+        { sector: 'PRODUCTION', streamName: 'Well Maintenance', category: 'MAINTENANCE' },
+        { sector: 'PRODUCTION', streamName: 'Production Monitoring', category: 'PRODUCTION' },
+        
+        { sector: 'REFINING', streamName: 'Crude Oil Processing', category: 'PROCESSING' },
+        { sector: 'REFINING', streamName: 'Distillation', category: 'PROCESSING' },
+        { sector: 'REFINING', streamName: 'Cracking Operations', category: 'PROCESSING' },
+        { sector: 'REFINING', streamName: 'Product Blending', category: 'PROCESSING' },
+        { sector: 'REFINING', streamName: 'Quality Control', category: 'QUALITY' },
+        { sector: 'REFINING', streamName: 'Safety Systems', category: 'SAFETY' },
+        
+        { sector: 'DISTRIBUTION', streamName: 'Pipeline Operations', category: 'DISTRIBUTION' },
+        { sector: 'DISTRIBUTION', streamName: 'Storage Management', category: 'DISTRIBUTION' },
+        { sector: 'DISTRIBUTION', streamName: 'Terminal Operations', category: 'DISTRIBUTION' },
+        { sector: 'DISTRIBUTION', streamName: 'Transport Logistics', category: 'LOGISTICS' },
+        { sector: 'DISTRIBUTION', streamName: 'Emergency Response', category: 'SAFETY' }
+      ]
+    }
+  ]
 
-  // Construction Industry
-  {
-    industry: "Construction",
-    sector: "Infrastructure",
-    operationalStreams: [
-      "Project Planning",
-      "Site Preparation",
-      "Construction Operations",
-      "Quality Control",
-      "Safety Management",
-      "Environmental Compliance",
-      "Equipment Management",
-      "Material Supply",
-      "Progress Monitoring",
-      "Commissioning"
-    ]
-  },
-  {
-    industry: "Construction",
-    sector: "Mining Infrastructure",
-    operationalStreams: [
-      "Mine Development",
-      "Infrastructure Construction",
-      "Equipment Installation",
-      "Safety Systems",
-      "Environmental Management",
-      "Quality Assurance",
-      "Commissioning",
-      "Maintenance Planning",
-      "Documentation",
-      "Regulatory Compliance"
-    ]
+  try {
+    for (const industryData of operationalStreamsData) {
+      const industry = await prisma.industry.findUnique({
+        where: { code: industryData.industryCode }
+      })
+
+      if (!industry) {
+        console.warn(`⚠️ Industry ${industryData.industryCode} not found, skipping operational streams`)
+        continue
+      }
+
+      console.log(`🔄 Seeding operational streams for ${industry.name}...`)
+
+      for (const stream of industryData.streams) {
+        await prisma.industryOperationalStreams.upsert({
+          where: {
+            industryId_sector_streamName: {
+              industryId: industry.id,
+              sector: stream.sector,
+              streamName: stream.streamName
+            }
+          },
+          update: {
+            category: stream.category,
+            description: `${stream.streamName} for ${stream.sector} sector`,
+            updatedAt: new Date()
+          },
+          create: {
+            industryId: industry.id,
+            sector: stream.sector,
+            streamName: stream.streamName,
+            category: stream.category,
+            description: `${stream.streamName} for ${stream.sector} sector`,
+            sortOrder: 0
+          }
+        })
+      }
+
+      console.log(`✅ Created/updated ${industryData.streams.length} operational streams for ${industry.name}`)
+    }
+
+    console.log('✅ Operational streams seeded successfully')
+  } catch (error) {
+    console.error('❌ Error seeding operational streams:', error)
+    throw error
   }
-]; 
+} 

@@ -17,13 +17,6 @@ enum RiskProfile {
   CRITICAL
 }
 
-enum DigitalMaturityLevel {
-  BASIC
-  INTERMEDIATE
-  ADVANCED
-  LEADING
-}
-
 enum BusinessType {
   CORPORATION
   PARTNERSHIP
@@ -78,7 +71,6 @@ model BusinessCanvas {
 
   // Risk & Compliance
   riskProfile           RiskProfile?
-  digitalMaturity       DigitalMaturityLevel?
   complianceRequirements String[]
   regulatoryFramework   String[]
 
@@ -210,7 +202,6 @@ export async function migrateExistingCanvases() {
         businessType: 'CORPORATION',
         regional: 'METROPOLITAN',
         riskProfile: 'MEDIUM',
-        digitalMaturity: 'BASIC',
         
         // Initialize arrays
         operationalStreams: [],
@@ -252,7 +243,8 @@ const formSchema = z.object({
   
   // Risk & Compliance fields
   riskProfile: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).optional(),
-  digitalMaturity: z.enum(['BASIC', 'INTERMEDIATE', 'ADVANCED', 'LEADING']).optional(),
+  complianceRequirements: z.array(z.string()).optional(),
+  regulatoryFramework: z.array(z.string()).optional(),
 });
 ```
 
@@ -430,7 +422,6 @@ export async function PUT(
         annualRevenue: body.annualRevenue ? new Decimal(body.annualRevenue) : null,
         employeeCount: body.employeeCount,
         riskProfile: body.riskProfile,
-        digitalMaturity: body.digitalMaturity,
         complianceRequirements: body.complianceRequirements,
         regulatoryFramework: body.regulatoryFramework,
         updatedAt: new Date()

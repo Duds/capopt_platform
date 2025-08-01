@@ -1,0 +1,417 @@
+---
+description: AI-aware testing and consistency strategy - Ensures schema-driven, testable development using centralized test IDs, Australian business context mock data, and comprehensive testing patterns (unit/integration/E2E) aligned with Prisma schema and seed files.
+alwaysApply: false
+---
+# AI-Aware Testing and Consistency Strategy
+
+## Core Principles
+
+### Schema-Driven Development
+- **ALWAYS** reference Prisma schema before creating components, tests, or API handlers
+- **NEVER** create props, fields, or state not justified by the schema
+- **ALWAYS** align test data with seed files in `/prisma/seed/`
+- **NEVER** use invented test data - use schema-conformant mocks
+
+### Test ID Consistency
+- **NEVER** hardcode `data-testid` values in components
+- **ALWAYS** import test IDs from `lib/testSelectors.ts`
+- **NEVER** create new test IDs without adding them to the central file
+- **ALWAYS** use the pattern `test-{entity}-{action/component}`
+
+### AI Prompt Rules for Cursor
+
+#### Component Development
+```typescript
+/**
+ * @component ComponentName
+ * @schema EntityName { field1, field2, field3 }
+ * @testIds from `lib/testSelectors.ts`
+ * @seed from `/prisma/seed/entity/`
+ * @note Do not use inline data-testid
+ */
+
+// ✅ CORRECT - Import test IDs
+import { entityTestIds } from '@/lib/testSelectors';
+
+export const ComponentName = ({ entity }: { entity: Entity }) => {
+  return (
+    <div data-testid={entityTestIds.entityCard}>
+      <h3>{entity.field1}</h3>
+      <button data-testid={entityTestIds.entityEditButton}>Edit</button>
+    </div>
+  );
+};
+
+// ❌ INCORRECT - Hardcoded test IDs
+export const ComponentName = ({ entity }: { entity: Entity }) => {
+  return (
+    <div data-testid="user-card">  // ❌ Hardcoded
+      <h3>{entity.field1}</h3>
+      <button data-testid="edit-btn">Edit</button>  // ❌ Hardcoded
+    </div>
+  );
+};
+```
+
+#### Test Development
+```typescript
+/**
+ * @test ComponentName.test.tsx
+ * @schema EntityName
+ * @testIds from `lib/testSelectors.ts`
+ * @seed from `/prisma/seed/entity/`
+ */
+
+import { render, screen } from '@testing-library/react';
+import { entityTestIds } from '@/lib/testSelectors';
+import { ComponentName } from './ComponentName';
+
+describe('ComponentName', () => {
+  it('should render entity data correctly', () => {
+    const mockEntity = {
+      id: 'test-id',
+      field1: 'Test Value',
+      field2: 'Test Description'
+    };
+
+    render(<ComponentName entity={mockEntity} />);
+    
+    expect(screen.getByTestId(entityTestIds.entityCard)).toBeInTheDocument();
+    expect(screen.getByText('Test Value')).toBeInTheDocument();
+  });
+});
+```
+
+#### API Route Development
+```typescript
+/**
+ * @api /api/entity/[id]/route.ts
+ * @schema EntityName
+ * @validation from `lib/validations/entity.ts`
+ * @testIds from `lib/testSelectors.ts`
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { entityValidation } from '@/lib/validations/entity';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const entity = await prisma.entity.findUnique({
+      where: { id: params.id },
+      include: { relatedEntity: true }
+    });
+
+    if (!entity) {
+      return NextResponse.json(
+        { error: 'Entity not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ data: entity });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+## Naming Conventions
+
+### Test ID Patterns
+- `test-{entity}-{action}` - e.g., `test-user-save-button`
+- `test-{entity}-{component}` - e.g., `test-user-card`
+- `test-input-{field}` - e.g., `test-input-email`
+- `test-{entity}-{status}` - e.g., `test-user-status-active`
+
+### File Naming
+- Components: `EntityName.tsx` or `EntityAction.tsx`
+- Tests: `EntityName.test.tsx` or `EntityAction.test.tsx`
+- API Routes: `route.ts` in appropriate directory
+- Seed Files: `index.ts` in `/prisma/seed/entity/`
+
+### Variable Naming
+- Use camelCase for variables and functions
+- Use PascalCase for components and types
+- Use UPPER_SNAKE_CASE for constants
+- Use kebab-case for test IDs
+
+## Validation Requirements
+
+### Schema Validation
+- **ALWAYS** validate input data against Prisma schema
+- **ALWAYS** use Zod schemas for API validation
+- **NEVER** accept data that doesn't match schema structure
+- **ALWAYS** handle validation errors gracefully
+
+### Test Data Validation
+- **ALWAYS** use realistic Australian data (names, addresses, businesses)
+- **ALWAYS** follow Australian business conventions
+- **NEVER** use placeholder data like "Test User" or "Sample Data"
+- **ALWAYS** validate test data against seed file structure
+
+### Component Validation
+- **ALWAYS** validate props against TypeScript interfaces
+- **ALWAYS** handle required vs optional props correctly
+- **NEVER** create props not justified by schema
+- **ALWAYS** provide meaningful default values
+
+## Testing Strategy
+
+### Unit Tests (70%)
+- Test individual components and functions
+- Mock external dependencies
+- Focus on business logic
+- Use schema-aligned test data
+
+### Integration Tests (20%)
+- Test component interactions
+- Test API endpoints with real database
+- Test authentication flows
+- Validate data flow between components
+
+### E2E Tests (10%)
+- Test complete user workflows
+- Use seeded test database
+- Test critical user journeys
+- Validate system integration
+
+## Code Quality Enforcements
+
+### Linting Rules
+```javascript
+// .eslintrc.js
+module.exports = {
+  rules: {
+    // Prevent hardcoded test IDs
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: 'Literal[value=/^test-/]',
+        message: 'Use test IDs from lib/testSelectors.ts instead of hardcoded values'
+      }
+    ],
+    
+    // Enforce test ID imports
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          {
+            group: ['**/testSelectors'],
+            message: 'Import test IDs from @/lib/testSelectors'
+          }
+        ]
+      }
+    ]
+  }
+};
+```
+
+### Pre-commit Hooks
+```bash
+#!/bin/bash
+# .husky/pre-commit
+
+# Run test ID validation
+npm run lint:test-ids
+
+# Run schema validation
+npm run validate:schema
+
+# Run tests
+npm run test:unit
+```
+
+## AI Completion Guidelines
+
+### When Creating Components
+1. **Check schema first** - Review Prisma schema for entity structure
+2. **Import test IDs** - Always import from `lib/testSelectors.ts`
+3. **Use proper types** - Define TypeScript interfaces based on schema
+4. **Add JSDoc comments** - Include schema and test ID references
+5. **Validate props** - Ensure all props align with schema fields
+
+### When Creating Tests
+1. **Use schema data** - Create test data that matches seed files
+2. **Import test IDs** - Use centralized test ID constants
+3. **Test realistic scenarios** - Use Australian business context
+4. **Validate assertions** - Ensure tests match expected behavior
+5. **Clean up data** - Reset test state between tests
+
+### When Creating API Routes
+1. **Validate input** - Use Zod schemas for request validation
+2. **Handle errors** - Provide meaningful error responses
+3. **Use proper status codes** - Follow HTTP status code conventions
+4. **Log operations** - Include audit logging for important operations
+5. **Test endpoints** - Create integration tests for all endpoints
+
+## Common Patterns
+
+### Component Template
+```typescript
+/**
+ * @component EntityCard
+ * @schema Entity { id, name, description, status }
+ * @testIds from `lib/testSelectors.ts`
+ * @seed from `/prisma/seed/entity/`
+ */
+
+import { entityTestIds } from '@/lib/testSelectors';
+
+interface EntityCardProps {
+  entity: Entity;
+  onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
+}
+
+export const EntityCard = ({ entity, onEdit, onDelete }: EntityCardProps) => {
+  return (
+    <div data-testid={entityTestIds.entityCard}>
+      <h3>{entity.name}</h3>
+      <p>{entity.description}</p>
+      <div className="flex gap-2">
+        {onEdit && (
+          <button 
+            data-testid={entityTestIds.entityEditButton}
+            onClick={() => onEdit(entity.id)}
+          >
+            Edit
+          </button>
+        )}
+        {onDelete && (
+          <button 
+            data-testid={entityTestIds.entityDeleteButton}
+            onClick={() => onDelete(entity.id)}
+          >
+            Delete
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+```
+
+### Test Template
+```typescript
+/**
+ * @test EntityCard.test.tsx
+ * @schema Entity
+ * @testIds from `lib/testSelectors.ts`
+ */
+
+import { render, screen, fireEvent } from '@testing-library/react';
+import { entityTestIds } from '@/lib/testSelectors';
+import { EntityCard } from './EntityCard';
+
+const mockEntity = {
+  id: 'test-entity-id',
+  name: 'Test Entity',
+  description: 'Test Description',
+  status: 'ACTIVE'
+};
+
+describe('EntityCard', () => {
+  it('should render entity information', () => {
+    render(<EntityCard entity={mockEntity} />);
+    
+    expect(screen.getByTestId(entityTestIds.entityCard)).toBeInTheDocument();
+    expect(screen.getByText('Test Entity')).toBeInTheDocument();
+    expect(screen.getByText('Test Description')).toBeInTheDocument();
+  });
+
+  it('should call onEdit when edit button is clicked', () => {
+    const onEdit = jest.fn();
+    render(<EntityCard entity={mockEntity} onEdit={onEdit} />);
+    
+    fireEvent.click(screen.getByTestId(entityTestIds.entityEditButton));
+    expect(onEdit).toHaveBeenCalledWith('test-entity-id');
+  });
+});
+```
+
+## Error Prevention
+
+### Common Mistakes to Avoid
+1. **Hardcoded test IDs** - Always import from central file
+2. **Schema drift** - Don't create fields not in Prisma schema
+3. **Invalid test data** - Use realistic, schema-conformant data
+4. **Missing validation** - Always validate inputs and outputs
+5. **Inconsistent naming** - Follow established naming conventions
+
+### Validation Checklist
+- [ ] All test IDs imported from `lib/testSelectors.ts`
+- [ ] Component props match schema fields
+- [ ] Test data aligns with seed files
+- [ ] API validation uses Zod schemas
+- [ ] Error handling is comprehensive
+- [ ] TypeScript types are properly defined
+- [ ] JSDoc comments include schema references
+- [ ] Tests cover realistic scenarios
+- [ ] Australian business context is maintained
+- [ ] Security requirements are met
+
+## Integration with CI/CD
+
+### Pipeline Requirements
+```yaml
+# .github/workflows/test.yml
+name: Test and Validate
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Setup database
+        run: |
+          npx prisma migrate deploy
+          npm run db:seed:test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      
+      - name: Run tests
+        run: |
+          npm run test:unit
+          npm run test:integration
+          npm run test:e2e
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      
+      - name: Validate test IDs
+        run: npm run lint:test-ids
+      
+      - name: Validate schema
+        run: npm run validate:schema
+```

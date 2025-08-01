@@ -6,6 +6,7 @@ import { seedOperational } from './operational'
 import { seedStrategic } from './strategic'
 import { seedCanvasTemplates } from './templates/canvas-templates'
 import { seedIndustries } from './industries'
+import { seedFrameworks } from './frameworks'
 
 const prisma = new PrismaClient()
 
@@ -19,6 +20,7 @@ async function main() {
     await seedEnterprise(prisma)
     await seedControls(prisma)
     await seedOperational(prisma)
+    await seedFrameworks(prisma)
     await seedStrategic(prisma)
     await seedCanvasTemplates(prisma)
 

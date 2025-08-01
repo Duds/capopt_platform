@@ -1,3 +1,5 @@
+import { PrismaClient } from '@prisma/client'
+
 export const complianceFrameworkData = [
   // Mining Industry
   {
@@ -453,4 +455,54 @@ export const complianceFrameworkData = [
       ]
     }
   }
-]; 
+];
+
+export async function seedComplianceFramework(prisma: PrismaClient) {
+  console.log('🛡️ Seeding compliance frameworks...')
+
+  try {
+    for (const data of complianceFrameworkData) {
+      const industry = await prisma.industry.findFirst({
+        where: { 
+          name: { contains: data.industry, mode: 'insensitive' }
+        }
+      })
+
+      if (!industry) {
+        console.warn(`⚠️ Industry ${data.industry} not found, skipping compliance framework`)
+        continue
+      }
+
+      await prisma.industryComplianceFramework.upsert({
+        where: {
+          industryId_sector_frameworkName: {
+            industryId: industry.id,
+            sector: data.sector,
+            frameworkName: 'DEFAULT_FRAMEWORK'
+          }
+        },
+        update: {
+          complianceRequirements: data.complianceRequirements,
+          regulatoryFramework: data.regulatoryFramework,
+          category: 'FEDERAL',
+          updatedAt: new Date()
+        },
+        create: {
+          industryId: industry.id,
+          sector: data.sector,
+          frameworkName: 'DEFAULT_FRAMEWORK',
+          category: 'FEDERAL',
+          complianceRequirements: data.complianceRequirements,
+          regulatoryFramework: data.regulatoryFramework,
+          description: `Compliance framework for ${data.sector} in ${data.industry} industry`,
+          sortOrder: 0
+        }
+      })
+    }
+
+    console.log('✅ Compliance frameworks seeded successfully')
+  } catch (error) {
+    console.error('❌ Error seeding compliance frameworks:', error)
+    throw error
+  }
+} 

@@ -46,8 +46,8 @@ import {
   CheckSquare,
   Square
 } from 'lucide-react'
-import { CanvasForm } from './canvas-form'
-import { StatusChangeDialog } from './status-change-dialog'
+import { CanvasEditor } from './CanvasEditor'
+import { CanvasStatusDialog } from './CanvasStatusDialog'
 
 // Canvas Node Interface
 interface CanvasNode {
@@ -423,7 +423,7 @@ function TreeNode({
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onEditCanvas(node.id)}>
                 <Edit className="h-4 w-4 mr-2" />
-                Edit Metadata
+                Edit
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onOpenStatusDialog?.(node.id)}>
                 <Target className="h-4 w-4 mr-2" />
@@ -544,7 +544,7 @@ function TreeList({
 }
 
 // Main Canvas Tree View Component
-export function CanvasTreeView({
+export function CanvasHierarchyView({
   canvases,
   onSelectCanvas,
   onAddChild,
@@ -669,12 +669,21 @@ export function CanvasTreeView({
   // Handle edit canvas
   const handleEditCanvas = async (canvasId: string) => {
     try {
+      console.log('🔍 CANVAS HIERARCHY DEBUG - Fetching canvas data for editing:', canvasId)
+      
       // Fetch canvas data for editing
       const response = await fetch(`/api/business-canvas/${canvasId}`)
       if (!response.ok) {
         throw new Error('Failed to fetch canvas data')
       }
       const canvasData = await response.json()
+      
+      console.log('🔍 CANVAS HIERARCHY DEBUG - Fetched canvas data:', canvasData)
+      console.log('🔍 CANVAS HIERARCHY DEBUG - Canvas data keys:', Object.keys(canvasData))
+      console.log('🔍 CANVAS HIERARCHY DEBUG - Name:', canvasData.name)
+      console.log('🔍 CANVAS HIERARCHY DEBUG - Industry:', canvasData.industry)
+      console.log('🔍 CANVAS HIERARCHY DEBUG - Business type:', canvasData.businessType)
+      console.log('🔍 CANVAS HIERARCHY DEBUG - Sectors:', canvasData.sectors)
       
       setEditingCanvasId(canvasId)
       setEditingCanvasData(canvasData)
@@ -689,25 +698,25 @@ export function CanvasTreeView({
   // Handle update canvas
   const handleUpdateCanvas = async (canvasId: string, businessInfo: any) => {
     try {
-      // Update canvas metadata
+      console.log('✏️ CANVAS HIERARCHY - Starting update process:', canvasId)
+      console.log('✏️ CANVAS HIERARCHY - Business info:', JSON.stringify(businessInfo, null, 2))
+      
+      // Update canvas metadata with all fields
       const response = await fetch(`/api/business-canvas/${canvasId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: businessInfo.name,
-          description: businessInfo.strategicObjective,
-          // Add other fields as needed
-        }),
+        body: JSON.stringify(businessInfo),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to update canvas')
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(`Failed to update canvas: ${errorData.details || response.statusText}`)
       }
 
       const updatedCanvas = await response.json()
-      console.log('✅ Canvas updated successfully:', updatedCanvas)
+      console.log('✅ CANVAS HIERARCHY - Canvas updated successfully:', updatedCanvas.name)
       
       // Call the parent update handler if provided
       onUpdateCanvas?.(canvasId, businessInfo)
@@ -717,8 +726,10 @@ export function CanvasTreeView({
       setEditingCanvasId(null)
       setEditingCanvasData(null)
     } catch (error) {
-      console.error('Error updating canvas:', error)
+      console.error('❌ CANVAS HIERARCHY - Error updating canvas:', error)
+      console.error('❌ CANVAS HIERARCHY - Error details:', error instanceof Error ? error.message : 'Unknown error')
       // You might want to show an error toast here
+      throw error // Re-throw to let the parent handle the error
     }
   }
 
@@ -883,7 +894,7 @@ export function CanvasTreeView({
             <div className="font-medium text-sm">Drop here to move to root level</div>
             <div className="text-xs mt-1 opacity-75 mb-4">Makes the canvas independent (no parent)</div>
             
-            {/* Add New Root Canvas Button */}
+            {/* Add New Button */}
             <Button
               variant="outline"
               size="sm"
@@ -891,7 +902,7 @@ export function CanvasTreeView({
               className="border-dashed border-2 hover:border-solid transition-all duration-200"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add New Root Canvas
+              Add New
             </Button>
           </div>
         </div>
@@ -947,7 +958,7 @@ export function CanvasTreeView({
       )}
 
       {/* Edit Canvas Modal */}
-      <CanvasForm
+      <CanvasEditor
         mode="edit"
         onSubmit={(businessInfo) => handleUpdateCanvas(editingCanvasId || '', businessInfo)}
         canvasId={editingCanvasId || ''}
@@ -956,10 +967,23 @@ export function CanvasTreeView({
         isOpen={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
       />
+      
+      {/* Debug info for CanvasEditor props */}
+      {isEditModalOpen && (
+        <div style={{ display: 'none' }}>
+          {console.log('🔍 CANVAS HIERARCHY DEBUG - CanvasEditor props:', {
+            mode: 'edit',
+            canvasId: editingCanvasId,
+            canvasData: editingCanvasData,
+            enterpriseContext,
+            isOpen: isEditModalOpen
+          })}
+        </div>
+      )}
 
       {/* Status Change Dialog */}
       {statusCanvas && (
-        <StatusChangeDialog
+        <CanvasStatusDialog
           isOpen={isStatusDialogOpen}
           onOpenChange={setIsStatusDialogOpen}
           canvas={statusCanvas}

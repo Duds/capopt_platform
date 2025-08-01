@@ -32,7 +32,19 @@ export async function GET(
       )
     }
 
-    return NextResponse.json(businessCanvas)
+    // Return raw database data - let the frontend handle sector transformation
+    // The CanvasEditor component will convert sectors from string[] to SectorSelection[]
+    const transformedCanvas = {
+      ...businessCanvas,
+      // Ensure numeric fields are properly typed
+      annualRevenue: businessCanvas.annualRevenue ? Number(businessCanvas.annualRevenue) : 0,
+      employeeCount: businessCanvas.employeeCount ? Number(businessCanvas.employeeCount) : 0
+    }
+
+    // Keep industry as display name (don't convert to code)
+    // The CanvasEditor expects the display name, not the code
+
+    return NextResponse.json(transformedCanvas)
   } catch (error) {
     console.error('Error fetching business canvas:', error)
     return NextResponse.json(
@@ -81,7 +93,13 @@ export async function PUT(
     if (body.legalName !== undefined) updateData.legalName = body.legalName
     if (body.abn !== undefined) updateData.abn = body.abn
     if (body.acn !== undefined) updateData.acn = body.acn
-    if (body.industry !== undefined) updateData.industry = body.industry
+    if (body.industry !== undefined) {
+      // Convert industry code to display name for storage
+      const industry = await prisma.industry.findUnique({
+        where: { code: body.industry }
+      })
+      updateData.industry = industry ? industry.name : body.industry
+    }
     if (body.sector !== undefined) updateData.sector = body.sector
     if (body.sectors !== undefined) {
       // Convert SectorSelection[] to string[] for database storage
@@ -115,7 +133,6 @@ export async function PUT(
     if (body.annualRevenue !== undefined) updateData.annualRevenue = body.annualRevenue
     if (body.employeeCount !== undefined) updateData.employeeCount = body.employeeCount
     if (body.riskProfile !== undefined) updateData.riskProfile = body.riskProfile
-    if (body.digitalMaturity !== undefined) updateData.digitalMaturity = body.digitalMaturity
     if (body.complianceRequirements !== undefined) updateData.complianceRequirements = body.complianceRequirements
     if (body.regulatoryFramework !== undefined) updateData.regulatoryFramework = body.regulatoryFramework
 

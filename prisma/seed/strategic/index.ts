@@ -25,6 +25,27 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
       version: '1.0',
       isActive: true,
       industry: 'Mining & Metals',
+      // Enhanced Metadata Fields
+      legalName: 'Hercules Levee Mining Corporation Pty Ltd',
+      abn: '12345678901',
+      acn: '123456789',
+      businessType: 'CORPORATION',
+      regional: 'REMOTE',
+      primaryLocation: 'Mount Isa, Queensland, Australia',
+      coordinates: '-20.7256,139.4927',
+      facilityType: 'MINE',
+      sectors: ['COAL', 'COPPER', 'URANIUM', 'GOLD', 'SILVER'],
+      sectorTypes: ['EXTRACTIVE', 'PRODUCTION'],
+      primarySector: 'COPPER',
+      operationalStreams: ['MINING', 'PROCESSING', 'REFINING', 'TRANSPORTATION'],
+      strategicObjective: 'Become the leading integrated mining and processing operation in Australia',
+      valueProposition: 'World-class integrated mining operation producing copper, uranium, gold, and silver',
+      competitiveAdvantage: 'Advanced processing technology with industry-leading recovery rates',
+      annualRevenue: 5400000000,
+      employeeCount: 2500,
+      riskProfile: 'HIGH',
+      complianceRequirements: ['WHS_ACT', 'ENVIRONMENTAL_PROTECTION', 'NUCLEAR_SAFETY', 'MINING_SAFETY'],
+      regulatoryFramework: ['ICMM', 'ISO_9001', 'ISO_14001', 'OHSAS_18001'],
       valuePropositions: {
         create: [
           {
@@ -383,6 +404,33 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
         isActive: true,
         industry: streamCanvas.industry,
         parentCanvasId: streamCanvas.parentCanvasId,
+        // Enhanced Metadata Fields for each stream
+        legalName: `${streamCanvas.name} Division`,
+        abn: '12345678901',
+        acn: '123456789',
+        businessType: 'CORPORATION',
+        regional: 'REMOTE',
+        primaryLocation: 'Mount Isa, Queensland, Australia',
+        coordinates: '-20.7256,139.4927',
+        facilityType: streamCanvas.commodity === 'Mining' ? 'MINE' : 'PROCESSING_PLANT',
+        sectors: [streamCanvas.commodity.toUpperCase()],
+        sectorTypes: ['EXTRACTIVE', 'PRODUCTION'],
+        primarySector: streamCanvas.commodity.toUpperCase(),
+        operationalStreams: streamCanvas.commodity === 'Mining' ? 
+          ['UNDERGROUND_MINING', 'OPEN_PIT_MINING', 'ORE_HANDLING'] :
+          streamCanvas.commodity === 'Copper' ? 
+          ['ORE_PROCESSING', 'SMELTING', 'ELECTROREFINING'] :
+          streamCanvas.commodity === 'Uranium' ? 
+          ['URANIUM_PROCESSING', 'SOLVENT_EXTRACTION', 'REGULATORY_COMPLIANCE'] :
+          ['PRECIOUS_METALS_PROCESSING', 'DORE_PRODUCTION', 'ELECTROREFINING'],
+        strategicObjective: `Become the leading ${streamCanvas.commodity.toLowerCase()} operation in Australia`,
+        valueProposition: streamCanvas.valueProps[0],
+        competitiveAdvantage: `Advanced ${streamCanvas.commodity.toLowerCase()} processing technology`,
+        annualRevenue: streamCanvas.revenues.reduce((sum, rev) => sum + rev.value, 0),
+        employeeCount: streamCanvas.commodity === 'Mining' ? 800 : 400,
+        riskProfile: 'HIGH',
+        complianceRequirements: ['WHS_ACT', 'ENVIRONMENTAL_PROTECTION'],
+        regulatoryFramework: ['ISO_9001', 'ISO_14001', 'OHSAS_18001'],
         valuePropositions: {
           create: streamCanvas.valueProps.map(vp => ({
             description: vp,
@@ -711,6 +759,27 @@ export async function seedStrategic(prisma: PrismaClient, options?: SeedOptions)
         isActive: true,
         industry: preciousMetalsCanvas.industry,
         parentCanvasId: createdCanvases['Copper Operations'].id,
+        // Enhanced Metadata Fields for Precious Metals
+        legalName: `${preciousMetalsCanvas.name} Division`,
+        abn: '12345678901',
+        acn: '123456789',
+        businessType: 'CORPORATION',
+        regional: 'REMOTE',
+        primaryLocation: 'Mount Isa, Queensland, Australia',
+        coordinates: '-20.7256,139.4927',
+        facilityType: 'REFINERY',
+        sectors: ['GOLD', 'SILVER'],
+        sectorTypes: ['EXTRACTIVE', 'PRODUCTION'],
+        primarySector: 'GOLD',
+        operationalStreams: ['PRECIOUS_METALS_PROCESSING', 'DORE_PRODUCTION', 'ELECTROREFINING', 'INGOT_CASTING'],
+        strategicObjective: 'Become the leading precious metals operation in Australia',
+        valueProposition: preciousMetalsCanvas.valueProps[0],
+        competitiveAdvantage: 'Advanced precious metals processing technology',
+        annualRevenue: preciousMetalsCanvas.revenues.reduce((sum, rev) => sum + rev.value, 0),
+        employeeCount: 300,
+        riskProfile: 'HIGH',
+        complianceRequirements: ['WHS_ACT', 'ENVIRONMENTAL_PROTECTION', 'PRECIOUS_METALS_REGULATION'],
+        regulatoryFramework: ['ISO_9001', 'ISO_14001', 'OHSAS_18001', 'LBMA'],
         valuePropositions: {
           create: preciousMetalsCanvas.valueProps.map(vp => ({
             description: vp,

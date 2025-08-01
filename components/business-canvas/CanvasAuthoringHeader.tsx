@@ -123,7 +123,7 @@ interface CanvasTemplate {
   rating: number
 }
 
-interface BMCAuthoringHeaderProps {
+interface CanvasAuthoringHeaderProps {
   currentCanvasId?: string
   onCanvasChange: (canvasId: string) => void
   onSave: () => void
@@ -141,7 +141,7 @@ interface BMCAuthoringHeaderProps {
   conflicts?: any[]
 }
 
-export function BMCAuthoringHeader({
+export function CanvasAuthoringHeader({
   currentCanvasId,
   onCanvasChange,
   onSave,
@@ -157,7 +157,7 @@ export function BMCAuthoringHeader({
   hasUnsavedChanges = false,
   lastSaved,
   conflicts = []
-}: BMCAuthoringHeaderProps) {
+}: CanvasAuthoringHeaderProps) {
   const { user } = useAuth()
   const { businessCanvases, loading } = useBusinessCanvas()
   

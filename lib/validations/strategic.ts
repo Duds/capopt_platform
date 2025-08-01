@@ -91,7 +91,6 @@ export const businessCanvasSchema = z.object({
   annualRevenue: z.number().optional(),
   employeeCount: z.number().optional(),
   riskProfile: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).optional(),
-  digitalMaturity: z.enum(['BASIC', 'INTERMEDIATE', 'ADVANCED', 'LEADING']).optional(),
   complianceRequirements: z.array(z.string()).optional(),
   regulatoryFramework: z.array(z.string()).optional(),
   
