@@ -43,24 +43,37 @@ interface SectorMultiSelectProps {
   onSectorsChange: (sectors: SectorSelection[]) => void
   disabled?: boolean
   showValidation?: boolean
+  industryCode?: string // Add industry code prop to filter sectors
 }
 
 // Helper function to categorize sectors based on their database category
-const categorizeSectors = (sectors: Sector[]) => {
-  // Get unique categories from the database
-  const uniqueCategories = [...new Set(sectors.map(s => s.category))]
+const categorizeSectors = (industries: Industry[], industryCode?: string) => {
+  // Get sectors from the specified industry or all industries
+  let allSectors: Sector[] = []
+  
+  if (industryCode) {
+    // Filter to specific industry
+    const targetIndustry = industries.find(ind => ind.code === industryCode)
+    allSectors = targetIndustry?.sectors || []
+  } else {
+    // Get all sectors from all industries
+    allSectors = industries.flatMap(industry => industry.sectors)
+  }
+  
+  // Get unique categories from the sectors
+  const uniqueCategories = [...new Set(allSectors.map(s => s.category))]
   
   // Create a mapping of category IDs to display names and icons
   const categoryConfig: Record<string, { name: string; description: string; icon: any; required: boolean }> = {
     'COMMODITY': {
       name: 'Commodity-Based',
-      description: 'Classified by the type of resource being extracted',
+      description: 'Classified by the type of resource being extracted or produced',
       icon: Building,
       required: true
     },
     'VALUE_CHAIN': {
       name: 'Value Chain',
-      description: 'Stage of the mining lifecycle',
+      description: 'Stage of the industry lifecycle',
       icon: Activity,
       required: false
     },
@@ -72,18 +85,18 @@ const categorizeSectors = (sectors: Sector[]) => {
     },
     'SUPPORT_SERVICES': {
       name: 'Support Services',
-      description: 'Essential services supporting mining operations',
+      description: 'Essential services supporting industry operations',
       icon: Wrench,
       required: false
     }
   }
   
-  // Dynamically create categories based on what's in the database
+  // Dynamically create categories based on what's in the sectors
   const categories: Record<string, Sector[]> = {}
   
   uniqueCategories.forEach(category => {
     const categoryKey = category.toLowerCase().replace('_', '-')
-    categories[categoryKey] = sectors.filter(s => s.category === category)
+    categories[categoryKey] = allSectors.filter(s => s.category === category)
   })
   
   return { categories, categoryConfig }
@@ -112,14 +125,15 @@ export function IndustrySectorSelector({
   selectedSectors,
   onSectorsChange,
   disabled = false,
-  showValidation = true
+  showValidation = true,
+  industryCode
 }: SectorMultiSelectProps) {
   const { industries, loading, error } = useIndustries()
   const [validationErrors, setValidationErrors] = useState<string[]>([])
 
   // Get all sectors from the database
   const allSectors = industries.flatMap(industry => industry.sectors)
-  const { categories, categoryConfig } = categorizeSectors(allSectors)
+  const { categories, categoryConfig } = categorizeSectors(industries, industryCode)
 
   // Update validation errors when sectors change
   useEffect(() => {

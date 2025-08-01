@@ -673,6 +673,7 @@ export function CanvasEditor({
         <IndustrySectorSelector
           selectedSectors={formData.sectors}
           onSectorsChange={(sectors) => handleInputChange('sectors', sectors)}
+          industryCode={currentIndustryCode}
         />
         {validationErrors.sectors && (
           <p className="text-sm text-red-500 mt-1">{validationErrors.sectors}</p>

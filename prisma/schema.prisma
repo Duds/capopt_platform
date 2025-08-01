@@ -348,6 +348,11 @@ model BusinessCanvas {
   templateSource    CanvasTemplate? @relation("TemplateSource", fields: [templateId], references: [id])
   templateId        String?
 
+  // Business Canvas Framework Associations
+  frameworkOperationalStreams  BusinessCanvasOperationalStreams[]
+  frameworkComplianceFrameworks BusinessCanvasComplianceFrameworks[]
+  frameworkFacilityTypes     BusinessCanvasFacilityTypes[]
+
   @@map("business_canvases")
 }
 
@@ -392,6 +397,7 @@ model IndustryFacilityTypes {
 
   // Relationships
   industry    Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  businessCanvasAssociations BusinessCanvasFacilityTypes[]
 
   @@unique([industryId, facilityTypeCode])
   @@map("industry_facility_types")
@@ -433,6 +439,7 @@ model IndustryOperationalStreams {
 
   // Relationships
   industry              Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  businessCanvasAssociations BusinessCanvasOperationalStreams[]
 
   @@unique([industryId, sector, streamName])
   @@map("industry_operational_streams")
@@ -455,6 +462,7 @@ model IndustryComplianceFramework {
 
   // Relationships
   industry              Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  businessCanvasAssociations BusinessCanvasComplianceFrameworks[]
 
   @@unique([industryId, sector, frameworkName])
   @@map("industry_compliance_frameworks")
@@ -1795,4 +1803,53 @@ enum RegionalClassification {
   RURAL
   COASTAL
   INLAND
+}
+
+// Business Canvas Framework Associations
+model BusinessCanvasOperationalStreams {
+  id                    String         @id @default(cuid())
+  businessCanvasId      String
+  operationalStreamId   String
+  isAutoApplied         Boolean        @default(true) // Whether this was auto-applied or manually added
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas        BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  operationalStream     IndustryOperationalStreams @relation(fields: [operationalStreamId], references: [id], onDelete: Cascade)
+
+  @@unique([businessCanvasId, operationalStreamId])
+  @@map("business_canvas_operational_streams")
+}
+
+model BusinessCanvasComplianceFrameworks {
+  id                    String         @id @default(cuid())
+  businessCanvasId      String
+  complianceFrameworkId String
+  isAutoApplied         Boolean        @default(true) // Whether this was auto-applied or manually added
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas        BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  complianceFramework   IndustryComplianceFramework @relation(fields: [complianceFrameworkId], references: [id], onDelete: Cascade)
+
+  @@unique([businessCanvasId, complianceFrameworkId])
+  @@map("business_canvas_compliance_frameworks")
+}
+
+model BusinessCanvasFacilityTypes {
+  id                    String         @id @default(cuid())
+  businessCanvasId      String
+  facilityTypeId        String
+  isAutoApplied         Boolean        @default(true) // Whether this was auto-applied or manually added
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  // Relationships
+  businessCanvas        BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  facilityType          IndustryFacilityTypes @relation(fields: [facilityTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([businessCanvasId, facilityTypeId])
+  @@map("business_canvas_facility_types")
 }
