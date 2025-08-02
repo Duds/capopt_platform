@@ -43,6 +43,12 @@ model User {
   createdCanvasCollaborators CanvasCollaborator[] @relation("CanvasCollaborator")
   createdCanvasExports       CanvasExport[]       @relation("CanvasExportCreator")
   createdCanvasTemplates     CanvasTemplate[]     @relation("TemplateCreator")
+  createdOperatingModels     OperatingModel[]     @relation("OperatingModelCreator")
+  createdOperatingModelVersions OperatingModelVersion[] @relation("OperatingModelVersionCreator")
+  createdOperatingModelCollaborators OperatingModelCollaborator[] @relation("OperatingModelCollaboratorCreator")
+  createdOperatingModelSharingSettings OperatingModelSharingSetting[] @relation("OperatingModelSharingSettingCreator")
+  createdOperatingModelExports OperatingModelExport[] @relation("OperatingModelExportCreator")
+  createdOperatingModelTemplates OperatingModelTemplate[] @relation("OperatingModelTemplateCreator")
 
   @@map("users")
 }
@@ -89,6 +95,7 @@ model Enterprise {
   assets           Asset[]
   bowtieModels     BowtieModel[]
   businessCanvases BusinessCanvas[]    @relation("EnterpriseBusinessCanvases")
+  operatingModels  OperatingModel[]    @relation("EnterpriseOperatingModels")
 
   @@map("enterprises")
 }
@@ -135,6 +142,7 @@ model Facility {
   assets           Asset[]
   processes        Process[]
   businessCanvases BusinessCanvas[] @relation("FacilityBusinessCanvases")
+  operatingModels  OperatingModel[] @relation("FacilityOperatingModels")
 
   @@map("facilities")
 }
@@ -161,6 +169,7 @@ model BusinessUnit {
   assets           Asset[]
   processes        Process[]
   businessCanvases BusinessCanvas[] @relation("BusinessUnitBusinessCanvases")
+  operatingModels  OperatingModel[] @relation("BusinessUnitOperatingModels")
 
   @@map("business_units")
 }
@@ -184,6 +193,8 @@ model Department {
   users        User[]       @relation("DepartmentUsers")
   assets       Asset[]
   processes    Process[]
+  // Legacy relationship - to be removed
+  // operatingModels OperatingModel[] @relation("DepartmentOperatingModels")
 
   @@map("departments")
 }
@@ -355,6 +366,7 @@ model BusinessCanvas {
 
   // Enhanced relationships
   patternApplications PatternApplication[]
+  operatingModels     OperatingModel[] @relation("BusinessCanvasOperatingModels")
 
   @@map("business_canvases")
 }
@@ -810,6 +822,9 @@ model Partnership {
 
   // Relationships
   businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  
+  // OMC Integration - link to Suppliers
+  operatingModelSuppliers OperatingModelSupplier[] @relation("SupplierPartnership")
 
   @@map("partnerships")
 }
@@ -886,18 +901,615 @@ model OperatingModel {
   description String?
   version     String   @default("1.0")
   isActive    Boolean  @default(true)
+  status      CanvasStatus @default(DRAFT)
+  editMode    EditMode @default(SINGLE_USER)
+  autoSave    Boolean  @default(true)
+  lastSaved   DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Enterprise context
+  enterpriseId   String?
+  facilityId     String?
+  businessUnitId String?
+
+  // Operating Model hierarchy (for parent-child relationships)
+  parentOperatingModelId String?
+
+  // Business Canvas linkage
+  businessCanvasId String?
+
   // Relationships
-  valueChains         ValueChain[]
-  serviceModels       ServiceModel[]
-  experienceModels    ExperienceModel[]
-  capabilityModels    CapabilityModel[]
-  operatingPrinciples OperatingPrinciple[]
+  enterprise    Enterprise?      @relation("EnterpriseOperatingModels", fields: [enterpriseId], references: [id])
+  facility      Facility?        @relation("FacilityOperatingModels", fields: [facilityId], references: [id])
+  businessUnit  BusinessUnit?    @relation("BusinessUnitOperatingModels", fields: [businessUnitId], references: [id])
+  parentOperatingModel OperatingModel? @relation("OperatingModelHierarchy", fields: [parentOperatingModelId], references: [id])
+  childOperatingModels OperatingModel[] @relation("OperatingModelHierarchy")
+  businessCanvas BusinessCanvas? @relation("BusinessCanvasOperatingModels", fields: [businessCanvasId], references: [id])
+
+  // Campbell, Lancelott, Gutierrez Operating Model Components
+  suppliers         OperatingModelSupplier[]
+  locations         OperatingModelLocation[]
+  valueChains       OperatingModelValueChain[]
+  organisation      OperatingModelOrganisation[]
+  information       OperatingModelInformation[]
+  managementSystems OperatingModelManagementSystem[]
+  
+  // Legacy components (to be deprecated)
+  legacyValueChains ValueChain[]
+
+  // Version control and collaboration
+  versions        OperatingModelVersion[]
+  collaborators   OperatingModelCollaborator[]
+  sharingSettings OperatingModelSharingSetting[]
+  exportHistory   OperatingModelExport[]
+  templateSource  OperatingModelTemplate? @relation("TemplateSource", fields: [templateId], references: [id])
+  templateId      String?
+
+  // Creator relationships
+  createdBy       String
+  creator         User @relation("OperatingModelCreator", fields: [createdBy], references: [id])
 
   @@map("operating_models")
 }
+
+// ============================================================================
+// CAMPBELL, LANCELOTT, GUTIERREZ OPERATING MODEL COMPONENTS
+// ============================================================================
+
+model OperatingModelSupplier {
+  id               String   @id @default(cuid())
+  operatingModelId String
+  name             String
+  description      String?
+  supplierType     SupplierType
+  category         String
+  criticality      SupplierCriticality
+  performance      SupplierPerformance
+  contractType     ContractType
+  contractValue    Decimal?
+  contractDuration Int? // months
+  riskLevel        RiskLevel
+  complianceStatus ComplianceStatus
+  location         String?
+  contactPerson    String?
+  contactEmail     String?
+  contactPhone     String?
+  website          String?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relationships
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  
+  // BMC Integration - link to Partnerships
+  businessCanvasPartnershipId String?
+  businessCanvasPartnership   Partnership? @relation("SupplierPartnership", fields: [businessCanvasPartnershipId], references: [id])
+
+  @@map("operating_model_suppliers")
+}
+
+model OperatingModelLocation {
+  id               String   @id @default(cuid())
+  operatingModelId String
+  name             String
+  description      String?
+  locationType     LocationType
+  address          String
+  city             String
+  state            String
+  postcode         String
+  country          String
+  coordinates      String? // lat,lng
+  capacity         String?
+  utilization      Int? // percentage
+  status           LocationStatus
+  criticality      LocationCriticality
+  costCenter       String?
+  manager          String?
+  employeeCount    Int?
+  operationalHours String?
+  timezone         String?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relationships
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  
+  // BMC Integration - link to Resources and Activities
+  businessCanvasResourceIds String[] // Array of Resource IDs
+  businessCanvasActivityIds String[] // Array of Activity IDs
+
+  @@map("operating_model_locations")
+}
+
+model OperatingModelValueChain {
+  id               String   @id @default(cuid())
+  operatingModelId String
+  name             String
+  description      String?
+  valueChainType   ValueChainType
+  sequence         Int
+  complexity       ValueChainComplexity
+  efficiency       Int? // percentage
+  cost             Decimal?
+  duration         Int? // days
+  riskLevel        RiskLevel
+  status           ValueChainStatus
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relationships
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  activities     OperatingModelValueChainActivity[]
+  inputs         OperatingModelValueChainInput[]
+  outputs        OperatingModelValueChainOutput[]
+  metrics        OperatingModelValueChainMetric[]
+  
+  // BMC Integration - link to Activities and Resources
+  businessCanvasActivityIds String[] // Array of Activity IDs
+  businessCanvasResourceIds String[] // Array of Resource IDs
+
+  @@map("operating_model_value_chains")
+}
+
+model OperatingModelValueChainActivity {
+  id                    String   @id @default(cuid())
+  operatingModelValueChainId String
+  name                  String
+  description           String?
+  activityType          ValueChainActivityType
+  sequence              Int
+  duration              Int // minutes
+  cost                  Decimal?
+  efficiency            Int? // percentage
+  automation            Int? // percentage
+  skillLevel            SkillLevel
+  resources             String[] // Array of resource IDs
+  dependencies          String[] // Array of activity IDs
+  risks                 String[] // Array of risk descriptions
+  notes                 String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relationships
+  valueChain OperatingModelValueChain @relation(fields: [operatingModelValueChainId], references: [id], onDelete: Cascade)
+
+  @@map("operating_model_value_chain_activities")
+}
+
+model OperatingModelValueChainInput {
+  id                    String   @id @default(cuid())
+  operatingModelValueChainId String
+  name                  String
+  description           String?
+  inputType             ValueChainInputType
+  source                String
+  quantity              String
+  quality               String
+  cost                  Decimal?
+  leadTime              Int? // days
+  reliability           Int? // percentage
+  notes                 String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relationships
+  valueChain OperatingModelValueChain @relation(fields: [operatingModelValueChainId], references: [id], onDelete: Cascade)
+
+  @@map("operating_model_value_chain_inputs")
+}
+
+model OperatingModelValueChainOutput {
+  id                    String   @id @default(cuid())
+  operatingModelValueChainId String
+  name                  String
+  description           String?
+  outputType            ValueChainOutputType
+  customer              String
+  quantity              String
+  quality               String
+  value                 Decimal?
+  deliveryTime          Int? // days
+  satisfaction          Int? // percentage
+  notes                 String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relationships
+  valueChain OperatingModelValueChain @relation(fields: [operatingModelValueChainId], references: [id], onDelete: Cascade)
+
+  @@map("operating_model_value_chain_outputs")
+}
+
+model OperatingModelValueChainMetric {
+  id                    String   @id @default(cuid())
+  operatingModelValueChainId String
+  name                  String
+  description           String?
+  metricType            ValueChainMetricType
+  unit                  String
+  target                Decimal
+  current               Decimal
+  frequency             MetricFrequency
+  trend                 MetricTrend
+  notes                 String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relationships
+  valueChain OperatingModelValueChain @relation(fields: [operatingModelValueChainId], references: [id], onDelete: Cascade)
+
+  @@map("operating_model_value_chain_metrics")
+}
+
+model OperatingModelOrganisation {
+  id               String   @id @default(cuid())
+  operatingModelId String
+  name             String
+  description      String?
+  orgType          OrganisationType
+  level            OrganisationLevel
+  parentOrgId      String?
+  manager          String?
+  employeeCount    Int?
+  budget           Decimal?
+  costCenter       String?
+  location         String?
+  responsibilities String[]
+  skills           String[]
+  performance      Int? // percentage
+  maturity         MaturityLevel
+  status           OrganisationStatus
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relationships
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  parentOrg      OperatingModelOrganisation? @relation("OrganisationHierarchy", fields: [parentOrgId], references: [id])
+  childOrgs      OperatingModelOrganisation[] @relation("OrganisationHierarchy")
+  
+  // BMC Integration - link to Resources and Activities
+  businessCanvasResourceIds String[] // Array of Resource IDs
+  businessCanvasActivityIds String[] // Array of Activity IDs
+
+  @@map("operating_model_organisations")
+}
+
+model OperatingModelInformation {
+  id               String   @id @default(cuid())
+  operatingModelId String
+  name             String
+  description      String?
+  infoType         InformationType
+  category         String
+  source           String
+  format           String
+  frequency        InformationFrequency
+  quality          Int? // percentage
+  accessibility    InformationAccessibility
+  security         InformationSecurity
+  retention        Int? // days
+  cost             Decimal?
+  owner            String?
+  users             String[] // Array of user roles
+  systems           String[] // Array of system names
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relationships
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  
+  // BMC Integration - link to Resources and Activities
+  businessCanvasResourceIds String[] // Array of Resource IDs
+  businessCanvasActivityIds String[] // Array of Activity IDs
+
+  @@map("operating_model_information")
+}
+
+model OperatingModelManagementSystem {
+  id               String   @id @default(cuid())
+  operatingModelId String
+  name             String
+  description      String?
+  systemType       ManagementSystemType
+  category         String
+  vendor            String?
+  version           String?
+  status            ManagementSystemStatus
+  implementation    ImplementationStatus
+  cost              Decimal?
+  roi               Decimal?
+  users             Int?
+  performance       Int? // percentage
+  reliability       Int? // percentage
+  security          ManagementSystemSecurity
+  compliance        ComplianceStatus
+  integration       String[] // Array of integrated systems
+  features          String[] // Array of key features
+  risks             String[] // Array of risk descriptions
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relationships
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  
+  // BMC Integration - link to Resources and Activities
+  businessCanvasResourceIds String[] // Array of Resource IDs
+  businessCanvasActivityIds String[] // Array of Activity IDs
+
+  @@map("operating_model_management_systems")
+}
+
+// ============================================================================
+// ENUMS FOR OPERATING MODEL COMPONENTS
+// ============================================================================
+
+enum SupplierType {
+  MATERIAL_SUPPLIER
+  SERVICE_PROVIDER
+  TECHNOLOGY_PARTNER
+  LOGISTICS_PROVIDER
+  CONSULTANT
+  EQUIPMENT_SUPPLIER
+  FINANCIAL_PARTNER
+  REGULATORY_PARTNER
+}
+
+enum SupplierCriticality {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum SupplierPerformance {
+  EXCELLENT
+  GOOD
+  AVERAGE
+  POOR
+  UNACCEPTABLE
+}
+
+enum ContractType {
+  LONG_TERM
+  MEDIUM_TERM
+  SHORT_TERM
+  PROJECT_BASED
+  ON_DEMAND
+  FRAMEWORK
+}
+
+enum LocationType {
+  HEADQUARTERS
+  PRODUCTION_FACILITY
+  WAREHOUSE
+  DISTRIBUTION_CENTER
+  OFFICE
+  LABORATORY
+  WORKSHOP
+  FIELD_OFFICE
+  REMOTE_SITE
+}
+
+enum LocationStatus {
+  ACTIVE
+  INACTIVE
+  PLANNED
+  UNDER_CONSTRUCTION
+  DECOMMISSIONED
+}
+
+enum LocationCriticality {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum ValueChainType {
+  PRIMARY
+  SUPPORT
+  ENABLING
+  CUSTOMER_FACING
+  INTERNAL
+}
+
+enum ValueChainComplexity {
+  SIMPLE
+  MODERATE
+  COMPLEX
+  VERY_COMPLEX
+}
+
+enum ValueChainStatus {
+  ACTIVE
+  INACTIVE
+  PLANNED
+  UNDER_DEVELOPMENT
+  OPTIMIZING
+}
+
+enum ValueChainActivityType {
+  PRIMARY
+  SUPPORT
+  ENABLING
+  DECISION
+  CONTROL
+}
+
+enum ValueChainInputType {
+  MATERIAL
+  INFORMATION
+  CAPITAL
+  HUMAN
+  ENERGY
+  TECHNOLOGY
+}
+
+enum ValueChainOutputType {
+  PRODUCT
+  SERVICE
+  INFORMATION
+  VALUE
+  WASTE
+}
+
+enum ValueChainMetricType {
+  EFFICIENCY
+  EFFECTIVENESS
+  QUALITY
+  COST
+  TIME
+  SATISFACTION
+}
+
+enum MetricFrequency {
+  REAL_TIME
+  HOURLY
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  ANNUALLY
+}
+
+enum MetricTrend {
+  IMPROVING
+  STABLE
+  DECLINING
+  VOLATILE
+}
+
+enum SkillLevel {
+  BASIC
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum OrganisationType {
+  FUNCTIONAL
+  DIVISIONAL
+  MATRIX
+  NETWORK
+  TEAM_BASED
+  PROJECT_BASED
+}
+
+enum OrganisationLevel {
+  EXECUTIVE
+  SENIOR_MANAGEMENT
+  MIDDLE_MANAGEMENT
+  SUPERVISORY
+  OPERATIONAL
+}
+
+enum OrganisationStatus {
+  ACTIVE
+  INACTIVE
+  PLANNED
+  RESTRUCTURING
+}
+
+enum InformationType {
+  OPERATIONAL
+  STRATEGIC
+  TACTICAL
+  FINANCIAL
+  TECHNICAL
+  REGULATORY
+  CUSTOMER
+  SUPPLIER
+}
+
+enum InformationFrequency {
+  REAL_TIME
+  HOURLY
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  ON_DEMAND
+}
+
+enum InformationAccessibility {
+  PUBLIC
+  INTERNAL
+  RESTRICTED
+  CONFIDENTIAL
+  CLASSIFIED
+}
+
+enum InformationSecurity {
+  BASIC
+  STANDARD
+  ENHANCED
+  HIGH
+  MAXIMUM
+}
+
+enum ManagementSystemType {
+  ERP
+  CRM
+  SCM
+  HRM
+  FINANCE
+  QUALITY
+  SAFETY
+  ENVIRONMENTAL
+  ASSET
+  PROJECT
+  ANALYTICS
+  COLLABORATION
+}
+
+enum ManagementSystemStatus {
+  ACTIVE
+  INACTIVE
+  PLANNED
+  UNDER_IMPLEMENTATION
+  UPGRADING
+  DECOMMISSIONING
+}
+
+enum ImplementationStatus {
+  NOT_STARTED
+  PLANNING
+  IN_PROGRESS
+  TESTING
+  LIVE
+  OPTIMIZING
+}
+
+enum ManagementSystemSecurity {
+  BASIC
+  STANDARD
+  ENHANCED
+  HIGH
+  MAXIMUM
+}
+
+// Additional enums needed for the new OMC framework
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ============================================================================
+// LEGACY OPERATING MODEL COMPONENTS (TO BE DEPRECATED)
+// ============================================================================
+
+// These models are kept for backward compatibility but will be deprecated
+// in favor of the new Campbell, Lancelott, Gutierrez framework
 
 model ValueChain {
   id               String   @id @default(cuid())
@@ -905,73 +1517,94 @@ model ValueChain {
   name             String
   description      String?
   sequence         Int
+  activityType     String? // PRIMARY, SUPPORT, ENABLING
+  duration         Int? // minutes
+  resources        String[] // Array of resource IDs or names
+  dependencies     String[] // Array of activity IDs
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   // Relationships
   operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  activities     ValueChainActivity[]
+  inputs         ValueChainInput[]
+  outputs        ValueChainOutput[]
+  metrics        ValueChainMetric[]
 
   @@map("value_chains")
 }
 
-model ServiceModel {
+model ValueChainActivity {
   id               String   @id @default(cuid())
-  operatingModelId String
+  valueChainId     String
   name             String
   description      String?
-  type             String?
+  activityType     String // PRIMARY, SUPPORT, ENABLING
+  sequence         Int
+  duration         Int // minutes
+  resources        String[] // Array of resource IDs
+  dependencies     String[] // Array of activity IDs
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   // Relationships
-  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  valueChain ValueChain @relation(fields: [valueChainId], references: [id], onDelete: Cascade)
 
-  @@map("service_models")
+  @@map("value_chain_activities")
 }
 
-model ExperienceModel {
+model ValueChainInput {
   id               String   @id @default(cuid())
-  operatingModelId String
+  valueChainId     String
   name             String
   description      String?
-  touchpoints      String?
+  inputType        String // MATERIAL, INFORMATION, CAPITAL, HUMAN
+  source           String
+  quantity         String
+  quality          String
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   // Relationships
-  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  valueChain ValueChain @relation(fields: [valueChainId], references: [id], onDelete: Cascade)
 
-  @@map("experience_models")
+  @@map("value_chain_inputs")
 }
 
-model CapabilityModel {
-  id               String        @id @default(cuid())
-  operatingModelId String
-  name             String
-  description      String?
-  maturityLevel    MaturityLevel @default(INITIAL)
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-
-  // Relationships
-  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
-
-  @@map("capability_models")
-}
-
-model OperatingPrinciple {
+model ValueChainOutput {
   id               String   @id @default(cuid())
-  operatingModelId String
+  valueChainId     String
   name             String
   description      String?
-  priority         Priority @default(MEDIUM)
+  outputType       String // PRODUCT, SERVICE, INFORMATION, VALUE
+  customer         String
+  quantity         String
+  quality          String
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   // Relationships
-  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  valueChain ValueChain @relation(fields: [valueChainId], references: [id], onDelete: Cascade)
 
-  @@map("operating_principles")
+  @@map("value_chain_outputs")
+}
+
+model ValueChainMetric {
+  id               String   @id @default(cuid())
+  valueChainId     String
+  name             String
+  description      String?
+  metricType       String // EFFICIENCY, EFFECTIVENESS, QUALITY, COST
+  unit             String
+  target           Float
+  current          Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relationships
+  valueChain ValueChain @relation(fields: [valueChainId], references: [id], onDelete: Cascade)
+
+  @@map("value_chain_metrics")
 }
 
 // ============================================================================
@@ -2099,4 +2732,92 @@ model PatternApplication {
   @@index([canvasId])
   @@index([patternId])
   @@map("pattern_applications")
+}
+
+// ============================================================================
+// OPERATING MODEL VERSION CONTROL AND COLLABORATION
+// ============================================================================
+
+model OperatingModelVersion {
+  id                String   @id @default(cuid())
+  operatingModelId  String
+  versionNumber     String
+  description       String?
+  changes           Json? // JSON object describing changes
+  createdBy         String
+  createdAt         DateTime @default(now())
+
+  // Relationships
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  creator         User           @relation("OperatingModelVersionCreator", fields: [createdBy], references: [id])
+
+  @@map("operating_model_versions")
+}
+
+model OperatingModelCollaborator {
+  id                String   @id @default(cuid())
+  operatingModelId  String
+  userId            String
+  role              CollaboratorRole @default(VIEWER)
+  permissions       Json? // JSON object with specific permissions
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relationships
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  user            User           @relation("OperatingModelCollaboratorCreator", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([operatingModelId, userId])
+  @@map("operating_model_collaborators")
+}
+
+model OperatingModelSharingSetting {
+  id                String      @id @default(cuid())
+  operatingModelId  String
+  sharingType       SharingType @default(TEAM_ACCESS)
+  allowedUsers      String[] // Array of user IDs
+  allowedRoles      String[] // Array of role names
+  expiresAt         DateTime?
+  createdBy         String
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Relationships
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  creator         User           @relation("OperatingModelSharingSettingCreator", fields: [createdBy], references: [id])
+
+  @@map("operating_model_sharing_settings")
+}
+
+model OperatingModelExport {
+  id                String       @id @default(cuid())
+  operatingModelId  String
+  exportFormat      ExportFormat @default(JSON)
+  exportData        Json // The exported data
+  exportedBy        String
+  createdAt         DateTime     @default(now())
+
+  // Relationships
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+  creator         User           @relation("OperatingModelExportCreator", fields: [exportedBy], references: [id])
+
+  @@map("operating_model_exports")
+}
+
+model OperatingModelTemplate {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  category          String
+  templateData      Json // The template structure
+  isActive          Boolean  @default(true)
+  createdBy         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relationships
+  sourceOperatingModels OperatingModel[] @relation("TemplateSource")
+  creator               User             @relation("OperatingModelTemplateCreator", fields: [createdBy], references: [id])
+
+  @@map("operating_model_templates")
 }

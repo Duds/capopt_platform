@@ -81,7 +81,6 @@ export function SidebarNav({
             variant={activeLayer === "operating-model" ? "default" : "ghost"}
             className={`w-full ${sidebarCollapsed ? 'justify-center px-2' : 'justify-start'}`}
             onClick={() => onLayerChange("operating-model")}
-            disabled
           >
             <Network className="h-4 w-4" />
             {!sidebarCollapsed && <span className="ml-2">Operating Model</span>}

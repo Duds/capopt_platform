@@ -71,6 +71,8 @@ import { controlsApi, processesApi, assetsApi, formatDate, getStatusColor, getPr
 import { BusinessModelCanvas } from '@/components/business-canvas/BusinessModelCanvas'
 import { BusinessModel } from '@/components/business-canvas/types'
 import { defaultBusinessModel } from '@/components/business-canvas/utils'
+import { OperatingModelCanvas } from '@/components/operating-model/OperatingModelCanvas'
+import { OperatingModel, defaultOperatingModel } from '@/components/operating-model/types'
 import { EnterpriseContext } from '@/components/navigation/enterprise-context'
 import { StrategicContext } from '@/components/navigation/strategic-context'
 import { StrategicBreadcrumbs } from '@/components/navigation/strategic-breadcrumbs'
@@ -108,6 +110,7 @@ export default function CapOptPlatform() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [notifications] = useState(3) // Mock notification count
   const [businessModel, setBusinessModel] = useState<BusinessModel>(defaultBusinessModel)
+  const [operatingModel, setOperatingModel] = useState<OperatingModel>(defaultOperatingModel)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const maturityScores = {
@@ -646,6 +649,19 @@ export default function CapOptPlatform() {
                   </div>
                 )}
 
+                {activeLayer === "operating-model" && (
+                  <div className="space-y-6">
+                    <OperatingModelCanvas 
+                      operatingModel={operatingModel} 
+                      onUpdate={setOperatingModel} 
+                      isEditing={isEditing}
+                      viewMode={viewMode}
+                      onViewModeChange={setViewMode}
+                      onEditingChange={setIsEditing}
+                    />
+                  </div>
+                )}
+
                 {activeLayer === "processes" && (
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
@@ -857,7 +873,7 @@ export default function CapOptPlatform() {
                 )}
 
                 {/* Placeholder content for other layers */}
-                {(activeLayer === "operating-model" || activeLayer === "value-chain" || activeLayer === "service-model" || activeLayer === "process-maps" || activeLayer === "playbooks" || activeLayer === "analytics") && (
+                {(activeLayer === "value-chain" || activeLayer === "service-model" || activeLayer === "process-maps" || activeLayer === "playbooks" || activeLayer === "analytics") && (
                   <div className="space-y-6">
                     <div>
                       <h2 className="text-3xl font-bold capitalize">{activeLayer.replace('-', ' ')}</h2>
