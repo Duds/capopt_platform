@@ -11,6 +11,141 @@ datasource db {
 }
 
 // ============================================================================
+// GRAPH-RELATIONAL HYBRID ARCHITECTURE
+// ============================================================================
+
+// Core graph structure for flexible relationship modeling
+model Node {
+  id        String   @id @default(cuid())
+  type      String   // 'activity', 'canvas_card', 'control', 'process', 'asset', 'enterprise', 'facility', etc.
+  label     String
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  outgoingEdges Edge[] @relation("FromNode")
+  incomingEdges Edge[] @relation("ToNode")
+  
+  // Master data relationships
+  masterRoles    MasterRole[]
+  masterSystems  MasterSystem[]
+  masterVendors  MasterVendor[]
+  masterHazards  MasterHazard[]
+  masterControls MasterControl[]
+  
+  // Entity relationships
+  users          User[]
+  enterprises    Enterprise[]
+  facilities     Facility[]
+  businessUnits  BusinessUnit[]
+  departments    Department[]
+  businessCanvases BusinessCanvas[]
+  processes      Process[]
+
+  @@map("nodes")
+}
+
+model Edge {
+  fromId       String
+  toId         String
+  relationType String // 'delivers', 'mitigates', 'depends_on', 'controls', 'operates', 'contains', 'manages', etc.
+  metadata     Json   @default("{}")
+  createdAt    DateTime @default(now())
+
+  // Relationships
+  fromNode Node @relation("FromNode", fields: [fromId], references: [id], onDelete: Cascade)
+  toNode   Node @relation("ToNode", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@id([fromId, toId, relationType])
+  @@map("edges")
+}
+
+// Master data centralization for reusable concepts
+model MasterRole {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    String?
+  metadata    Json     @default("{}")
+  graphNodeId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  graphNode Node? @relation(fields: [graphNodeId], references: [id])
+
+  @@map("master_roles")
+}
+
+model MasterSystem {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  systemType  String?
+  vendor      String?
+  metadata    Json     @default("{}")
+  graphNodeId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  graphNode Node? @relation(fields: [graphNodeId], references: [id])
+
+  @@map("master_systems")
+}
+
+model MasterVendor {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  contactInfo Json?
+  metadata    Json     @default("{}")
+  graphNodeId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  graphNode Node? @relation(fields: [graphNodeId], references: [id])
+
+  @@map("master_vendors")
+}
+
+model MasterHazard {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  hazardType   String?
+  severityLevel String?
+  metadata     Json     @default("{}")
+  graphNodeId  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relationships
+  graphNode Node? @relation(fields: [graphNodeId], references: [id])
+
+  @@map("master_hazards")
+}
+
+model MasterControl {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  controlType       String?
+  effectivenessLevel String?
+  metadata          Json     @default("{}")
+  graphNodeId       String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relationships
+  graphNode Node? @relation(fields: [graphNodeId], references: [id])
+
+  @@map("master_controls")
+}
+
+// ============================================================================
 // USER MANAGEMENT & AUTHENTICATION
 // ============================================================================
 
@@ -29,9 +164,13 @@ model User {
   enterpriseId String?
   departmentId String?
 
+  // Graph node reference
+  graphNodeId String?
+
   // Relationships
   enterprise                 Enterprise?          @relation("EnterpriseUsers", fields: [enterpriseId], references: [id])
   department                 Department?          @relation("DepartmentUsers", fields: [departmentId], references: [id])
+  graphNode                  Node?                @relation(fields: [graphNodeId], references: [id])
   createdProcesses           Process[]            @relation("ProcessCreator")
   createdControls            CriticalControl[]    @relation("ControlCreator")
   createdAssets              Asset[]              @relation("AssetCreator")
@@ -86,6 +225,10 @@ model Enterprise {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Graph-Relational fields
+  hierarchyPath String? // LTREE path for hierarchical queries
+  graphNodeId   String? // Reference to graph node
+
   // Relationships
   addresses        EnterpriseAddress[]
   facilities       Facility[]
@@ -96,6 +239,7 @@ model Enterprise {
   bowtieModels     BowtieModel[]
   businessCanvases BusinessCanvas[]    @relation("EnterpriseBusinessCanvases")
   operatingModels  OperatingModel[]    @relation("EnterpriseOperatingModels")
+  graphNode        Node?               @relation(fields: [graphNodeId], references: [id])
 
   @@map("enterprises")
 }
@@ -136,8 +280,13 @@ model Facility {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
+  // Graph-Relational fields
+  hierarchyPath String? // LTREE path for hierarchical queries
+  graphNodeId   String? // Reference to graph node
+
   // Relationships
   enterprise       Enterprise       @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  graphNode        Node?            @relation(fields: [graphNodeId], references: [id])
   businessUnits    BusinessUnit[]
   assets           Asset[]
   processes        Process[]
@@ -162,9 +311,14 @@ model BusinessUnit {
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
 
+  // Graph-Relational fields
+  hierarchyPath String? // LTREE path for hierarchical queries
+  graphNodeId   String? // Reference to graph node
+
   // Relationships
   enterprise       Enterprise       @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
   facility         Facility?        @relation(fields: [facilityId], references: [id])
+  graphNode        Node?            @relation(fields: [graphNodeId], references: [id])
   departments      Department[]
   assets           Asset[]
   processes        Process[]
@@ -188,8 +342,13 @@ model Department {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 
+  // Graph-Relational fields
+  hierarchyPath String? // LTREE path for hierarchical queries
+  graphNodeId   String? // Reference to graph node
+
   // Relationships
   businessUnit BusinessUnit @relation(fields: [businessUnitId], references: [id], onDelete: Cascade)
+  graphNode    Node?        @relation(fields: [graphNodeId], references: [id])
   users        User[]       @relation("DepartmentUsers")
   assets       Asset[]
   processes    Process[]
@@ -299,6 +458,10 @@ model BusinessCanvas {
   // Canvas hierarchy (for parent-child relationships between canvases)
   parentCanvasId String?
 
+  // Graph-Relational fields
+  hierarchyPath String? // LTREE path for hierarchical queries
+  graphNodeId   String? // Reference to graph node
+
   // Enhanced Metadata Fields
   // Legal & Registration
   legalName String?
@@ -340,6 +503,7 @@ model BusinessCanvas {
   businessUnit  BusinessUnit?    @relation("BusinessUnitBusinessCanvases", fields: [businessUnitId], references: [id])
   parentCanvas  BusinessCanvas?  @relation("CanvasHierarchy", fields: [parentCanvasId], references: [id])
   childCanvases BusinessCanvas[] @relation("CanvasHierarchy")
+  graphNode     Node?            @relation(fields: [graphNodeId], references: [id])
 
   // Canvas content
   valuePropositions ValueProposition[]
@@ -1938,6 +2102,10 @@ model Process {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Graph-Relational fields
+  hierarchyPath String? // LTREE path for hierarchical queries
+  graphNodeId   String? // Reference to graph node
+
   // Relationships
   createdBy      User                   @relation("ProcessCreator", fields: [createdById], references: [id])
   enterprise     Enterprise?            @relation(fields: [enterpriseId], references: [id])
@@ -1952,6 +2120,7 @@ model Process {
   controls       ProcessControl[]
   playbooks      ProcessPlaybook[]
   maturityScores ProcessMaturityScore[]
+  graphNode      Node?                 @relation(fields: [graphNodeId], references: [id])
 
   @@map("processes")
 }

@@ -6,9 +6,12 @@
 > - Solution Architecture: @docs/design/solution-architecture-design.md
 > - Implementation Status: @docs/implementation-status.md
 > - Reference Architecture: @docs/design/reference-architecture.md
+> - Data Architecture Strategy: @docs/design/capopt-platform-data-architecture-strategy.md
 
 ## Backlog Overview
 This backlog reflects the current state of the CapOpt Platform with the completed application framework and Business Model Canvas implementation. The platform is now positioned as "CapOps" - a comprehensive operational capability optimisation system with Critical Control Theory (CCT) at its core.
+
+**New Architecture**: The platform now implements a **Graph-Relational Hybrid** architecture that combines the integrity of relational databases with the flexibility of graph structures for complex interrelationships.
 
 ## Sprint 1: Application Framework ✅ **COMPLETED**
 
@@ -37,486 +40,411 @@ This backlog reflects the current state of the CapOpt Platform with the complete
 - **Cost Structures**: Cost model management
 - **Channels**: Distribution channel management
 
-## Sprint 2: Strategic Layer Foundation ⏳ **PLANNED**
+## Sprint 2: Graph-Relational Foundation 🆕 **NEW PRIORITY**
 
-### ⏳ Business Model Canvas Finalisation
+### 🆕 Graph Database Integration
+- **Priority**: CRITICAL
+- **Effort**: 2-3 weeks
+- **Description**: Implement core graph-relational hybrid architecture
+- **Acceptance Criteria**:
+  - PostgreSQL with graph extensions (Apache AGE or custom functions)
+  - Core nodes and edges tables for polymorphic entity storage
+  - LTREE extension for hierarchical data modeling
+  - JSONB metadata storage for extensible attributes
+  - Graph query optimization and indexing
+  - Hybrid query patterns combining relational and graph data
+  - Graph traversal algorithms for relationship analysis
+  - Performance optimization for large graph datasets
+
+### 🆕 Master Data Centralization with Graph Relationships
 - **Priority**: HIGH
 - **Effort**: 1-2 weeks
-- **Description**: Complete and polish the Business Model Canvas implementation
+- **Description**: Centralize master data with graph-based relationship mapping
 - **Acceptance Criteria**:
-  - Enhanced user experience and interface polish
-  - Advanced canvas features and interactions
-  - Improved data validation and error handling
-  - Export and sharing capabilities
-  - Integration with strategic navigation flow
-  - Performance optimization
+  - Centralized master data entities (roles, systems, vendors, hazards, controls)
+  - Graph nodes for all master data entities
+  - Graph edges for master data relationships
+  - Reference-based relationships instead of data duplication
+  - Template inheritance system with graph relationships
+  - Master data validation and integrity constraints
+  - Graph-based master data querying and filtering
+  - Performance optimization for master data queries
 
-### ⏳ Operating Model Canvas Development
+### 🆕 Hierarchical Data Modeling with LTREE
+- **Priority**: HIGH
+- **Effort**: 1-2 weeks
+- **Description**: Implement hierarchical data modeling using LTREE extension
+- **Acceptance Criteria**:
+  - LTREE columns for all hierarchical entities
+  - Hierarchical path generation and management
+  - Recursive CTEs for complex hierarchical queries
+  - GIST indexes for efficient hierarchical queries
+  - Hierarchical navigation and breadcrumb generation
+  - Hierarchical relationship visualization
+  - Performance optimization for deep hierarchies
+  - Hierarchical data validation and integrity
+
+## Sprint 3: Strategic Layer with Graph Integration ⏳ **UPDATED**
+
+### ⏳ Business Model Canvas with Graph Relationships
+- **Priority**: HIGH
+- **Effort**: 2-3 weeks
+- **Description**: Enhance Business Model Canvas with graph-based relationship mapping
+- **Acceptance Criteria**:
+  - Graph nodes for all canvas elements
+  - Graph edges for inter-block relationships
+  - Interactive relationship visualization
+  - Relationship creation and editing
+  - Relationship validation and business rules
+  - Graph-based canvas analytics
+  - Real-time relationship updates
+  - Export capabilities for graph relationships
+  - Performance optimization for large canvases
+
+### ⏳ Operating Model Canvas with Graph Integration
 - **Priority**: HIGH
 - **Effort**: 4-5 weeks
-- **Description**: Implement operating model canvas for operational strategy
+- **Description**: Implement operating model canvas with graph-based components
 - **Acceptance Criteria**:
-  - Interactive operating model canvas
-  - Value chain visualization
-  - Service model mapping
-  - Experience model design
-  - Capability model assessment
-  - Integration with strategic navigation flow
-  - Real-time data persistence
-  - Database schema for operating model entities
-  - API endpoints for operating model management
+  - Interactive operating model canvas with graph relationships
+  - Value chain visualization with graph flows
+  - Service model mapping with relationship networks
+  - Experience model design with user journey graphs
+  - Capability model assessment with dependency graphs
+  - Graph-based strategic navigation flow
+  - Real-time data persistence with graph updates
+  - Database schema for operating model entities with graph integration
+  - API endpoints for operating model management with graph queries
 
-### ⏳ Value Chain Management Development
+### ⏳ Value Chain Management with Graph Flows
 - **Priority**: HIGH
 - **Effort**: 3-4 weeks
-- **Description**: Implement value chain management and visualization
+- **Description**: Implement value chain management with graph-based flow visualization
 - **Acceptance Criteria**:
-  - Value chain mapping and visualization
-  - Value stream analysis
-  - Value chain optimization tools
-  - Integration with operational processes
-  - Strategic navigation flow integration
-  - Database schema for value chain entities
-  - API endpoints for value chain management
+  - Value chain mapping with graph-based flows
+  - Value stream analysis with relationship networks
+  - Value chain optimization tools with graph analytics
+  - Integration with operational processes through graph relationships
+  - Graph-based strategic navigation flow
+  - Database schema for value chain entities with graph integration
+  - API endpoints for value chain management with graph queries
+  - Real-time value flow monitoring
 
-## Sprint 3: Operational Layer Foundation ⏳ **PLANNED**
+## Sprint 4: Operational Layer with Graph Integration ⏳ **UPDATED**
 
-### ⏳ Process Maps Implementation
+### ⏳ Process Maps with Graph Visualization
 - **Priority**: HIGH
 - **Effort**: 4-5 weeks
-- **Description**: Implement comprehensive process mapping functionality
+- **Description**: Implement comprehensive process mapping with graph-based visualization
 - **Acceptance Criteria**:
-  - Visual process mapping interface
-  - Process flow diagrams
-  - Process step management
-  - Process optimization tools
-  - Integration with strategic navigation
-  - Database schema for process maps
-  - Real-time collaboration features
-  - Process health monitoring
+  - Visual process mapping interface with graph relationships
+  - Process flow diagrams with graph-based flows
+  - Process step management with dependency graphs
+  - Process optimization tools with graph analytics
+  - Graph-based strategic navigation integration
+  - Database schema for process maps with graph integration
+  - Real-time collaboration features with graph updates
+  - Process health monitoring with relationship analysis
+  - Graph-based process impact analysis
 
-### ⏳ Playbooks Implementation
+### ⏳ Playbooks with Graph Workflows
 - **Priority**: HIGH
 - **Effort**: 3-4 weeks
-- **Description**: Implement playbook orchestration and management
+- **Description**: Implement playbooks with graph-based workflow management
 - **Acceptance Criteria**:
-  - Playbook creation interface
-  - Procedure management
-  - Training material integration
-  - Best practice sharing
-  - Version control and approval workflows
-  - Database schema for playbooks
-  - Integration with strategic navigation
-  - Playbook health monitoring
+  - Playbook creation and management with graph workflows
+  - Procedure mapping with relationship networks
+  - Training material integration with learning paths
+  - Best practice sharing with knowledge networks
+  - Graph-based workflow execution
+  - Real-time collaboration on playbooks
+  - Integration with process maps through graph relationships
+  - Performance tracking with graph analytics
 
-### ⏳ ControlOps Implementation
+## Sprint 5: Control & Risk Layer with Graph Integration 🆕 **NEW**
+
+### 🆕 Critical Control Management with Graph Networks
+- **Priority**: CRITICAL
+- **Effort**: 4-5 weeks
+- **Description**: Implement critical control management with graph-based control networks
+- **Acceptance Criteria**:
+  - Critical control identification and categorization with graph relationships
+  - Control networks with relationship mapping
+  - Control effectiveness measurement with graph analytics
+  - Control verification tracking with graph-based audit trails
+  - Integration with processes and assets through graph relationships
+  - Real-time control monitoring with graph updates
+  - Control gap analysis with graph-based coverage mapping
+  - Compliance reporting with graph-based relationship analysis
+
+### 🆕 Bowtie Analysis with Graph Models
+- **Priority**: HIGH
+- **Effort**: 3-4 weeks
+- **Description**: Implement bowtie analysis with graph-based risk models
+- **Acceptance Criteria**:
+  - Interactive bowtie diagrams with graph relationships
+  - Threat visualization with relationship mapping
+  - Control mapping with graph-based barrier networks
+  - Risk propagation visualization with graph flows
+  - Control effectiveness analysis with graph metrics
+  - Scenario analysis with graph-based modeling
+  - Integration with critical controls through graph relationships
+  - Real-time risk monitoring with graph updates
+
+### 🆕 Risk Propagation Engine with Graph Traversal
 - **Priority**: HIGH
 - **Effort**: 4-5 weeks
-- **Description**: Implement Critical Control Theory with verification workflows
+- **Description**: Implement risk propagation engine with graph-based traversal
 - **Acceptance Criteria**:
-  - Control verification interface
-  - Attestation workflows
-  - Control effectiveness tracking
-  - Verification status management
-  - Control failure escalation
-  - Real-time control monitoring
-  - Control health dashboards
-  - Integration with process maps and playbooks
+  - Risk signal detection with graph-based propagation
+  - Risk propagation tracking with graph path analysis
+  - Risk threshold management with graph-based networks
+  - Risk alert generation with graph-based routing
+  - Real-time risk monitoring with graph updates
+  - Risk impact analysis with graph traversal
+  - Integration with all system layers through graph relationships
+  - Predictive risk modeling with graph analytics
 
-## Sprint 4: Tactical Layer Implementation ⏳ **PLANNED**
+## Sprint 6: Graph Visualization & Analytics 🆕 **NEW**
 
-### ⏳ BowtieLab UI Implementation
+### 🆕 Interactive Graph Visualization
 - **Priority**: HIGH
 - **Effort**: 4-5 weeks
-- **Description**: Implement interactive bowtie diagram builder with real functionality
+- **Description**: Implement comprehensive graph visualization capabilities
 - **Acceptance Criteria**:
-  - Interactive bowtie diagram editor
-  - Threat-consequence-control mapping
-  - Real-time bowtie model updates
-  - Bowtie export functionality
-  - Regulatory compliance reporting
-  - Bowtie status management
-  - Visual risk modelling
-  - Integration with ControlOps
+  - Interactive relationship maps with D3.js or React Flow
+  - Node and edge visualization with custom styling
+  - Graph filtering and search capabilities
+  - Zoom and pan controls for large graphs
+  - Graph clustering for better visualization
+  - Export capabilities for graph visualizations
+  - Real-time graph updates with WebSocket integration
+  - Performance optimization for large graph visualizations
+  - Mobile-responsive graph visualization
 
-### ⏳ RiskMap UI Implementation
+### 🆕 Graph Analytics Dashboard
 - **Priority**: MEDIUM
 - **Effort**: 3-4 weeks
-- **Description**: Implement risk propagation visualization with real functionality
+- **Description**: Implement graph analytics dashboard for insights and reporting
 - **Acceptance Criteria**:
-  - Risk signal visualization
-  - Risk propagation calculations
-  - Risk threshold management
-  - Risk alert generation
-  - Risk insight narratives
-  - Real-time risk monitoring
-  - Risk heatmaps
-  - Integration with strategic layers
+  - Graph analytics metrics and KPIs
+  - Relationship analysis and insights
+  - Network analysis and centrality measures
+  - Path analysis and optimization recommendations
+  - Graph-based performance monitoring
+  - Custom graph analytics queries
+  - Export capabilities for analytics reports
+  - Real-time analytics updates
+  - Integration with business intelligence tools
 
-### ⏳ CCT UI Implementation
-- **Priority**: HIGH
-- **Effort**: 3-4 weeks
-- **Description**: Build UI for Critical Control Theory with verification workflows
-- **Acceptance Criteria**:
-  - Control verification interface
-  - Attestation workflows
-  - Control effectiveness tracking
-  - Verification status management
-  - Control failure escalation
-  - Real-time control monitoring
-  - Control health dashboards
-  - Integration with BowtieLab and RiskMap
-
-## Sprint 5: Strategic Navigation & Service Model ⏳ **PLANNED**
-
-### ⏳ Strategic Navigation Implementation
+### 🆕 Graph-Based Reporting
 - **Priority**: MEDIUM
 - **Effort**: 2-3 weeks
-- **Description**: Implement functional navigation between strategic and operational layers
+- **Description**: Implement graph-based reporting capabilities
 - **Acceptance Criteria**:
-  - Functional enterprise context display
-  - Real strategic alignment metrics
-  - Working navigation breadcrumbs
-  - Layer navigation functionality
-  - Strategic dashboard with real data
-  - Context-aware navigation
+  - Graph-based compliance reporting
+  - Relationship analysis reports
+  - Risk propagation reports
+  - Control effectiveness reports
+  - Process optimization reports
+  - Custom report generation with graph data
+  - Scheduled report generation
+  - Report export in multiple formats
+  - Integration with external reporting tools
 
-### ⏳ Service Model Implementation
-- **Priority**: MEDIUM
-- **Effort**: 3-4 weeks
-- **Description**: Implement service model as connecting layer
+## Sprint 7: Integration & Performance 🆕 **NEW**
+
+### 🆕 External System Integration with Graph Relationships
+- **Priority**: HIGH
+- **Effort**: 4-5 weeks
+- **Description**: Implement external system integration with graph-based relationships
 - **Acceptance Criteria**:
-  - Service model design and mapping
-  - Service catalog management
-  - Service performance tracking
-  - Integration with process maps
-  - Strategic navigation flow integration
-  - Database schema and API endpoints
+  - ERP integration with cost center relationships
+  - MES integration with real-time process flows
+  - RCM integration with asset dependency graphs
+  - BI integration with risk propagation paths
+  - Graph-based data synchronization
+  - Real-time integration updates
+  - Integration monitoring and alerting
+  - Data quality validation for integrations
+  - Performance optimization for integration queries
 
-## Sprint 6: Real Dashboard & Actionable Features ⏳ **PLANNED**
-
-### ⏳ Real Dashboard Implementation
-- **Priority**: MEDIUM
-- **Effort**: 3-4 weeks
-- **Description**: Replace mock data with real database queries and functional metrics
+### 🆕 Graph Performance Optimization
+- **Priority**: HIGH
+- **Effort**: 2-3 weeks
+- **Description**: Optimize graph performance for large-scale deployments
 - **Acceptance Criteria**:
-  - Real-time database queries for all metrics
-  - Functional KPI calculations from actual data
-  - Live enterprise context display
-  - Real strategic alignment metrics
-  - Functional navigation between sections
-  - Database-driven progress indicators
-  - Integration with all functional systems
+  - Graph query optimization and caching
+  - Graph indexing strategy implementation
+  - Graph partitioning for horizontal scaling
+  - Graph data archiving and cleanup
+  - Performance monitoring for graph operations
+  - Graph query performance analytics
+  - Memory optimization for large graphs
+  - Graph operation throttling and rate limiting
+  - Graph backup and recovery procedures
 
-### ⏳ Actionable Functionality Implementation
+### 🆕 Graph Security & Access Control
+- **Priority**: HIGH
+- **Effort**: 2-3 weeks
+- **Description**: Implement graph-based security and access control
+- **Acceptance Criteria**:
+  - Graph-based permission management
+  - Relationship-level access control
+  - Graph data encryption and security
+  - Graph audit logging and monitoring
+  - Graph-based role inheritance
+  - Graph data privacy controls
+  - Graph security compliance reporting
+  - Graph access monitoring and alerting
+  - Graph security testing and validation
+
+## Sprint 8: Advanced Graph Features 🆕 **NEW**
+
+### 🆕 Machine Learning with Graph Data
 - **Priority**: MEDIUM
 - **Effort**: 4-5 weeks
-- **Description**: Implement actionable features for operational effectiveness
+- **Description**: Implement machine learning capabilities using graph data
 - **Acceptance Criteria**:
-  - Task assignment and management
-  - Calendar scheduling for periodic reviews
-  - Assignment tracking and notifications
-  - Review scheduling and reminders
-  - Data update workflows
-  - User responsibility management
-  - Integration with all operational systems
+  - Graph-based anomaly detection
+  - Predictive risk modeling with graph features
+  - Graph-based recommendation systems
+  - Graph clustering and community detection
+  - Graph-based pattern recognition
+  - Machine learning model training with graph data
+  - Real-time ML predictions with graph updates
+  - ML model performance monitoring
+  - Integration with external ML platforms
 
-## Sprint 7: Advanced Features ⏳ **PLANNED**
-
-### ⏳ TraceLine Implementation
+### 🆕 Graph-Based Predictive Analytics
 - **Priority**: MEDIUM
 - **Effort**: 3-4 weeks
-- **Description**: Implement strategic traceability engine
+- **Description**: Implement predictive analytics using graph relationships
 - **Acceptance Criteria**:
-  - End-to-end traceability mapping
-  - Strategic-operational linkage
-  - Dependency visualization
-  - Impact analysis tools
-  - Database schema for traceability
-  - API endpoints for traceability
+  - Risk prediction using graph relationships
+  - Process optimization predictions
+  - Control effectiveness predictions
+  - Resource requirement predictions
+  - Performance trend predictions
+  - Predictive maintenance with graph data
+  - Real-time prediction updates
+  - Prediction accuracy monitoring
+  - Integration with business planning tools
 
-### ⏳ AssureBoard Implementation
+### 🆕 Graph-Based Optimization Engine
 - **Priority**: MEDIUM
-- **Effort**: 3-4 weeks
-- **Description**: Implement executive and regulator reporting
+- **Effort**: 4-5 weeks
+- **Description**: Implement optimization engine using graph relationships
 - **Acceptance Criteria**:
-  - Executive dashboards
-  - Regulatory compliance reports
-  - Control health summaries
-  - Audit trail generation
-  - Export functionality (PDF, CSV)
-  - Database schema for reporting
-  - API endpoints for reporting
-
-### ⏳ PulseDeck Implementation
-- **Priority**: LOW
-- **Effort**: 3-4 weeks
-- **Description**: Implement operational insight and early warning system
-- **Acceptance Criteria**:
-  - Real-time operational insights
-  - Early warning indicators
-  - Heatmap visualizations
-  - Performance metrics
-  - Database schema for insights
-  - API endpoints for insights
-
-## Sprint 8: External Integrations ⏳ **FUTURE VISION**
-
-### ⏳ External API Integrations
-- **Priority**: LOW
-- **Effort**: 4-6 weeks
-- **Description**: Implement APIs for external system integrations
-- **Acceptance Criteria**:
-  - Reliability maintenance planning APIs
-  - ERP system integration
-  - Project planning integration
-  - Condition monitoring APIs
-  - Data synchronization
-  - Real-time data feeds
-  - Error handling and retry logic
-
-### ⏳ Advanced Analytics
-- **Priority**: LOW
-- **Effort**: 4-6 weeks
-- **Description**: Implement predictive analytics and machine learning
-- **Acceptance Criteria**:
-  - Predictive maintenance models
-  - Risk prediction algorithms
+  - Process optimization using graph analysis
+  - Resource allocation optimization
+  - Control placement optimization
+  - Risk mitigation optimization
+  - Cost optimization with graph relationships
   - Performance optimization recommendations
-  - Anomaly detection
-  - Machine learning model training
-  - Data pipeline for analytics
-  - Real-time analytics dashboards
+  - Real-time optimization updates
+  - Optimization impact analysis
+  - Integration with operational systems
 
-## Updated Priority Matrix
+## Technical Debt & Infrastructure
 
-### High Priority (Must Have) - Strategic Layer Foundation
-1. **Business Model Canvas Finalisation** - Complete BMC implementation and polish
-2. **Operating Model Canvas Development** - Strategic layer foundation
-3. **Value Chain Management Development** - Strategic-operational alignment foundation
+### 🆕 Graph Database Migration
+- **Priority**: HIGH
+- **Effort**: 2-3 weeks
+- **Description**: Migrate existing data to graph-relational hybrid architecture
+- **Acceptance Criteria**:
+  - Data migration scripts for existing entities
+  - Graph node and edge creation for existing data
+  - Data validation and integrity checks
+  - Migration rollback procedures
+  - Performance testing after migration
+  - Data consistency verification
+  - Migration monitoring and reporting
+  - User training on new graph features
 
-### High Priority (Must Have) - Operational Layer Foundation
-4. **Process Maps Implementation** - Operational layer foundation
-5. **Playbooks Implementation** - Operational excellence foundation
-6. **ControlOps Implementation** - Critical Control Theory foundation
+### 🆕 Graph API Development
+- **Priority**: HIGH
+- **Effort**: 3-4 weeks
+- **Description**: Develop comprehensive graph API endpoints
+- **Acceptance Criteria**:
+  - Graph query API endpoints
+  - Graph traversal API endpoints
+  - Graph analytics API endpoints
+  - Graph visualization API endpoints
+  - Graph relationship management API
+  - Graph performance monitoring API
+  - API documentation and examples
+  - API testing and validation
+  - API security and access control
 
-### Medium Priority (Should Have) - Tactical Layer
-7. **BowtieLab UI Implementation** - Interactive risk modelling
-8. **RiskMap UI Implementation** - Risk propagation visualization
-9. **CCT UI Implementation** - Critical Control Theory UI
-10. **Strategic Navigation Implementation** - Functional navigation between layers
-11. **Service Model Implementation** - Strategic layer completion
-
-### Medium Priority (Should Have) - Dashboard & Actionable Features
-12. **Real Dashboard Implementation** - Replace mock data with real functionality
-13. **Actionable Functionality Implementation** - Task assignments, calendar scheduling, periodic reviews
-
-### Low Priority (Could Have) - Advanced Features
-14. **TraceLine Implementation** - Strategic traceability
-15. **AssureBoard Implementation** - Executive reporting
-16. **PulseDeck Implementation** - Advanced insights
-
-### Low Priority (Could Have) - External Integrations
-17. **External API Integrations** - Reliability maintenance planning, ERP, Project Planning
-18. **Advanced Analytics** - Predictive analytics and machine learning
-19. **Condition Monitoring** - Real-time monitoring and alerting
-
-## Epic Structure
-
-### Epic 1: Application Framework ✅ **COMPLETED**
-**Epic**: Establish application framework and core infrastructure
-**Features**:
-- Application Framework
-- Business Model Canvas
-
-**User Stories**:
-- As a developer, I want a solid application framework so that I can build features efficiently
-- As a business analyst, I want to create business model canvases so that I can visualize strategic models
-- As a user, I want to authenticate securely so that I can access the platform safely
-- As a system administrator, I want to manage enterprise data so that I can configure multi-facility operations
-
-### Epic 2: Strategic Layer Foundation ⏳ **PLANNED**
-**Epic**: Complete the strategic layer with Business Model Canvas, Operating Model Canvas, and Value Chain Management
-**Features**:
-- Business Model Canvas Finalisation
-- Operating Model Canvas Development
-- Value Chain Management Development
-
-**User Stories**:
-- As a business analyst, I want to finalize the business model canvas so that I can have a complete strategic view
-- As a strategic planner, I want to create operating models so that I can design operational strategy
-- As a business analyst, I want to map value chains so that I can optimize value creation
-- As a manager, I want to see strategic-operational alignment so that I can ensure strategic execution
-
-### Epic 3: Operational Layer Foundation ⏳ **PLANNED**
-**Epic**: Establish operational layer with process maps, playbooks, and control operations
-**Features**:
-- Process Maps Implementation
-- Playbooks Implementation
-- ControlOps Implementation
-
-**User Stories**:
-- As a process manager, I want to create visual process maps so that I can document workflows
-- As a trainer, I want to create playbooks so that I can standardize operations
-- As a safety manager, I want to track critical controls so that I can ensure operational safety
-- As a worker, I want to follow documented procedures so that I can perform tasks correctly
-
-### Epic 4: Tactical Layer Implementation ⏳ **PLANNED**
-**Epic**: Implement tactical layer with risk modelling and control verification
-**Features**:
-- BowtieLab UI Implementation
-- RiskMap UI Implementation
-- CCT UI Implementation
-- Strategic Navigation Implementation
-- Service Model Implementation
-
-**User Stories**:
-- As a risk analyst, I want to create bowtie models so that I can visualize risk scenarios
-- As an operator, I want to verify controls so that I can ensure they are working
-- As a manager, I want to see risk propagation so that I can understand strategic impacts
-- As a service manager, I want to design service models so that I can improve service delivery
-- As a user, I want to navigate between layers so that I can access different functionality
-
-### Epic 5: Dashboard & Actionable Features ⏳ **PLANNED**
-**Epic**: Implement real dashboard and actionable functionality for operational effectiveness
-**Features**:
-- Real Dashboard Implementation
-- Actionable Functionality Implementation
-
-**User Stories**:
-- As a manager, I want to see real metrics so that I can make informed decisions
-- As a team leader, I want to assign tasks so that I can manage responsibilities
-- As a manager, I want to schedule periodic reviews so that I can keep data current
-- As a user, I want to track assignments so that I can manage my responsibilities
-
-### Epic 6: Advanced Features ⏳ **PLANNED**
-**Epic**: Implement advanced traceability, reporting, and insight features
-**Features**:
-- TraceLine Implementation
-- AssureBoard Implementation
-- PulseDeck Implementation
-
-**User Stories**:
-- As a manager, I want to trace strategic impacts so that I can understand dependencies
-- As an executive, I want to see assurance reports so that I can verify operational health
-- As an operator, I want to see operational insights so that I can make better decisions
-- As a regulator, I want to export compliance reports so that I can verify regulatory compliance
-
-### Epic 7: External Integrations ⏳ **FUTURE VISION**
-**Epic**: Implement external system integrations and advanced analytics
-**Features**:
-- External API Integrations
-- Advanced Analytics
-- Condition Monitoring
-
-**User Stories**:
-- As a maintenance manager, I want to integrate with reliability systems so that I can plan maintenance
-- As a project manager, I want to integrate with project planning tools so that I can align activities
-- As an operator, I want real-time condition monitoring so that I can prevent failures
-- As a manager, I want predictive analytics so that I can optimize performance
+### 🆕 Graph Testing Framework
+- **Priority**: MEDIUM
+- **Effort**: 2-3 weeks
+- **Description**: Implement comprehensive testing framework for graph features
+- **Acceptance Criteria**:
+  - Unit tests for graph components
+  - Integration tests for graph queries
+  - Performance tests for graph operations
+  - Graph data validation tests
+  - Graph security tests
+  - Graph visualization tests
+  - Automated testing pipeline
+  - Test coverage reporting
+  - Continuous integration for graph features
 
 ## Success Metrics
 
-### Phase 1 Completion: ✅ **17% (2/12 features)**
-- Application Framework ✅
-- Business Model Canvas ✅
+### Graph Architecture Metrics
+- **Graph Performance**: Sub-second response times for graph queries
+- **Graph Scalability**: Support for 10,000+ nodes and 100,000+ edges
+- **Graph Reliability**: 99.9% uptime for graph operations
+- **Graph Security**: Zero security incidents related to graph data
+- **Graph Adoption**: 80% of users actively using graph features
 
-### Phase 2 Target: **42% (5/12 features)**
-- Business Model Canvas Finalisation ⏳
-- Operating Model Canvas Development ⏳
-- Value Chain Management Development ⏳
+### Business Impact Metrics
+- **Relationship Discovery**: 50% increase in relationship insights
+- **Decision Quality**: 30% improvement in decision-making speed
+- **Process Optimization**: 25% improvement in process efficiency
+- **Risk Reduction**: 40% reduction in risk incidents
+- **Operational Efficiency**: 20% improvement in operational metrics
 
-### Phase 3 Target: **75% (9/12 features)**
-- Process Maps Implementation ⏳
-- Playbooks Implementation ⏳
-- ControlOps Implementation ⏳
+### Technical Metrics
+- **Query Performance**: 60% improvement in complex relationship queries
+- **Data Quality**: 100% single source of truth for master data
+- **Extensibility**: New relationship types without schema changes
+- **Integration**: Seamless connection with external systems
+- **Maintainability**: Reduced technical debt through graph architecture
 
-### Phase 4 Target: **100% (12/12 features)**
-- BowtieLab UI Implementation ⏳
-- RiskMap UI Implementation ⏳
-- CCT UI Implementation ⏳
-- Strategic Navigation Implementation ⏳
-- Service Model Implementation ⏳
-- Real Dashboard Implementation ⏳
-- Actionable Functionality Implementation ⏳
-- TraceLine Implementation ⏳
-- AssureBoard Implementation ⏳
-- PulseDeck Implementation ⏳
+## Risk Mitigation
 
-### Future Vision (Beyond Core Platform)
-- External API Integrations ⏳
-- Advanced Analytics ⏳
-- Condition Monitoring ⏳
+### Technical Risks
+- **Graph Performance**: Implement comprehensive performance optimization
+- **Data Migration**: Thorough testing and rollback procedures
+- **Integration Complexity**: Phased integration approach
+- **Scalability Challenges**: Horizontal scaling and partitioning strategies
+- **Security Vulnerabilities**: Comprehensive security testing and monitoring
 
-## Implementation Status Summary
+### Business Risks
+- **User Adoption**: Comprehensive training and change management
+- **Data Quality**: Robust validation and monitoring procedures
+- **Compliance Issues**: Regular compliance audits and reporting
+- **Performance Impact**: Continuous performance monitoring and optimization
+- **Integration Delays**: Agile development with regular stakeholder communication
 
-### ✅ **Completed Features (2/12)**
-1. **Application Framework** - Complete Next.js/React/TypeScript setup with authentication and database
-2. **Business Model Canvas** - Fully functional interactive business model canvas
+## Future Enhancements
 
-### 🔄 **In Progress Features (0/12)**
-- All planned features are either completed or not started
+### Advanced Graph Features
+- **3D Graph Visualization**: Three-dimensional graph representations
+- **Graph Virtual Reality**: VR-based graph exploration
+- **Graph Natural Language**: Natural language queries for graph data
+- **Graph Blockchain**: Blockchain-based graph data integrity
+- **Graph Edge Computing**: Edge computing for graph processing
 
-### ⏳ **Planned Features (10/12)**
-1. **Business Model Canvas Finalisation** - Complete BMC implementation and polish
-2. **Operating Model Canvas Development** - Strategic layer foundation
-3. **Value Chain Management Development** - Strategic-operational alignment foundation
-4. **Process Maps Implementation** - Operational layer foundation
-5. **Playbooks Implementation** - Operational excellence foundation
-6. **ControlOps Implementation** - Critical Control Theory foundation
-7. **BowtieLab UI Implementation** - Interactive risk modelling
-8. **RiskMap UI Implementation** - Risk propagation visualization
-9. **CCT UI Implementation** - Critical Control Theory UI
-10. **Strategic Navigation Implementation** - Functional navigation between layers
-11. **Service Model Implementation** - Strategic layer completion
-12. **Real Dashboard Implementation** - Replace mock data with real functionality
-13. **Actionable Functionality Implementation** - Task assignments, calendar scheduling, periodic reviews
-14. **TraceLine Implementation** - Strategic traceability
-15. **AssureBoard Implementation** - Executive reporting
-16. **PulseDeck Implementation** - Advanced insights
+### Industry-Specific Features
+- **Mining Industry Graphs**: Mining-specific relationship patterns
+- **Defence Industry Graphs**: Defence-specific security and compliance
+- **Petrochemical Graphs**: Petrochemical-specific risk and safety patterns
+- **Pharmaceutical Graphs**: Pharmaceutical-specific regulatory compliance
+- **Cross-Industry Graphs**: Cross-industry relationship analysis
 
-The platform has achieved 17% completion with a solid foundation of application framework and Business Model Canvas. The next phase focuses on completing the strategic layer foundation, followed by operational layer foundation, tactical layer implementation, and finally dashboard and actionable features when we have functional systems and data.
-
-## Current Reality Check
-
-### **What's Actually Working**
-- ✅ **Application Framework**: Complete Next.js/React/TypeScript setup
-- ✅ **Authentication**: JWT-based auth with role management
-- ✅ **Database**: PostgreSQL with Prisma ORM
-- ✅ **Business Model Canvas**: Fully functional interactive canvas
-- ✅ **Seed Data**: Comprehensive test data loaded
-
-### **What's Wireframe/Mock Data**
-- ⏳ **Dashboard**: All metrics are mock data
-- ⏳ **Critical Controls**: Interface exists but no real functionality
-- ⏳ **Process Management**: Interface exists but no real functionality
-- ⏳ **Strategic Navigation**: Visual only, not functional
-- ⏳ **Enterprise Context**: Mock data display only
-
-### **What's Database Schema Only**
-- ⏳ **CCT Implementation**: Schema exists but no UI
-- ⏳ **Bowtie Analysis**: Schema exists but no UI
-- ⏳ **Risk Propagation**: Schema exists but no UI
-
-### **What's Not Started**
-- ⏳ **Operating Model Canvas**: Not implemented
-- ⏳ **Value Chain Management**: Not implemented
-- ⏳ **Service Model**: Not implemented
-- ⏳ **Playbooks**: Not implemented
-- ⏳ **Advanced Features**: Not implemented
-
-### **New Development Sequence**
-1. **Strategic Layer Foundation** - BMC Finalisation → OM Development → Value Chain Development
-2. **Operational Layer Foundation** - Process Maps → Playbooks → ControlOps
-3. **Tactical Layer Implementation** - BowtieLab → RiskMap → CCT UI
-4. **Dashboard & Actionable Features** - Real Dashboard → Task Assignments → Calendar Scheduling
-5. **Advanced Features** - TraceLine → AssureBoard → PulseDeck
-6. **External Integrations** - APIs → Analytics → Condition Monitoring 
-
-## Related Documentation
-
-- **Project Purpose:** @docs/design/why-statement.md
-- **Problems Solved:** @docs/design/problem-statement.md
-- **Solution Architecture:** @docs/design/solution-architecture-design.md
-- **Implementation Status:** @docs/implementation-status.md
-- **Reference Architecture:** @docs/design/reference-architecture.md 
+This updated backlog reflects the new Graph-Relational Hybrid architecture strategy and provides a comprehensive roadmap for implementing graph-based features while maintaining the existing functionality and strategic objectives of the CapOpt Platform. 

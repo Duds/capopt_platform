@@ -4,10 +4,13 @@
 > - Operational Canvas Design: @docs/design/operational-canvas-design.md
 > - Operational Canvas Implementation Plan: @docs/design/operational-canvas-implementation-plan.md
 > - Solution Architecture: @docs/design/solution-architecture-design.md
+> - Data Architecture Strategy: @docs/design/capopt-platform-data-architecture-strategy.md
 
 ## Executive Summary
 
-After analyzing the proposed Operational Canvas plan against data architecture best practices, several critical improvements are needed to ensure **efficient data relationships**, **extensibility**, **scalability**, and **minimized master data duplication**.
+After analyzing the proposed Operational Canvas plan against data architecture best practices and the new **Graph-Relational Hybrid** architecture strategy, several critical improvements are needed to ensure **efficient data relationships**, **extensibility**, **scalability**, and **minimized master data duplication**.
+
+**New Architecture Alignment**: The operational canvas now leverages the Graph-Relational Hybrid pattern for complex operational relationships, flexible process mapping, and real-time risk propagation.
 
 ## Current Plan Analysis
 
@@ -16,62 +19,87 @@ After analyzing the proposed Operational Canvas plan against data architecture b
 #### 1. **Data Relationship Inefficiencies**
 - **Problem**: Proposed separate `operational_canvas` table creates unnecessary duplication
 - **Impact**: Breaks the established pattern of using existing business canvas data
-- **Better Approach**: Extend existing `BusinessCanvas` model with operational attributes
+- **Better Approach**: Extend existing `BusinessCanvas` model with operational attributes and graph relationships
 
 #### 2. **Master Data Duplication**
 - **Problem**: New master data tables (`process_templates`, `control_frameworks`, `asset_specifications`) duplicate existing patterns
 - **Impact**: Inconsistent with established `IndustryFacilityTypes`, `IndustryOperationalStreams` patterns
-- **Better Approach**: Extend existing industry-sector association tables
+- **Better Approach**: Extend existing industry-sector association tables with graph-based relationships
 
 #### 3. **Scalability Concerns**
 - **Problem**: JSONB fields for complex data structures limit querying and indexing
 - **Impact**: Poor performance for large datasets and complex queries
-- **Better Approach**: Normalized relational structures with proper indexing
+- **Better Approach**: Normalized relational structures with graph relationships and proper indexing
 
 #### 4. **Extensibility Limitations**
 - **Problem**: Hard-coded stream types and process templates
 - **Impact**: Difficult to add new industries, sectors, or operational patterns
-- **Better Approach**: Flexible, configurable master data system
+- **Better Approach**: Flexible, configurable master data system with graph-based extensibility
 
 ## Improved Data Architecture
 
-### ✅ **Optimized Approach: Extend Existing Patterns**
+### ✅ **Optimized Approach: Graph-Relational Hybrid Pattern**
 
-#### 1. **Leverage Existing Business Canvas Structure**
+#### 1. **Leverage Existing Business Canvas Structure with Graph Integration**
 
-Instead of creating a separate `operational_canvas` table, extend the existing `BusinessCanvas` model:
+Instead of creating a separate `operational_canvas` table, extend the existing `BusinessCanvas` model with graph relationships:
 
 ```sql
 -- Extend BusinessCanvas with operational attributes
 ALTER TABLE business_canvases ADD COLUMN operational_mode BOOLEAN DEFAULT false;
 ALTER TABLE business_canvases ADD COLUMN operational_parent_id TEXT REFERENCES business_canvases(id);
 ALTER TABLE business_canvases ADD COLUMN operational_status operational_status DEFAULT 'PLANNING';
+ALTER TABLE business_canvases ADD COLUMN hierarchy_path LTREE;
 
--- Operational Canvas inherits from Business Canvas
--- No new table needed - same entity, different mode
+-- Graph nodes for operational canvas elements
+INSERT INTO nodes (id, type, label, metadata) VALUES
+  (canvas_id, 'operational_canvas', canvas_name, {
+    'operational_mode': true,
+    'parent_canvas_id': parent_canvas_id,
+    'status': 'active',
+    'version': '1.0'
+  });
+
+-- Graph edges for operational relationships
+INSERT INTO edges (from_id, to_id, relation_type, metadata) VALUES
+  (operational_canvas_id, process_map_id, 'contains', {'component': 'process_map'}),
+  (operational_canvas_id, control_framework_id, 'implements', {'framework': 'icmm'}),
+  (process_map_id, process_step_id, 'consists_of', {'sequence': 1});
 ```
 
-#### 2. **Extend Existing Master Data Patterns**
+#### 2. **Extend Existing Master Data Patterns with Graph Relationships**
 
-Follow the established pattern of industry-sector associations:
+Follow the established pattern of industry-sector associations with graph integration:
 
 ```sql
 -- Extend existing IndustryOperationalStreams for process templates
 ALTER TABLE industry_operational_streams ADD COLUMN process_template_data JSONB;
 ALTER TABLE industry_operational_streams ADD COLUMN control_framework_data JSONB;
 ALTER TABLE industry_operational_streams ADD COLUMN asset_specification_data JSONB;
+ALTER TABLE industry_operational_streams ADD COLUMN node_id UUID REFERENCES nodes(id);
 
--- Use existing FacilityTypeMaster for asset specifications
-ALTER TABLE facility_type_master ADD COLUMN asset_specifications JSONB;
-ALTER TABLE facility_type_master ADD COLUMN operational_requirements JSONB;
+-- Graph nodes for master data
+INSERT INTO nodes (id, type, label, metadata) VALUES
+  (stream_id, 'operational_stream', stream_name, {
+    'industry': 'mining',
+    'sector': 'copper',
+    'process_templates': process_template_data,
+    'control_frameworks': control_framework_data
+  });
+
+-- Graph edges for master data relationships
+INSERT INTO edges (from_id, to_id, relation_type, metadata) VALUES
+  (stream_id, process_template_id, 'includes', {'template_type': 'standard'}),
+  (stream_id, control_framework_id, 'implements', {'framework': 'icmm'}),
+  (process_template_id, control_id, 'requires', {'control_type': 'critical'});
 ```
 
-#### 3. **Normalized Process Management**
+#### 3. **Normalized Process Management with Graph Relationships**
 
-Replace JSONB with proper relational structures:
+Replace JSONB with proper relational structures and graph relationships:
 
 ```sql
--- Process Maps (normalized)
+-- Process Maps (normalized with graph integration)
 CREATE TABLE process_maps (
   id TEXT PRIMARY KEY,
   business_canvas_id TEXT REFERENCES business_canvases(id),
@@ -79,11 +107,12 @@ CREATE TABLE process_maps (
   name TEXT NOT NULL,
   description TEXT,
   status process_status DEFAULT 'DRAFT',
+  hierarchy_path LTREE,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Process Steps (normalized)
+-- Process Steps (normalized with graph relationships)
 CREATE TABLE process_steps (
   id TEXT PRIMARY KEY,
   process_map_id TEXT REFERENCES process_maps(id),
@@ -98,153 +127,102 @@ CREATE TABLE process_steps (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Process Controls (normalized)
-CREATE TABLE process_controls (
-  id TEXT PRIMARY KEY,
-  process_step_id TEXT REFERENCES process_steps(id),
-  control_id TEXT REFERENCES critical_controls(id),
-  control_type control_type,
-  effectiveness control_effectiveness DEFAULT 'PENDING',
-  verification_required BOOLEAN DEFAULT true,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
+-- Graph nodes for process elements
+INSERT INTO nodes (id, type, label, metadata) VALUES
+  (process_map_id, 'process_map', process_map_name, {
+    'status': 'active',
+    'stream_type': 'copper',
+    'complexity': 'high'
+  });
+
+-- Graph edges for process relationships
+INSERT INTO edges (from_id, to_id, relation_type, metadata) VALUES
+  (process_map_id, process_step_id, 'consists_of', {'sequence': step_number}),
+  (process_step_id, control_id, 'requires', {'control_type': 'critical'}),
+  (process_step_id, asset_id, 'uses', {'asset_type': 'equipment'});
 ```
 
-### ✅ **Improved Cascade Strategy**
+### ✅ **Graph-Relational Integration Patterns**
 
-#### 1. **Efficient Data Inheritance**
+#### 1. **Operational Canvas Graph Structure**
 
 ```typescript
-// services/operational-cascade.service.ts
-export class OperationalCascadeService {
-  
-  // Create Operational Canvas from Business Canvas
-  async createOperationalCanvas(businessCanvasId: string, facilityId: string) {
-    const businessCanvas = await this.getBusinessCanvas(businessCanvasId);
-    
-    // Create operational canvas as a child of business canvas
-    const operationalCanvas = await prisma.businessCanvas.create({
-      data: {
-        name: `${businessCanvas.name} - Operational`,
-        description: `Operational implementation of ${businessCanvas.name}`,
-        operationalMode: true,
-        operationalParentId: businessCanvasId,
-        enterpriseId: businessCanvas.enterpriseId,
-        facilityId: facilityId,
-        businessUnitId: businessCanvas.businessUnitId,
-        industry: businessCanvas.industry,
-        sectors: businessCanvas.sectors,
-        primarySector: businessCanvas.primarySector,
-        facilityTypes: businessCanvas.facilityTypes,
-        operationalStreams: businessCanvas.operationalStreams,
-        complianceRequirements: businessCanvas.complianceRequirements,
-        regulatoryFramework: businessCanvas.regulatoryFramework,
-        status: 'DRAFT'
-      }
-    });
-    
-    // Cascade operational streams using existing patterns
-    await this.cascadeOperationalStreams(operationalCanvas, businessCanvas);
-    
-    return operationalCanvas;
-  }
-  
-  // Use existing industry-sector associations
-  private async cascadeOperationalStreams(operationalCanvas: BusinessCanvas, businessCanvas: BusinessCanvas) {
-    // Use existing BusinessCanvasOperationalStreams pattern
-    const industryStreams = await prisma.industryOperationalStreams.findMany({
-      where: {
-        industry: { code: businessCanvas.industry },
-        sector: { code: { in: businessCanvas.sectors } }
-      },
-      include: {
-        operationalStream: true,
-        processTemplateData: true,
-        controlFrameworkData: true
-      }
-    });
-    
-    for (const industryStream of industryStreams) {
-      // Create operational stream association
-      await prisma.businessCanvasOperationalStreams.create({
-        data: {
-          businessCanvasId: operationalCanvas.id,
-          operationalStreamId: industryStream.operationalStreamId,
-          isAutoApplied: true,
-          industryOperationalStreamsId: industryStream.id
-        }
-      });
-      
-      // Create process maps from template data
-      if (industryStream.processTemplateData) {
-        await this.createProcessMapsFromTemplate(
-          operationalCanvas.id,
-          industryStream.operationalStreamId,
-          industryStream.processTemplateData
-        );
-      }
-    }
-  }
+// Graph-based operational canvas structure
+interface OperationalCanvas extends BusinessCanvas {
+  operationalMode: true;
+  operationalParentId: string; // Reference to business canvas
+  processMaps: ProcessMap[]; // References to process maps
+  graphNodeId: string; // Reference to graph node
+  inheritedData: {
+    industry: string; // Reference to existing
+    sectors: string[]; // Reference to existing
+    facilityTypes: string[]; // Reference to existing
+  };
+}
+
+// Graph node for operational canvas
+interface OperationalCanvasNode {
+  id: string;
+  type: 'operational_canvas';
+  label: string;
+  metadata: {
+    operationalMode: true;
+    parentCanvasId: string;
+    status: string;
+    version: string;
+    industry: string;
+    sectors: string[];
+  };
 }
 ```
 
-### ✅ **Master Data Optimization**
-
-#### 1. **Extend Existing Master Data Tables**
-
-```sql
--- Extend IndustryOperationalStreams with operational data
-ALTER TABLE industry_operational_streams ADD COLUMN process_template JSONB;
-ALTER TABLE industry_operational_streams ADD COLUMN control_framework JSONB;
-ALTER TABLE industry_operational_streams ADD COLUMN asset_requirements JSONB;
-
--- Extend FacilityTypeMaster with operational specifications
-ALTER TABLE facility_type_master ADD COLUMN operational_specifications JSONB;
-ALTER TABLE facility_type_master ADD COLUMN process_requirements JSONB;
-```
-
-#### 2. **Flexible Template System**
+#### 2. **Process Management Graph Integration**
 
 ```typescript
-// types/master-data.ts
-interface ProcessTemplate {
+// Process map with graph relationships
+interface ProcessMap {
   id: string;
+  businessCanvasId: string;
+  operationalStreamId: string;
   name: string;
   description: string;
-  industryCode: string;
-  sectorCodes: string[];
-  streamType: StreamType;
-  steps: ProcessStepTemplate[];
-  controls: ControlTemplate[];
-  assets: AssetTemplate[];
-  isActive: boolean;
+  status: ProcessStatus;
+  hierarchyPath: string; // LTREE path
+  graphNodeId: string; // Reference to graph node
+  steps: ProcessStep[];
+  controls: CriticalControl[];
+  assets: Asset[];
 }
 
-interface ProcessStepTemplate {
+// Process step with graph relationships
+interface ProcessStep {
+  id: string;
+  processMapId: string;
   name: string;
+  description: string;
+  stepNumber: number;
   stepType: ProcessStepType;
-  duration: number;
-  inputs: string[];
-  outputs: string[];
-  controls: string[];
-  risks: string[];
+  durationMinutes: number;
   predecessorSteps: string[];
   successorSteps: string[];
+  graphNodeId: string; // Reference to graph node
+  controls: CriticalControl[];
+  risks: RiskSignal[];
 }
 ```
 
-### ✅ **Scalable Query Patterns**
+### ✅ **Scalable Query Patterns with Graph Integration**
 
-#### 1. **Efficient Data Retrieval**
+#### 1. **Efficient Data Retrieval with Hybrid Queries**
 
 ```typescript
 // services/operational-data.service.ts
 export class OperationalDataService {
   
-  // Get operational canvas with all related data in single query
+  // Get operational canvas with all related data using hybrid queries
   async getOperationalCanvas(canvasId: string) {
-    return await prisma.businessCanvas.findUnique({
+    // Relational query for core data
+    const businessCanvas = await prisma.businessCanvas.findUnique({
       where: { 
         id: canvasId,
         operationalMode: true 
@@ -287,10 +265,21 @@ export class OperationalDataService {
         }
       }
     });
+    
+    // Graph query for complex relationships
+    const graphRelationships = await this.graphQuery(`
+      MATCH (oc:OperationalCanvas {id: $canvasId})-[:contains]->(pm:ProcessMap)
+      MATCH (pm)-[:consists_of]->(ps:ProcessStep)
+      MATCH (ps)-[:requires]->(c:Control)
+      RETURN pm, ps, c
+    `);
+    
+    return { businessCanvas, graphRelationships };
   }
   
-  // Efficient cascade query using existing patterns
+  // Efficient cascade query using hybrid patterns
   async getCascadeData(businessCanvasId: string) {
+    // Relational query for master data
     const businessCanvas = await prisma.businessCanvas.findUnique({
       where: { id: businessCanvasId },
       include: {
@@ -319,22 +308,31 @@ export class OperationalDataService {
       }
     });
     
-    return { businessCanvas, operationalData };
+    // Graph query for complex relationships
+    const graphData = await this.graphQuery(`
+      MATCH (bc:BusinessCanvas {id: $businessCanvasId})-[:operational_mode]->(oc:OperationalCanvas)
+      MATCH (oc)-[:contains]->(pm:ProcessMap)
+      MATCH (pm)-[:implements]->(cf:ControlFramework)
+      RETURN oc, pm, cf
+    `);
+    
+    return { businessCanvas, operationalData, graphData };
   }
 }
 ```
 
-### ✅ **Extensibility Improvements**
+### ✅ **Extensibility Improvements with Graph Integration**
 
-#### 1. **Configurable Master Data**
+#### 1. **Configurable Master Data with Graph Relationships**
 
 ```typescript
 // services/master-data-config.service.ts
 export class MasterDataConfigService {
   
-  // Dynamic template loading based on industry/sector
+  // Dynamic template loading based on industry/sector with graph relationships
   async getProcessTemplates(industryCode: string, sectorCodes: string[]) {
-    return await prisma.industryOperationalStreams.findMany({
+    // Relational query for templates
+    const templates = await prisma.industryOperationalStreams.findMany({
       where: {
         industry: { code: industryCode },
         sector: { code: { in: sectorCodes } },
@@ -345,11 +343,22 @@ export class MasterDataConfigService {
         controlFramework: true
       }
     });
+    
+    // Graph query for template relationships
+    const templateRelationships = await this.graphQuery(`
+      MATCH (ios:IndustryOperationalStream)-[:includes]->(pt:ProcessTemplate)
+      WHERE ios.industry_code = $industryCode AND ios.sector_code IN $sectorCodes
+      MATCH (pt)-[:requires]->(c:Control)
+      RETURN pt, c
+    `);
+    
+    return { templates, templateRelationships };
   }
   
-  // Extensible control framework system
+  // Extensible control framework system with graph relationships
   async getControlFrameworks(industryCode: string, sectorCodes: string[]) {
-    return await prisma.industryComplianceFramework.findMany({
+    // Relational query for frameworks
+    const frameworks = await prisma.industryComplianceFramework.findMany({
       where: {
         industry: { code: industryCode },
         sector: { code: { in: sectorCodes } }
@@ -358,29 +367,52 @@ export class MasterDataConfigService {
         controlFramework: true
       }
     });
+    
+    // Graph query for framework relationships
+    const frameworkRelationships = await this.graphQuery(`
+      MATCH (icf:IndustryComplianceFramework)-[:implements]->(cf:ControlFramework)
+      WHERE icf.industry_code = $industryCode AND icf.sector_code IN $sectorCodes
+      MATCH (cf)-[:contains]->(c:Control)
+      RETURN cf, c
+    `);
+    
+    return { frameworks, frameworkRelationships };
   }
 }
 ```
 
-## Performance Optimizations
+## Performance Optimizations with Graph Integration
 
-### 1. **Indexing Strategy**
+### 1. **Hybrid Indexing Strategy**
 
 ```sql
--- Optimize cascade queries
+-- Optimize cascade queries with graph integration
 CREATE INDEX idx_business_canvas_operational ON business_canvases(operational_mode, operational_parent_id);
 CREATE INDEX idx_industry_sector_streams ON industry_operational_streams(industry_id, sector_id);
 CREATE INDEX idx_process_maps_canvas ON process_maps(business_canvas_id);
 CREATE INDEX idx_process_steps_map ON process_steps(process_map_id, step_number);
+
+-- Graph indexes for efficient traversal
+CREATE INDEX idx_nodes_type_label ON nodes USING GIN (type, label);
+CREATE INDEX idx_edges_relation_type ON edges USING GIN (relation_type);
+CREATE INDEX idx_edges_metadata ON edges USING GIN (metadata);
+
+-- Hierarchical indexes for LTREE
+CREATE INDEX idx_business_canvas_hierarchy ON business_canvases USING GIST (hierarchy_path);
+CREATE INDEX idx_process_maps_hierarchy ON process_maps USING GIST (hierarchy_path);
+
+-- JSONB indexes for metadata queries
+CREATE INDEX idx_nodes_metadata ON nodes USING GIN (metadata);
+CREATE INDEX idx_edges_metadata ON edges USING GIN (metadata);
 ```
 
-### 2. **Query Optimization**
+### 2. **Hybrid Query Optimization**
 
 ```typescript
-// Optimized cascade query with minimal joins
+// Optimized cascade query with graph integration
 async getOperationalCascadeData(businessCanvasId: string) {
-  // Single query with all necessary data
-  const result = await prisma.$queryRaw`
+  // Single relational query with all necessary data
+  const relationalData = await prisma.$queryRaw`
     SELECT 
       bc.*,
       json_agg(DISTINCT ios.*) as operational_streams,
@@ -393,101 +425,128 @@ async getOperationalCascadeData(businessCanvasId: string) {
     GROUP BY bc.id
   `;
   
-  return result[0];
+  // Graph query for complex relationships
+  const graphData = await this.graphQuery(`
+    MATCH (bc:BusinessCanvas {id: $businessCanvasId})-[:operational_mode]->(oc:OperationalCanvas)
+    MATCH (oc)-[:contains]->(pm:ProcessMap)
+    MATCH (pm)-[:consists_of]->(ps:ProcessStep)
+    MATCH (ps)-[:requires]->(c:Control)
+    RETURN oc, pm, ps, c
+  `);
+  
+  return { relationalData: relationalData[0], graphData };
 }
 ```
 
-## Data Duplication Minimization
+## Data Duplication Minimization with Graph Integration
 
-### 1. **Single Source of Truth**
+### 1. **Single Source of Truth with Graph Relationships**
 
-- **Business Canvas**: Single entity for both strategic and operational modes
-- **Master Data**: Extend existing industry-sector associations
-- **Templates**: Store in existing master data tables, not separate tables
+- **Business Canvas**: Single entity for both strategic and operational modes with graph relationships
+- **Master Data**: Extend existing industry-sector associations with graph nodes and edges
+- **Templates**: Store in existing master data tables with graph relationships, not separate tables
+- **Graph Integration**: Use graph nodes and edges for complex relationships without duplicating data
 
-### 2. **Reference-Based Relationships**
+### 2. **Reference-Based Relationships with Graph Integration**
 
 ```typescript
-// Use references instead of duplicating data
+// Use references instead of duplicating data with graph relationships
 interface OperationalCanvas extends BusinessCanvas {
   operationalMode: true;
   operationalParentId: string; // Reference to business canvas
   processMaps: ProcessMap[]; // References to process maps
+  graphNodeId: string; // Reference to graph node
   inheritedData: {
     industry: string; // Reference to existing
     sectors: string[]; // Reference to existing
     facilityTypes: string[]; // Reference to existing
   };
 }
+
+// Graph relationships for operational canvas
+interface OperationalCanvasGraphRelationships {
+  canvasNode: GraphNode;
+  processMapNodes: GraphNode[];
+  controlNodes: GraphNode[];
+  assetNodes: GraphNode[];
+  relationships: GraphEdge[];
+}
 ```
 
-## Scalability Considerations
+## Scalability Considerations with Graph Integration
 
-### 1. **Horizontal Scaling**
+### 1. **Horizontal Scaling with Graph Integration**
 
-- **Partitioning**: Partition by enterprise or facility
-- **Sharding**: Shard by industry or region
-- **Caching**: Redis for frequently accessed master data
+- **Partitioning**: Partition by enterprise or facility with graph relationship preservation
+- **Sharding**: Shard by industry or region with graph relationship routing
+- **Caching**: Redis for frequently accessed master data and graph traversal results
 
-### 2. **Vertical Scaling**
+### 2. **Vertical Scaling with Graph Integration**
 
-- **Indexing**: Comprehensive indexing strategy
-- **Query Optimization**: Efficient query patterns
-- **Data Archiving**: Archive old operational data
+- **Indexing**: Comprehensive indexing strategy for both relational and graph queries
+- **Query Optimization**: Efficient hybrid query patterns combining relational and graph data
+- **Data Archiving**: Archive old operational data with graph relationship preservation
 
-## Implementation Recommendations
+## Implementation Recommendations with Graph Integration
 
-### ✅ **Phase 1: Extend Existing Structure (1-2 weeks)**
+### ✅ **Phase 1: Extend Existing Structure with Graph Integration (2-3 weeks)**
 
-1. **Extend BusinessCanvas Model**
+1. **Extend BusinessCanvas Model with Graph Relationships**
    - Add operational mode attributes
    - Implement operational parent-child relationships
    - Use existing master data patterns
+   - Add graph nodes and edges for operational relationships
 
-2. **Extend Master Data Tables**
+2. **Extend Master Data Tables with Graph Integration**
    - Add operational data to existing industry-sector associations
    - Implement template system within existing structure
    - Maintain backward compatibility
+   - Add graph relationships for master data
 
-### ✅ **Phase 2: Process Management (2-3 weeks)**
+### ✅ **Phase 2: Process Management with Graph Integration (3-4 weeks)**
 
-1. **Normalized Process Tables**
+1. **Normalized Process Tables with Graph Relationships**
    - Implement proper relational process structures
    - Use existing control and asset relationships
    - Maintain data integrity constraints
+   - Add graph nodes and edges for process relationships
 
-2. **Efficient Cascade System**
+2. **Efficient Cascade System with Graph Integration**
    - Use existing pattern assignment system
    - Implement efficient data inheritance
    - Optimize query performance
+   - Add graph-based relationship traversal
 
-### ✅ **Phase 3: Advanced Features (2-3 weeks)**
+### ✅ **Phase 3: Advanced Features with Graph Integration (4-6 weeks)**
 
-1. **Real-time Monitoring**
+1. **Real-time Monitoring with Graph Relationships**
    - Leverage existing asset and control monitoring
    - Implement operational performance tracking
    - Use existing risk management framework
+   - Add graph-based real-time relationship updates
 
-2. **Predictive Analytics**
+2. **Predictive Analytics with Graph Integration**
    - Build on existing data patterns
    - Implement machine learning on operational data
    - Use existing performance metrics
+   - Add graph-based predictive analytics
 
-## Success Metrics
+## Success Metrics with Graph Integration
 
-### **Data Efficiency**
-- **Query Performance**: 50% improvement in cascade query performance
-- **Storage Optimization**: 30% reduction in data duplication
-- **Index Efficiency**: 90% query coverage through proper indexing
+### **Data Efficiency with Graph Integration**
+- **Query Performance**: 70% improvement in complex relationship queries with graph integration
+- **Storage Optimization**: 40% reduction in data duplication with graph relationships
+- **Index Efficiency**: 95% query coverage through proper indexing and graph traversal
 
-### **Scalability**
-- **Horizontal Scaling**: Support for 1000+ enterprises
-- **Vertical Scaling**: Handle 100,000+ operational records
-- **Performance**: Sub-second response times for operational queries
+### **Scalability with Graph Integration**
+- **Horizontal Scaling**: Support for 1000+ enterprises with graph relationship preservation
+- **Vertical Scaling**: Handle 100,000+ operational records with graph traversal optimization
+- **Performance**: Sub-second response times for operational queries with graph integration
 
-### **Extensibility**
-- **New Industries**: Add new industry support in < 1 day
-- **New Sectors**: Add new sector support in < 4 hours
-- **New Templates**: Add new process templates in < 2 hours
+### **Extensibility with Graph Integration**
+- **New Industries**: Add new industry support in < 1 day with graph relationship templates
+- **New Sectors**: Add new sector support in < 4 hours with graph relationship inheritance
+- **New Templates**: Add new process templates in < 2 hours with graph relationship mapping
+- **New Relationships**: Add new relationship types without schema changes using graph edges
 
-This improved architecture ensures **efficient data relationships**, **extensibility**, **scalability**, and **minimized master data duplication** while leveraging the existing robust patterns established in the Business Canvas implementation. 
+This improved architecture ensures **efficient data relationships**, **extensibility**, **scalability**, and **minimized master data duplication** while leveraging the existing robust patterns established in the Business Canvas implementation and the new Graph-Relational Hybrid architecture strategy. 

@@ -3,6 +3,8 @@
 ## Executive Summary
 The CapOpt Platform UX Architecture focuses on **Strategic Navigation Flow** as the core principle, enabling seamless navigation between operational and strategic layers while maintaining context and alignment visibility.
 
+**New Data Architecture**: The platform now implements **Graph-Relational Hybrid** visualization patterns that combine traditional UI components with interactive graph-based relationship mapping and real-time relationship traversal.
+
 ---
 
 ## 1. Enterprise Information System UX
@@ -12,18 +14,24 @@ The CapOpt Platform UX Architecture focuses on **Strategic Navigation Flow** as 
 
 **Key UX Patterns:**
 - **Enterprise Header**: Display current enterprise and facility context
-- **Organizational Breadcrumbs**: Show user's position in organizational hierarchy
-- **Multi-Facility Navigation**: Switch between facilities and business units
-- **Operational Stream Indicators**: Visual indicators for different operational streams
+- **Organizational Breadcrumbs**: Show user's position in organizational hierarchy with graph-based relationship paths
+- **Multi-Facility Navigation**: Switch between facilities and business units with relationship visualization
+- **Operational Stream Indicators**: Visual indicators for different operational streams with graph-based flow mapping
+
+**Graph-Relational Integration:**
+- **Hierarchical Visualization**: Interactive organizational charts with graph-based relationship mapping
+- **Relationship Paths**: Visual representation of organizational relationships using graph edges
+- **Context Preservation**: Maintain graph context when navigating between organizational levels
+- **Real-time Updates**: Live updates of organizational relationships and dependencies
 
 **Design Principles:**
-- **Contextual Information**: Always show relevant enterprise context
-- **Hierarchical Navigation**: Clear organizational structure navigation
-- **Stream Awareness**: Visual distinction between operational streams
-- **Scalability**: Support for multiple facilities and business units
+- **Contextual Information**: Always show relevant enterprise context with graph relationships
+- **Hierarchical Navigation**: Clear organizational structure navigation with graph-based paths
+- **Stream Awareness**: Visual distinction between operational streams with relationship flows
+- **Scalability**: Support for multiple facilities and business units with graph-based scaling
 
 ### 1.2 Enterprise Dashboard
-**Purpose**: Enterprise-level overview with multi-facility visibility
+**Purpose**: Enterprise-level overview with multi-facility visibility and graph-based relationship mapping
 
 **Components:**
 ```typescript
@@ -33,705 +41,579 @@ interface EnterpriseDashboard {
   businessUnits: BusinessUnitMetrics[];
   operationalStreams: StreamPerformance[];
   keyMetrics: EnterpriseKPIs;
+  graphRelationships: GraphRelationshipData;
+}
+
+interface GraphRelationshipData {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  hierarchies: HierarchyPath[];
+  relationships: RelationshipType[];
 }
 ```
 
 **Layout Structure:**
-- **Enterprise Header**: Enterprise name, ABN, industry
-- **Facility Overview**: Multi-facility performance summary
-- **Business Unit Metrics**: Cross-unit performance comparison
-- **Operational Streams**: Stream-specific KPIs and status
-- **Organizational Health**: Overall enterprise performance indicators
+- **Enterprise Header**: Enterprise name, ABN, industry with graph-based relationship indicators
+- **Facility Overview**: Multi-facility performance summary with relationship mapping
+- **Business Unit Metrics**: Cross-unit performance comparison with dependency graphs
+- **Operational Streams**: Stream-specific KPIs and status with flow visualization
+- **Organizational Health**: Overall enterprise performance indicators with graph-based analysis
+- **Relationship Map**: Interactive graph visualization of organizational relationships
 
 ### 1.3 Facility Management Interface
-**Purpose**: Comprehensive facility management and monitoring
+**Purpose**: Comprehensive facility management and monitoring with graph-based relationship mapping
 
 **Key Features:**
-- **Facility Overview**: Location, capacity, operational status
-- **Business Unit Management**: Unit-specific dashboards and controls
-- **Department Structure**: Organizational chart with staffing information
-- **Operational Stream Tracking**: Stream-specific processes and metrics
-- **Address Management**: Multiple address types and locations
+- **Facility Overview**: Location, capacity, operational status with relationship networks
+- **Business Unit Management**: Unit-specific dashboards and controls with dependency graphs
+- **Department Structure**: Organizational chart with staffing information and relationship paths
+- **Operational Stream Tracking**: Stream-specific processes and metrics with flow visualization
+- **Address Management**: Multiple address types and locations with geographic relationship mapping
+
+**Graph-Relational Integration:**
+- **Relationship Networks**: Interactive visualization of facility relationships and dependencies
+- **Dependency Graphs**: Visual representation of business unit and department dependencies
+- **Flow Mapping**: Real-time visualization of operational stream flows and relationships
+- **Geographic Relationships**: Map-based visualization of facility and address relationships
 
 **Navigation Patterns:**
-- **Facility Selector**: Dropdown for multi-facility navigation
-- **Business Unit Tabs**: Quick access to different operational areas
-- **Department Drill-Down**: Hierarchical navigation to specific departments
-- **Stream Filters**: Filter views by operational stream
+- **Facility Selector**: Dropdown for multi-facility navigation with relationship indicators
+- **Business Unit Tabs**: Quick access to different operational areas with dependency graphs
+- **Department Drill-Down**: Hierarchical navigation to specific departments with relationship paths
+- **Stream Filters**: Filter views by operational stream with flow visualization
+- **Graph Navigation**: Interactive graph-based navigation between organizational elements
 
 ---
 
 ## 2. Strategic Navigation Flow Design
 
-### 1.1 Navigation Flow Philosophy
-**Core Principle**: Enable seamless bidirectional navigation between operational and strategic layers, providing users with clear context and alignment visibility at every level.
+### 2.1 Navigation Flow Philosophy
+**Core Principle**: Enable seamless bidirectional navigation between operational and strategic layers, providing users with clear context and alignment visibility at every level through graph-based relationship mapping.
 
-### 1.2 Navigation Flow Architecture
+### 2.2 Navigation Flow Architecture
 
-#### **Operational to Strategic Flow**
+#### **Operational to Strategic Flow with Graph Relationships**
 ```
 Process Maps → Service Model → Value Chain → Operating Model → Business Canvas
+     ↓              ↓              ↓              ↓              ↓
+Graph Edges → Relationship Paths → Flow Networks → Dependency Maps → Strategic Graphs
 ```
 
 **Design Principles:**
-- **Context Preservation**: Maintain user context when navigating between layers
-- **Alignment Visibility**: Show strategic alignment at each navigation point
-- **Progressive Disclosure**: Reveal strategic context progressively
-- **Clear Pathways**: Provide clear navigation paths with visual indicators
+- **Context Preservation**: Maintain user context and graph relationships when navigating between layers
+- **Alignment Visibility**: Show strategic alignment at each navigation point with relationship mapping
+- **Progressive Disclosure**: Reveal strategic context progressively with graph-based relationship exploration
+- **Clear Pathways**: Provide clear navigation paths with visual indicators and relationship flows
+- **Graph Traversal**: Enable interactive exploration of relationships between operational and strategic elements
 
-#### **Strategic to Operational Flow**
+#### **Strategic to Operational Flow with Graph Relationships**
 ```
 Business Canvas → Operating Model → Value Chain → Service Model → Process Maps
+       ↓              ↓              ↓              ↓              ↓
+Strategic Graphs → Dependency Maps → Flow Networks → Relationship Paths → Graph Edges
 ```
 
 **Design Principles:**
-- **Impact Traceability**: Show how strategic decisions impact operations
-- **Execution Visibility**: Provide clear view of operational execution
-- **Control Assurance**: Ensure controls are properly implemented
-- **Performance Monitoring**: Track strategic objective achievement
+- **Impact Traceability**: Show how strategic decisions impact operations through relationship mapping
+- **Execution Visibility**: Provide clear view of operational execution with dependency graphs
+- **Control Assurance**: Ensure controls are properly implemented with relationship verification
+- **Performance Monitoring**: Track strategic objective achievement with graph-based metrics
+- **Relationship Exploration**: Enable interactive exploration of strategic-to-operational relationships
 
-### 1.3 Navigation Flow Components
+### 2.3 Navigation Flow Components
 
-#### **Strategic Context Panel**
-**Purpose**: Display strategic context for operational processes
+#### **Strategic Context Panel with Graph Integration**
+**Purpose**: Display strategic context for operational processes with interactive relationship mapping
 
 **Design Elements:**
-- **Alignment Indicators**: Visual progress bars showing strategic alignment
-- **Navigation Buttons**: Quick access to strategic layers with status indicators
-- **Context Information**: Relevant strategic context for current entity
-- **Status Badges**: Implementation status of navigation targets
+- **Alignment Indicators**: Visual progress bars showing strategic alignment with relationship strength indicators
+- **Navigation Buttons**: Quick access to strategic layers with status indicators and relationship counts
+- **Graph Mini-Map**: Interactive mini-graph showing relationships between current operational element and strategic layers
+- **Relationship Explorer**: Expandable panel for exploring relationships between operational and strategic elements
 
-**Visual Design:**
+#### **Graph-Based Relationship Visualization**
+**Purpose**: Provide interactive visualization of relationships between operational and strategic elements
+
+**Components:**
 ```typescript
-interface StrategicContextPanel {
-  // Visual layout
-  layout: 'sidebar' | 'overlay' | 'modal'
-  
-  // Alignment indicators
-  alignmentScores: {
-    serviceModel: number // 0-100
-    valueChain: number
-    operatingModel: number
-    businessCanvas: number
-  }
-  
-  // Navigation targets
-  navigationTargets: {
-    serviceModel: { id: string, implemented: boolean, accessible: boolean }
-    valueChain: { id: string, implemented: boolean, accessible: boolean }
-    operatingModel: { id: string, implemented: boolean, accessible: boolean }
-    businessCanvas: { id: string, implemented: boolean, accessible: boolean }
-  }
+interface GraphVisualization {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  nodeTypes: NodeType[];
+  edgeTypes: EdgeType[];
+  filters: GraphFilter[];
+  interactions: GraphInteraction[];
+}
+
+interface GraphNode {
+  id: string;
+  type: NodeType;
+  label: string;
+  metadata: Record<string, any>;
+  position: Position;
+  style: NodeStyle;
+}
+
+interface GraphEdge {
+  fromId: string;
+  toId: string;
+  type: EdgeType;
+  metadata: Record<string, any>;
+  style: EdgeStyle;
 }
 ```
 
-#### **Navigation Breadcrumbs**
-**Purpose**: Provide clear navigation path through strategic layers
-
-**Design Elements:**
-- **Layer Indicators**: Show current position in strategic hierarchy
-- **Quick Navigation**: Click to navigate to any layer
-- **Status Indicators**: Show implementation status of each layer
-- **Context Preservation**: Maintain context when navigating
-
-**Visual Design:**
-```typescript
-interface NavigationBreadcrumb {
-  path: Array<{
-    layer: string
-    entityId: string
-    entityName: string
-    implemented: boolean
-    accessible: boolean
-  }>
-  currentLayer: string
-  currentEntityId: string
-}
-```
-
-#### **Alignment Scoring Visualization**
-**Purpose**: Visualize strategic alignment between layers
-
-**Design Elements:**
-- **Progress Bars**: Visual representation of alignment scores
-- **Color Coding**: Green (high alignment), Yellow (medium), Red (low)
-- **Trend Indicators**: Show alignment trends over time
-- **Actionable Insights**: Provide recommendations for improvement
-
-### 1.4 Navigation Flow User Experience
-
-#### **Process Detail View Integration**
-**Layout**: Three-column layout with strategic context sidebar
-
-**Components:**
-- **Main Content Area**: Process details, steps, controls
-- **Strategic Context Sidebar**: Alignment indicators and navigation
-- **Action Bar**: Process management actions
-- **Breadcrumb Navigation**: Clear path through strategic layers
-
-**User Journey:**
-1. User views process details
-2. Strategic context panel shows alignment with higher layers
-3. User can navigate to Service Model, Value Chain, etc.
-4. Clear visual indicators show implementation status
-5. Alignment scores provide strategic context
-
-#### **Service Model View Integration**
-**Layout**: Service blueprint with process links and value chain navigation
-
-**Components:**
-- **Service Blueprint**: Visual service delivery process
-- **Process Links**: Show linked processes that deliver the service
-- **Value Chain Navigation**: Connect to value creation flow
-- **Quality Metrics**: Service performance indicators
-
-**User Journey:**
-1. User views service model
-2. Process links show operational execution
-3. Value chain navigation shows strategic value creation
-4. Quality metrics show service performance
-5. Clear navigation to next strategic layer
-
-#### **Value Chain View Integration**
-**Layout**: Value flow visualization with optimization opportunities
-
-**Components:**
-- **Value Flow Diagram**: Visual value creation process
-- **Service Links**: Show services that contribute to value creation
-- **Operating Model Navigation**: Connect to operational strategy
-- **Optimization Opportunities**: Identify improvement areas
-
-**User Journey:**
-1. User views value chain
-2. Service links show service delivery
-3. Operating model navigation shows strategic operational design
-4. Optimization opportunities highlight improvement areas
-5. Clear path to strategic business model
-
-#### **Operating Model View Integration**
-**Layout**: Operating principles and capability model
-
-**Components:**
-- **Operating Principles**: Strategic operational guidelines
-- **Value Chain Links**: Show value chains that align with principles
-- **Business Canvas Navigation**: Connect to strategic business model
-- **Capability Model**: Show organizational capabilities
-
-**User Journey:**
-1. User views operating model
-2. Value chain links show value creation alignment
-3. Business canvas navigation shows strategic business model
-4. Capability model shows organizational strengths
-5. Clear connection to overall strategy
-
-#### **Business Canvas View Integration**
-**Layout**: Strategic business model with operational impact
-
-**Components:**
-- **Business Model Canvas**: Complete strategic business model
-- **Operating Model Links**: Show operating models that support strategy
-- **Strategic Impact Summary**: Show operational impact on strategy
-- **Strategic Metrics**: Business performance indicators
-
-**User Journey:**
-1. User views business canvas
-2. Operating model links show operational strategy
-3. Strategic impact summary shows operational contribution
-4. Strategic metrics show business performance
-5. Complete strategic-operational alignment view
+**Interaction Patterns:**
+- **Node Selection**: Click to select nodes and highlight related relationships
+- **Edge Exploration**: Hover over edges to see relationship details
+- **Path Finding**: Interactive path finding between operational and strategic elements
+- **Filtering**: Filter nodes and edges by type, status, or other criteria
+- **Zoom and Pan**: Navigate large relationship graphs with zoom and pan controls
 
 ---
 
-## 2. User Interface Design System
+## 3. Graph-Relational UX Patterns
 
-### 2.1 Design Tokens
+### 3.1 Graph Visualization Components
 
-#### **Colors**
-```css
-/* Primary Colors */
---primary-50: #eff6ff
---primary-100: #dbeafe
---primary-500: #3b82f6
---primary-600: #2563eb
---primary-900: #1e3a8a
+#### **Interactive Relationship Map**
+**Purpose**: Provide interactive visualization of complex relationships between system elements
 
-/* Strategic Navigation Colors */
---strategic-success: #10b981  /* High alignment */
---strategic-warning: #f59e0b  /* Medium alignment */
---strategic-danger: #ef4444   /* Low alignment */
---strategic-neutral: #6b7280  /* Not implemented */
+**Key Features:**
+- **Node Types**: Different visual representations for different entity types (processes, controls, risks, etc.)
+- **Edge Types**: Different line styles and colors for different relationship types
+- **Clustering**: Automatic clustering of related nodes for better visualization
+- **Search**: Search functionality to find specific nodes or relationships
+- **Export**: Export graph visualizations for reporting and documentation
 
-/* Implementation Status Colors */
---implemented: #10b981       /* Fully implemented */
---partial: #f59e0b          /* Partially implemented */
---not-implemented: #6b7280   /* Not implemented */
-```
-
-#### **Typography**
-```css
-/* Font Hierarchy */
---font-family: 'Inter', system-ui, sans-serif
---font-size-xs: 0.75rem
---font-size-sm: 0.875rem
---font-size-base: 1rem
---font-size-lg: 1.125rem
---font-size-xl: 1.25rem
---font-size-2xl: 1.5rem
---font-size-3xl: 1.875rem
-
-/* Font Weights */
---font-weight-normal: 400
---font-weight-medium: 500
---font-weight-semibold: 600
---font-weight-bold: 700
-```
-
-#### **Spacing**
-```css
-/* Spacing Scale */
---space-1: 0.25rem
---space-2: 0.5rem
---space-3: 0.75rem
---space-4: 1rem
---space-6: 1.5rem
---space-8: 2rem
---space-12: 3rem
---space-16: 4rem
-```
-
-### 2.2 Component Library
-
-#### **Navigation Components**
-
-**Strategic Context Panel**
+**Implementation:**
 ```typescript
-interface StrategicContextPanelProps {
-  entityId: string
-  entityType: 'process' | 'service' | 'valueChain' | 'operatingModel'
-  alignmentScores: AlignmentScores
-  navigationTargets: NavigationTargets
-  onNavigate: (target: string) => void
-}
-
-const StrategicContextPanel: React.FC<StrategicContextPanelProps> = ({
-  entityId,
-  entityType,
-  alignmentScores,
-  navigationTargets,
-  onNavigate
-}) => {
-  return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold">
-          Strategic Navigation Context
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Alignment Indicators */}
-        <div className="space-y-3">
-          {Object.entries(alignmentScores).map(([layer, score]) => (
-            <AlignmentIndicator
-              key={layer}
-              layer={layer}
-              score={score}
-              implemented={navigationTargets[layer]?.implemented}
-              onNavigate={() => onNavigate(layer)}
-            />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  )
+interface RelationshipMap {
+  // Graph data
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  
+  // Visualization settings
+  layout: GraphLayout;
+  styling: GraphStyling;
+  interactions: GraphInteractions;
+  
+  // Filtering and search
+  filters: GraphFilter[];
+  searchQuery: string;
+  
+  // Performance
+  clustering: boolean;
+  maxNodes: number;
+  maxEdges: number;
 }
 ```
 
-**Alignment Indicator**
+#### **Hierarchical Tree Visualization**
+**Purpose**: Display hierarchical relationships using LTREE data with interactive exploration
+
+**Key Features:**
+- **Expandable Nodes**: Click to expand/collapse hierarchical nodes
+- **Path Highlighting**: Highlight the path from root to selected node
+- **Breadcrumb Navigation**: Show current position in hierarchy with clickable breadcrumbs
+- **Search**: Search for nodes in the hierarchy
+- **Drag and Drop**: Reorganize hierarchy through drag and drop
+
+**Implementation:**
 ```typescript
-interface AlignmentIndicatorProps {
-  layer: string
-  score: number
-  implemented: boolean
-  onNavigate: () => void
-}
-
-const AlignmentIndicator: React.FC<AlignmentIndicatorProps> = ({
-  layer,
-  score,
-  implemented,
-  onNavigate
-}) => {
-  const getAlignmentColor = (score: number) => {
-    if (score >= 80) return 'text-green-600'
-    if (score >= 60) return 'text-yellow-600'
-    return 'text-red-600'
-  }
-
-  const getAlignmentLabel = (score: number) => {
-    if (score >= 80) return 'High Alignment'
-    if (score >= 60) return 'Medium Alignment'
-    return 'Low Alignment'
-  }
-
-  return (
-    <div className="flex items-center justify-between p-3 border rounded-lg">
-      <div className="flex-1">
-        <div className="flex justify-between text-sm mb-1">
-          <span className="font-medium capitalize">{layer.replace(/([A-Z])/g, ' $1')}</span>
-          <span className={getAlignmentColor(score)}>{score}%</span>
-        </div>
-        <Progress value={score} className="h-2" />
-        <p className="text-xs text-gray-500 mt-1">{getAlignmentLabel(score)}</p>
-      </div>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onNavigate}
-        disabled={!implemented}
-        className="ml-3"
-      >
-        {implemented ? 'View' : 'Coming Soon'}
-      </Button>
-    </div>
-  )
+interface HierarchicalTree {
+  // Tree data
+  rootNode: TreeNode;
+  nodes: TreeNode[];
+  
+  // Display settings
+  expandedNodes: Set<string>;
+  selectedNode: string | null;
+  
+  // Navigation
+  breadcrumbs: TreeNode[];
+  searchResults: TreeNode[];
+  
+  // Interactions
+  allowDragDrop: boolean;
+  allowSearch: boolean;
 }
 ```
 
-**Navigation Breadcrumb**
+### 3.2 Relationship Exploration Patterns
+
+#### **Contextual Relationship Panel**
+**Purpose**: Show relationships for the currently selected element
+
+**Components:**
+- **Related Nodes**: List of nodes directly related to the selected element
+- **Relationship Types**: Breakdown of relationships by type
+- **Relationship Strength**: Visual indicators of relationship strength
+- **Quick Actions**: Actions that can be performed on related elements
+- **Path Exploration**: Explore paths to other elements through relationships
+
+#### **Relationship Path Visualization**
+**Purpose**: Visualize paths between elements through intermediate relationships
+
+**Features:**
+- **Path Finding**: Find and display paths between two elements
+- **Path Metrics**: Show path length, strength, and other metrics
+- **Alternative Paths**: Show multiple paths between elements
+- **Path Filtering**: Filter paths by relationship type or strength
+- **Path Export**: Export path information for analysis
+
+### 3.3 Real-time Relationship Updates
+
+#### **Live Relationship Monitoring**
+**Purpose**: Provide real-time updates of relationship changes
+
+**Features:**
+- **WebSocket Updates**: Real-time updates via WebSocket connections
+- **Change Indicators**: Visual indicators for new, modified, or deleted relationships
+- **Change History**: Track relationship changes over time
+- **Alert System**: Alerts for significant relationship changes
+- **Audit Trail**: Complete audit trail of relationship modifications
+
+#### **Dynamic Graph Updates**
+**Purpose**: Update graph visualizations in real-time as relationships change
+
+**Implementation:**
 ```typescript
-interface NavigationBreadcrumbProps {
-  path: NavigationPath[]
-  currentLayer: string
-  currentEntityId: string
-  onNavigate: (layer: string, entityId: string) => void
-}
-
-const NavigationBreadcrumb: React.FC<NavigationBreadcrumbProps> = ({
-  path,
-  currentLayer,
-  currentEntityId,
-  onNavigate
-}) => {
-  return (
-    <nav aria-label="Strategic Navigation" className="flex items-center space-x-2">
-      {path.map((item, index) => (
-        <React.Fragment key={item.layer}>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onNavigate(item.layer, item.entityId)}
-            disabled={!item.implemented}
-            className={cn(
-              "text-sm",
-              item.implemented ? "text-blue-600 hover:text-blue-800" : "text-gray-400"
-            )}
-          >
-            {item.entityName}
-            {!item.implemented && (
-              <Badge variant="outline" className="ml-2 text-xs">Coming Soon</Badge>
-            )}
-          </Button>
-          {index < path.length - 1 && (
-            <ChevronRight className="h-4 w-4 text-gray-400" />
-          )}
-        </React.Fragment>
-      ))}
-    </nav>
-  )
-}
-```
-
-### 2.3 Page Layouts
-
-#### **Process Detail Page Layout**
-```typescript
-const ProcessDetailPage: React.FC = () => {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Header with breadcrumbs */}
-        <div className="mb-8">
-          <NavigationBreadcrumb
-            path={breadcrumbPath}
-            currentLayer="process"
-            currentEntityId={processId}
-            onNavigate={handleNavigation}
-          />
-          <h1 className="text-3xl font-bold text-gray-900 mt-4">{process.name}</h1>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Process details */}
-            <ProcessDetailsCard process={process} />
-            
-            {/* Process steps */}
-            <ProcessStepsCard steps={process.steps} />
-            
-            {/* Process controls */}
-            <ProcessControlsCard controls={process.controls} />
-          </div>
-          
-          {/* Strategic navigation sidebar */}
-          <div className="space-y-6">
-            <StrategicContextPanel
-              entityId={process.id}
-              entityType="process"
-              alignmentScores={alignmentScores}
-              navigationTargets={navigationTargets}
-              onNavigate={handleStrategicNavigation}
-            />
-            
-            <AlignmentIndicators
-              process={process}
-              alignmentScore={overallAlignment}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-```
-
-#### **Service Model Page Layout**
-```typescript
-const ServiceModelPage: React.FC = () => {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Header with navigation */}
-        <div className="mb-8">
-          <NavigationBreadcrumb
-            path={breadcrumbPath}
-            currentLayer="serviceModel"
-            currentEntityId={serviceModelId}
-            onNavigate={handleNavigation}
-          />
-          <h1 className="text-3xl font-bold text-gray-900 mt-4">Service Model</h1>
-        </div>
-        
-        {/* Service blueprint content */}
-        <ServiceBlueprint serviceModel={serviceModel} />
-        
-        {/* Navigation footer */}
-        <div className="mt-8 flex justify-between">
-          <Button variant="outline" onClick={() => router.back()}>
-            ← Back to Process
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => router.push(`/value-chain/${serviceModel.valueChainId}`)}
-            disabled={!serviceModel.valueChainId}
-          >
-            Value Chain →
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
+interface DynamicGraph {
+  // Real-time updates
+  websocket: WebSocket;
+  updateQueue: GraphUpdate[];
+  
+  // Change handling
+  changeHandlers: ChangeHandler[];
+  conflictResolution: ConflictResolution;
+  
+  // Performance
+  updateThrottling: number;
+  batchUpdates: boolean;
 }
 ```
 
 ---
 
-## 3. User Experience Patterns
+## 4. Canvas-Based UX with Graph Integration
 
-### 3.1 Implementation Status Transparency
+### 4.1 Business Model Canvas with Graph Relationships
 
-#### **Visual Indicators**
-- **Opacity Reduction**: Non-functional components use 50% opacity
-- **Status Badges**: Clear badges showing implementation status
-- **Disabled States**: Consistent disabled styling across components
-- **Progress Indicators**: Show implementation progress
+#### **Canvas Elements with Relationship Mapping**
+**Purpose**: Enhance business model canvas with interactive relationship visualization
 
-#### **User Communication**
-- **Honest Messaging**: Clear communication about feature capabilities
-- **Progress Tracking**: Show development progress transparently
-- **Expectation Management**: Set realistic expectations about features
-- **Helpful Guidance**: Provide guidance for non-functional features
+**Key Features:**
+- **Relationship Indicators**: Visual indicators showing relationships between canvas blocks
+- **Relationship Lines**: Interactive lines connecting related canvas elements
+- **Relationship Details**: Tooltips and panels showing relationship details
+- **Relationship Creation**: Drag and drop to create new relationships
+- **Relationship Validation**: Validate relationships based on business rules
 
-### 3.2 Strategic Navigation Patterns
+**Implementation:**
+```typescript
+interface CanvasWithGraph {
+  // Canvas elements
+  blocks: CanvasBlock[];
+  relationships: CanvasRelationship[];
+  
+  // Graph integration
+  graphNodes: GraphNode[];
+  graphEdges: GraphEdge[];
+  
+  // Interactions
+  allowRelationshipCreation: boolean;
+  allowRelationshipEditing: boolean;
+  relationshipValidation: RelationshipValidator;
+}
+```
 
-#### **Context Preservation**
-- **Breadcrumb Navigation**: Maintain navigation context
-- **State Management**: Preserve user state during navigation
-- **Quick Return**: Easy return to previous context
-- **Context Indicators**: Show current context clearly
+#### **Interactive Relationship Creation**
+**Purpose**: Enable users to create and modify relationships between canvas elements
 
-#### **Alignment Visualization**
-- **Progress Bars**: Visual alignment indicators
-- **Color Coding**: Consistent color scheme for alignment levels
-- **Trend Indicators**: Show alignment trends over time
-- **Actionable Insights**: Provide improvement recommendations
+**Features:**
+- **Drag and Drop**: Drag from one element to another to create relationships
+- **Relationship Types**: Choose relationship type from predefined options
+- **Relationship Properties**: Set properties for relationships (strength, direction, etc.)
+- **Validation**: Validate relationships based on business rules
+- **Undo/Redo**: Support for undoing and redoing relationship changes
 
-### 3.3 Accessibility Patterns
+### 4.2 Process Mapping with Graph Visualization
 
-#### **Navigation Accessibility**
+#### **Process Flow Visualization**
+**Purpose**: Visualize process flows using graph-based relationship mapping
+
+**Key Features:**
+- **Process Nodes**: Visual representation of process steps
+- **Flow Edges**: Arrows showing process flow direction
+- **Decision Points**: Special nodes for decision points in processes
+- **Parallel Paths**: Visual representation of parallel process paths
+- **Loop Detection**: Detect and visualize process loops
+
+**Implementation:**
+```typescript
+interface ProcessFlowGraph {
+  // Process elements
+  steps: ProcessStep[];
+  flows: ProcessFlow[];
+  decisions: ProcessDecision[];
+  
+  // Graph representation
+  nodes: ProcessNode[];
+  edges: ProcessEdge[];
+  
+  // Layout
+  layout: ProcessLayout;
+  styling: ProcessStyling;
+}
+```
+
+#### **Process Relationship Analysis**
+**Purpose**: Analyze relationships between processes and other system elements
+
+**Features:**
+- **Control Mapping**: Show which controls are applied to which process steps
+- **Risk Mapping**: Show risks associated with process steps
+- **Asset Mapping**: Show assets used by process steps
+- **Dependency Analysis**: Analyze dependencies between processes
+- **Impact Analysis**: Analyze impact of process changes on other elements
+
+---
+
+## 5. Risk and Control Visualization
+
+### 5.1 Bowtie Analysis with Graph Integration
+
+#### **Interactive Bowtie Diagrams**
+**Purpose**: Interactive bowtie analysis with graph-based relationship mapping
+
+**Key Features:**
+- **Threat Visualization**: Visual representation of threats with relationship mapping
+- **Control Mapping**: Show controls and their relationships to threats and consequences
+- **Risk Propagation**: Visualize how risks propagate through the system
+- **Control Effectiveness**: Show control effectiveness with visual indicators
+- **Scenario Analysis**: Analyze different risk scenarios
+
+**Implementation:**
+```typescript
+interface BowtieGraph {
+  // Bowtie elements
+  topEvent: TopEvent;
+  threats: Threat[];
+  consequences: Consequence[];
+  controls: Control[];
+  
+  // Graph representation
+  nodes: BowtieNode[];
+  edges: BowtieEdge[];
+  
+  // Analysis
+  riskPropagation: RiskPropagation;
+  controlEffectiveness: ControlEffectiveness;
+}
+```
+
+#### **Risk Propagation Visualization**
+**Purpose**: Visualize how risks propagate through the system
+
+**Features:**
+- **Propagation Paths**: Show paths through which risks propagate
+- **Propagation Speed**: Visual indicators of propagation speed
+- **Propagation Strength**: Show strength of risk propagation
+- **Mitigation Points**: Show where risks can be mitigated
+- **Early Warning**: Provide early warning of risk propagation
+
+### 5.2 Control Network Visualization
+
+#### **Control Relationship Networks**
+**Purpose**: Visualize networks of controls and their relationships
+
+**Key Features:**
+- **Control Nodes**: Visual representation of controls
+- **Control Relationships**: Show relationships between controls
+- **Control Effectiveness**: Visual indicators of control effectiveness
+- **Control Dependencies**: Show dependencies between controls
+- **Control Gaps**: Identify gaps in control coverage
+
+#### **Control Assurance Dashboard**
+**Purpose**: Dashboard for monitoring control assurance with relationship mapping
+
+**Components:**
+- **Control Status**: Overall status of controls with relationship indicators
+- **Effectiveness Metrics**: Metrics showing control effectiveness
+- **Verification Status**: Status of control verifications
+- **Risk Coverage**: Coverage of risks by controls
+- **Relationship Analysis**: Analysis of control relationships
+
+---
+
+## 6. Performance and Scalability UX
+
+### 6.1 Graph Performance Optimization
+
+#### **Progressive Loading**
+**Purpose**: Load graph data progressively to improve performance
+
+**Features:**
+- **Lazy Loading**: Load nodes and edges as needed
+- **Level-of-Detail**: Show different levels of detail based on zoom level
+- **Clustering**: Cluster nodes for better performance with large graphs
+- **Virtualization**: Virtualize large lists of nodes and edges
+- **Caching**: Cache graph data for better performance
+
+#### **Graph Interaction Optimization**
+**Purpose**: Optimize graph interactions for better user experience
+
+**Features:**
+- **Throttling**: Throttle frequent interactions like pan and zoom
+- **Debouncing**: Debounce search and filter operations
+- **Background Processing**: Process heavy operations in background
+- **Progress Indicators**: Show progress for long-running operations
+- **Error Handling**: Graceful handling of graph operation errors
+
+### 6.2 Responsive Graph Design
+
+#### **Mobile Graph Visualization**
+**Purpose**: Optimize graph visualization for mobile devices
+
+**Features:**
+- **Touch Interactions**: Touch-friendly interactions for mobile devices
+- **Simplified Views**: Simplified graph views for small screens
+- **Gesture Support**: Support for pinch-to-zoom and other gestures
+- **Orientation Handling**: Handle device orientation changes
+- **Performance Optimization**: Optimize performance for mobile devices
+
+#### **Adaptive Graph Layout**
+**Purpose**: Adapt graph layout based on screen size and device capabilities
+
+**Features:**
+- **Responsive Layout**: Adapt layout based on screen size
+- **Dynamic Styling**: Adjust styling based on device capabilities
+- **Accessibility**: Ensure accessibility on all devices
+- **Performance Scaling**: Scale performance based on device capabilities
+- **Feature Detection**: Detect and adapt to device features
+
+---
+
+## 7. Accessibility and Usability
+
+### 7.1 Graph Accessibility
+
+#### **Screen Reader Support**
+**Purpose**: Ensure graph visualizations are accessible to screen readers
+
+**Features:**
+- **ARIA Labels**: Proper ARIA labels for graph elements
 - **Keyboard Navigation**: Full keyboard navigation support
-- **Screen Reader Support**: Proper ARIA labels and descriptions
-- **Focus Management**: Clear focus indicators and management
-- **Alternative Text**: Descriptive text for all visual elements
+- **Focus Management**: Proper focus management for graph interactions
+- **Alternative Text**: Alternative text for graph visualizations
+- **High Contrast**: High contrast mode for better visibility
 
-#### **Status Communication**
-- **Screen Reader Status**: Announce implementation status to screen readers
-- **Alternative Indicators**: Non-visual status indicators
-- **Clear Messaging**: Accessible error and status messages
-- **Helpful Guidance**: Accessible guidance for non-functional features
+#### **Cognitive Accessibility**
+**Purpose**: Ensure graph visualizations are accessible to users with cognitive disabilities
 
----
+**Features:**
+- **Simplified Views**: Simplified graph views for cognitive accessibility
+- **Clear Labels**: Clear and simple labels for graph elements
+- **Consistent Design**: Consistent design patterns throughout
+- **Error Prevention**: Prevent errors through good design
+- **Help and Guidance**: Provide help and guidance for complex interactions
 
-## 4. User Journey Design
+### 7.2 Usability Patterns
 
-### 4.1 Strategic Navigation Journey
+#### **Graph Learning Patterns**
+**Purpose**: Help users learn to use graph visualizations effectively
 
-#### **Process to Strategy Journey**
-1. **Start**: User views process details
-2. **Context**: Strategic context panel shows alignment
-3. **Navigate**: User clicks to view Service Model
-4. **Explore**: User explores service delivery and value creation
-5. **Continue**: User navigates to Value Chain
-6. **Analyze**: User analyzes value flow and optimization
-7. **Strategic**: User reaches Business Canvas
-8. **Align**: User sees complete strategic-operational alignment
+**Features:**
+- **Tutorials**: Interactive tutorials for graph features
+- **Tooltips**: Helpful tooltips for graph elements
+- **Contextual Help**: Contextual help based on user actions
+- **Best Practices**: Guidance on best practices for graph usage
+- **Feedback**: Provide feedback for user actions
 
-#### **Strategy to Execution Journey**
-1. **Start**: User views Business Canvas
-2. **Context**: Strategic objectives and business model
-3. **Navigate**: User clicks to view Operating Model
-4. **Explore**: User explores operational strategy and capabilities
-5. **Continue**: User navigates to Value Chain
-6. **Analyze**: User analyzes value creation and flow
-7. **Operational**: User reaches Process Maps
-8. **Execute**: User sees operational execution of strategy
+#### **Error Handling and Recovery**
+**Purpose**: Handle errors gracefully and help users recover
 
-### 4.2 Implementation Status Journey
-
-#### **Feature Discovery Journey**
-1. **Explore**: User explores platform features
-2. **Identify**: User identifies functional vs. non-functional features
-3. **Understand**: User understands implementation status
-4. **Plan**: User plans usage based on available features
-5. **Execute**: User uses functional features effectively
-
-#### **Progress Tracking Journey**
-1. **Monitor**: User monitors implementation progress
-2. **Anticipate**: User anticipates new feature availability
-3. **Prepare**: User prepares for new feature usage
-4. **Adopt**: User adopts new features as they become available
-5. **Provide Feedback**: User provides feedback on new features
+**Features:**
+- **Clear Error Messages**: Clear and helpful error messages
+- **Recovery Options**: Provide options for error recovery
+- **Undo Functionality**: Allow users to undo actions
+- **Validation**: Validate user actions before execution
+- **Graceful Degradation**: Graceful degradation when features are unavailable
 
 ---
 
-## 5. Responsive Design
+## 8. Implementation Guidelines
 
-### 5.1 Mobile Navigation
+### 8.1 Technology Stack for Graph Visualization
 
-#### **Mobile Navigation Patterns**
-- **Collapsible Sidebar**: Strategic context panel collapses on mobile
-- **Bottom Navigation**: Key navigation options in bottom bar
-- **Swipe Gestures**: Swipe to navigate between layers
-- **Touch Targets**: Adequate touch target sizes
+#### **Frontend Graph Libraries**
+- **D3.js**: Powerful data visualization library for custom graph implementations
+- **React Flow**: React-based library for node-based editors and diagrams
+- **Cytoscape.js**: Graph theory library for analysis and visualization
+- **Vis.js**: Dynamic, browser-based visualization library
+- **Three.js**: 3D visualization library for complex graph representations
 
-#### **Mobile Layout Adaptations**
-- **Single Column**: Stack content in single column on mobile
-- **Progressive Disclosure**: Hide secondary information on mobile
-- **Touch-Friendly**: Optimize for touch interaction
-- **Performance**: Optimize for mobile performance
+#### **Graph Data Management**
+- **GraphQL**: Query language for graph data with real-time subscriptions
+- **WebSocket**: Real-time communication for live graph updates
+- **IndexedDB**: Client-side storage for graph data caching
+- **Service Workers**: Background processing for graph operations
+- **Web Workers**: Parallel processing for complex graph calculations
 
-### 5.2 Tablet Navigation
+### 8.2 Performance Considerations
 
-#### **Tablet Navigation Patterns**
-- **Adaptive Layout**: Adapt layout for tablet screen sizes
-- **Touch Optimization**: Optimize for touch and pen input
-- **Split View**: Use split view for strategic context
-- **Gesture Support**: Support tablet-specific gestures
+#### **Graph Rendering Performance**
+- **Canvas vs SVG**: Choose appropriate rendering technology based on graph size
+- **WebGL**: Use WebGL for large graph visualizations
+- **Virtualization**: Implement virtualization for large graphs
+- **Caching**: Cache rendered graph elements
+- **Optimization**: Optimize graph rendering algorithms
 
----
+#### **Data Loading Performance**
+- **Pagination**: Implement pagination for large datasets
+- **Streaming**: Stream graph data for real-time updates
+- **Compression**: Compress graph data for faster transmission
+- **CDN**: Use CDN for static graph assets
+- **Caching**: Implement comprehensive caching strategy
 
-## 6. Performance Optimization
+### 8.3 Testing and Quality Assurance
 
-### 6.1 Navigation Performance
+#### **Graph Visualization Testing**
+- **Unit Testing**: Test individual graph components
+- **Integration Testing**: Test graph integration with other components
+- **Performance Testing**: Test graph performance with large datasets
+- **Accessibility Testing**: Test graph accessibility features
+- **Cross-browser Testing**: Test graph functionality across browsers
 
-#### **Loading Strategies**
-- **Preloading**: Preload critical navigation routes
-- **Lazy Loading**: Lazy load non-critical navigation components
-- **Caching**: Cache navigation state and data
-- **Optimization**: Optimize bundle size for navigation
-
-#### **Interaction Performance**
-- **Debouncing**: Debounce navigation interactions
-- **Throttling**: Throttle frequent navigation events
-- **Optimization**: Optimize component rendering
-- **Monitoring**: Monitor navigation performance
-
-### 6.2 Visual Performance
-
-#### **Animation Performance**
-- **Hardware Acceleration**: Use hardware acceleration for animations
-- **Optimization**: Optimize animation performance
-- **Reduced Motion**: Respect reduced motion preferences
-- **Smooth Transitions**: Ensure smooth navigation transitions
-
----
-
-## 7. Testing Strategy
-
-### 7.1 Navigation Testing
-
-#### **User Testing**
-- **Navigation Flow**: Test complete navigation flows
-- **Context Preservation**: Test context preservation during navigation
-- **Performance**: Test navigation performance
-- **Accessibility**: Test navigation accessibility
-
-#### **Usability Testing**
-- **Task Completion**: Test task completion rates
-- **Time on Task**: Measure time to complete navigation tasks
-- **Error Rates**: Track navigation error rates
-- **User Satisfaction**: Measure user satisfaction with navigation
-
-### 7.2 Implementation Status Testing
-
-#### **Transparency Testing**
-- **Clarity**: Test clarity of implementation status communication
-- **Accuracy**: Test accuracy of implementation status
-- **User Understanding**: Test user understanding of status
-- **Expectation Management**: Test expectation management
+#### **User Experience Testing**
+- **Usability Testing**: Test graph usability with real users
+- **A/B Testing**: Test different graph visualization approaches
+- **Performance Monitoring**: Monitor graph performance in production
+- **Error Tracking**: Track and analyze graph-related errors
+- **User Feedback**: Collect and analyze user feedback on graph features
 
 ---
 
-## 8. Success Metrics
+## 9. Success Metrics
 
-### 8.1 Navigation Success Metrics
+### 9.1 User Experience Metrics
+- **Task Completion Rate**: Percentage of users who complete graph-related tasks
+- **Time to Complete**: Time taken to complete graph-related tasks
+- **Error Rate**: Rate of errors in graph interactions
+- **User Satisfaction**: User satisfaction with graph features
+- **Feature Adoption**: Adoption rate of graph features
 
-#### **User Experience Metrics**
-- **Navigation Effectiveness**: Time to find strategic context
-- **Task Completion**: Success rate of navigation tasks
-- **User Satisfaction**: User satisfaction with navigation
-- **Error Rates**: Navigation error rates
+### 9.2 Performance Metrics
+- **Graph Load Time**: Time to load graph visualizations
+- **Interaction Responsiveness**: Responsiveness of graph interactions
+- **Memory Usage**: Memory usage of graph visualizations
+- **CPU Usage**: CPU usage during graph operations
+- **Network Usage**: Network usage for graph data
 
-#### **Business Impact Metrics**
-- **Strategic Alignment**: Improvement in strategic-operational alignment
-- **Decision Quality**: Faster strategic decision making
-- **Process Optimization**: Better process-strategy alignment
-- **User Adoption**: Percentage of users using navigation flow
-
-### 8.2 Implementation Status Metrics
-
-#### **Transparency Metrics**
-- **User Understanding**: User understanding of implementation status
-- **Expectation Management**: User expectation alignment
-- **Feature Discovery**: User discovery of functional features
-- **Feedback Quality**: Quality of user feedback on features
-
-#### **Development Metrics**
-- **Progress Tracking**: Accuracy of progress tracking
-- **Feature Completion**: Feature completion rates
-- **User Feedback**: User feedback on transparency
-- **Development Velocity**: Impact on development velocity
-
----
-
-This UX architecture design provides a comprehensive framework for implementing the strategic navigation flow while maintaining transparency about implementation status and ensuring excellent user experience across all devices and accessibility needs. 
+### 9.3 Business Metrics
+- **Relationship Discovery**: Number of new relationships discovered through graph visualization
+- **Decision Quality**: Quality of decisions made using graph insights
+- **Process Optimization**: Improvements in process optimization through graph analysis
+- **Risk Reduction**: Reduction in risks through better relationship understanding
+- **Operational Efficiency**: Improvements in operational efficiency through graph insights 

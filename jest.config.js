@@ -18,114 +18,50 @@ const createJestConfig = nextJest({
 
 // Add any custom config to be passed to Jest
 const customJestConfig = {
-  // Test environment
   testEnvironment: 'jsdom',
-  
-  // Setup files
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  
-  // Test file patterns
-  testMatch: [
-    '<rootDir>/tests/**/*.test.{ts,tsx}',
-    '<rootDir>/components/**/*.test.{ts,tsx}',
-    '<rootDir>/app/**/*.test.{ts,tsx}',
-    '<rootDir>/lib/**/*.test.{ts,tsx}',
-    '<rootDir>/hooks/**/*.test.{ts,tsx}',
-  ],
-  
-  // Test path patterns for different test types
-  testPathIgnorePatterns: [
-    '<rootDir>/.next/',
-    '<rootDir>/node_modules/',
-    '<rootDir>/coverage/',
-    '<rootDir>/dist/',
-    '<rootDir>/build/',
-  ],
-  
-  // Coverage configuration
-  collectCoverageFrom: [
-    'components/**/*.{ts,tsx}',
-    'app/**/*.{ts,tsx}',
-    'lib/**/*.{ts,tsx}',
-    'hooks/**/*.{ts,tsx}',
-    '!**/*.d.ts',
-    '!**/*.test.{ts,tsx}',
-    '!**/*.spec.{ts,tsx}',
-    '!**/node_modules/**',
-    '!**/.next/**',
-    '!**/coverage/**',
-    '!**/dist/**',
-    '!**/build/**',
-    '!**/scripts/**',
-    '!**/prisma/**',
-    '!**/docs/**',
-  ],
-  
-  // Coverage thresholds
-  coverageThreshold: {
-    global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
-    },
-  },
-  
-  // Coverage reporters
-  coverageReporters: [
-    'text',
-    'lcov',
-    'html',
-    'json',
-  ],
-  
-  // Module name mapping
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
     '^@/components/(.*)$': '<rootDir>/components/$1',
     '^@/lib/(.*)$': '<rootDir>/lib/$1',
     '^@/hooks/(.*)$': '<rootDir>/hooks/$1',
     '^@/app/(.*)$': '<rootDir>/app/$1',
-    '^@/types/(.*)$': '<rootDir>/types/$1',
   },
-  
-  // Module file extensions
-  moduleFileExtensions: [
-    'ts',
-    'tsx',
-    'js',
-    'jsx',
-    'json',
-    'node',
+  collectCoverageFrom: [
+    'app/**/*.{ts,tsx}',
+    'components/**/*.{ts,tsx}',
+    'lib/**/*.{ts,tsx}',
+    'hooks/**/*.{ts,tsx}',
+    '!**/*.d.ts',
+    '!**/node_modules/**',
+    '!**/tests/**',
+    '!**/coverage/**',
+    '!**/.next/**',
+    '!**/dist/**',
   ],
-  
-  // Test timeout
-  testTimeout: 10000,
-  
-  // Verbose output
-  verbose: true,
-  
-  // Clear mocks between tests
-  clearMocks: true,
-  
-  // Reset modules between tests
-  resetModules: true,
-  
-  // Restore mocks between tests
-  restoreMocks: true,
-  
-  // Test environment variables
-  testEnvironmentOptions: {
-    customExportConditions: [''],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
   },
-  
-
-  
-
-  
-
-  
-
+  coverageReporters: ['text', 'lcov', 'html'],
+  coverageDirectory: 'coverage',
+  testMatch: [
+    '<rootDir>/tests/**/*.test.{ts,tsx}',
+    '<rootDir>/tests/**/*.spec.{ts,tsx}',
+  ],
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/.next/',
+    '<rootDir>/dist/',
+  ],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  testEnvironmentOptions: {
+    url: 'http://localhost',
+  },
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

@@ -235,13 +235,21 @@ describe('Business Canvas API', () => {
 
   describe('Australian Business Context', () => {
     it('should handle Australian business data correctly', async () => {
-      const australianCanvas = global.testUtils.createMockCanvas({
+      const australianCanvas = {
+        id: 'australian-canvas-id',
+        name: 'Australian Mining Canvas',
+        description: 'Australian mining operations canvas',
         legalName: 'Australian Mining Corp Pty Ltd',
         abn: '12345678901',
         acn: '123456789',
         primaryLocation: 'Queensland, Australia',
         industry: 'MINING',
-      });
+        sectors: ['COAL'],
+        status: 'DRAFT',
+        isActive: true,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
+      };
 
       (prisma.businessCanvas.create as jest.Mock).mockResolvedValue(australianCanvas);
 

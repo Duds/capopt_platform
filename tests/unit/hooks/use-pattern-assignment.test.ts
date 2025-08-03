@@ -4,7 +4,7 @@
  * @note Comprehensive testing for pattern assignment hook
  */
 
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { usePatternAssignment } from '@/hooks/use-pattern-assignment';
 
 // Mock the API call
@@ -32,12 +32,14 @@ describe('usePatternAssignment', () => {
 
       const { result } = renderHook(() => usePatternAssignment());
 
-      await result.current.assignPatterns({
-        industry: 'MINING',
-        sectors: ['COAL'],
-        location: 'Queensland, Australia',
-        businessSize: 'LARGE',
-        riskProfile: 'HIGH',
+      await act(async () => {
+        await result.current.assignPatterns({
+          industry: 'MINING',
+          sectors: ['COAL'],
+          location: 'Queensland, Australia',
+          businessSize: 'LARGE',
+          riskProfile: 'HIGH',
+        });
       });
 
       await waitFor(() => {
@@ -64,12 +66,14 @@ describe('usePatternAssignment', () => {
 
       const { result } = renderHook(() => usePatternAssignment());
 
-      await result.current.assignPatterns({
-        industry: 'MINING',
-        sectors: ['COAL'],
-        location: 'Queensland, Australia',
-        businessSize: 'LARGE',
-        riskProfile: 'HIGH',
+      await act(async () => {
+        await result.current.assignPatterns({
+          industry: 'MINING',
+          sectors: ['COAL'],
+          location: 'Queensland, Australia',
+          businessSize: 'LARGE',
+          riskProfile: 'HIGH',
+        });
       });
 
       await waitFor(() => {
@@ -89,12 +93,14 @@ describe('usePatternAssignment', () => {
 
       const { result } = renderHook(() => usePatternAssignment());
 
-      await result.current.assignPatterns({
-        industry: 'MINING',
-        sectors: ['COAL'],
-        location: 'Queensland, Australia',
-        businessSize: 'LARGE',
-        riskProfile: 'HIGH',
+      await act(async () => {
+        await result.current.assignPatterns({
+          industry: 'MINING',
+          sectors: ['COAL'],
+          location: 'Queensland, Australia',
+          businessSize: 'LARGE',
+          riskProfile: 'HIGH',
+        });
       });
 
       await waitFor(() => {
@@ -112,12 +118,16 @@ describe('usePatternAssignment', () => {
 
       const { result } = renderHook(() => usePatternAssignment());
 
-      const assignPromise = result.current.assignPatterns({
-        industry: 'MINING',
-        sectors: ['COAL'],
-        location: 'Queensland, Australia',
-        businessSize: 'LARGE',
-        riskProfile: 'HIGH',
+      let assignPromise: Promise<void>;
+      
+      await act(async () => {
+        assignPromise = result.current.assignPatterns({
+          industry: 'MINING',
+          sectors: ['COAL'],
+          location: 'Queensland, Australia',
+          businessSize: 'LARGE',
+          riskProfile: 'HIGH',
+        });
       });
 
       // Should be loading
@@ -134,7 +144,9 @@ describe('usePatternAssignment', () => {
         }),
       });
 
-      await assignPromise;
+      await act(async () => {
+        await assignPromise;
+      });
 
       // Should not be loading anymore
       expect(result.current.loading).toBe(false);
@@ -158,12 +170,14 @@ describe('usePatternAssignment', () => {
       const { result } = renderHook(() => usePatternAssignment());
 
       // First assign patterns
-      await result.current.assignPatterns({
-        industry: 'MINING',
-        sectors: ['COAL'],
-        location: 'Queensland, Australia',
-        businessSize: 'LARGE',
-        riskProfile: 'HIGH',
+      await act(async () => {
+        await result.current.assignPatterns({
+          industry: 'MINING',
+          sectors: ['COAL'],
+          location: 'Queensland, Australia',
+          businessSize: 'LARGE',
+          riskProfile: 'HIGH',
+        });
       });
 
       await waitFor(() => {
@@ -171,7 +185,9 @@ describe('usePatternAssignment', () => {
       });
 
       // Then clear assignment
-      result.current.clearAssignment();
+      act(() => {
+        result.current.clearAssignment();
+      });
 
       expect(result.current.assignment).toBeNull();
       expect(result.current.error).toBeNull();
@@ -194,12 +210,14 @@ describe('usePatternAssignment', () => {
 
       const { result } = renderHook(() => usePatternAssignment());
 
-      await result.current.assignPatterns({
-        industry: 'MINING',
-        sectors: ['COAL', 'IRON_ORE'],
-        location: 'Queensland, Australia',
-        businessSize: 'LARGE',
-        riskProfile: 'HIGH',
+      await act(async () => {
+        await result.current.assignPatterns({
+          industry: 'MINING',
+          sectors: ['COAL', 'IRON_ORE'],
+          location: 'Queensland, Australia',
+          businessSize: 'LARGE',
+          riskProfile: 'HIGH',
+        });
       });
 
       await waitFor(() => {
@@ -226,12 +244,14 @@ describe('usePatternAssignment', () => {
 
       const { result } = renderHook(() => usePatternAssignment());
 
-      await result.current.assignPatterns({
-        industry: 'MINING',
-        sectors: ['COAL'],
-        location: 'Queensland, Australia',
-        businessSize: 'SMALL',
-        riskProfile: 'LOW',
+      await act(async () => {
+        await result.current.assignPatterns({
+          industry: 'MINING',
+          sectors: ['COAL'],
+          location: 'Queensland, Australia',
+          businessSize: 'SMALL',
+          riskProfile: 'LOW',
+        });
       });
 
       await waitFor(() => {
@@ -244,12 +264,14 @@ describe('usePatternAssignment', () => {
     it('should handle invalid input parameters', async () => {
       const { result } = renderHook(() => usePatternAssignment());
 
-      await result.current.assignPatterns({
-        industry: '',
-        sectors: [],
-        location: '',
-        businessSize: 'INVALID' as any,
-        riskProfile: 'INVALID' as any,
+      await act(async () => {
+        await result.current.assignPatterns({
+          industry: '',
+          sectors: [],
+          location: '',
+          businessSize: 'INVALID' as any,
+          riskProfile: 'INVALID' as any,
+        });
       });
 
       await waitFor(() => {
@@ -267,12 +289,14 @@ describe('usePatternAssignment', () => {
 
       const { result } = renderHook(() => usePatternAssignment());
 
-      await result.current.assignPatterns({
-        industry: 'MINING',
-        sectors: ['COAL'],
-        location: 'Queensland, Australia',
-        businessSize: 'LARGE',
-        riskProfile: 'HIGH',
+      await act(async () => {
+        await result.current.assignPatterns({
+          industry: 'MINING',
+          sectors: ['COAL'],
+          location: 'Queensland, Australia',
+          businessSize: 'LARGE',
+          riskProfile: 'HIGH',
+        });
       });
 
       await waitFor(() => {
@@ -298,24 +322,24 @@ describe('usePatternAssignment', () => {
       const { result } = renderHook(() => usePatternAssignment());
 
       // Start multiple assignments concurrently
-      const promises = [
-        result.current.assignPatterns({
-          industry: 'MINING',
-          sectors: ['COAL'],
-          location: 'Queensland, Australia',
-          businessSize: 'LARGE',
-          riskProfile: 'HIGH',
-        }),
-        result.current.assignPatterns({
-          industry: 'MANUFACTURING',
-          sectors: ['STEEL'],
-          location: 'New South Wales, Australia',
-          businessSize: 'MEDIUM',
-          riskProfile: 'MEDIUM',
-        }),
-      ];
-
-      await Promise.all(promises);
+      await act(async () => {
+        await Promise.all([
+          result.current.assignPatterns({
+            industry: 'MINING',
+            sectors: ['COAL'],
+            location: 'Queensland, Australia',
+            businessSize: 'LARGE',
+            riskProfile: 'HIGH',
+          }),
+          result.current.assignPatterns({
+            industry: 'MANUFACTURING',
+            sectors: ['STEEL'],
+            location: 'New South Wales, Australia',
+            businessSize: 'MEDIUM',
+            riskProfile: 'MEDIUM',
+          }),
+        ]);
+      });
 
       // Should handle concurrent calls without issues
       expect(mockFetch).toHaveBeenCalledTimes(2);

@@ -25,7 +25,9 @@ import {
   Map,
   Network,
   BookOpen,
-  BarChart3
+  BarChart3,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react'
 
 interface SidebarNavProps {
@@ -47,12 +49,10 @@ export function SidebarNav({
       <Button
         variant="ghost"
         size="sm"
-        className="absolute -right-3 top-6 h-8 w-8 rounded-full border bg-white shadow-sm hover:bg-gray-50 flex items-center justify-center"
+        className="absolute -right-3 top-6 h-8 w-8 rounded-md border bg-white shadow-sm hover:bg-gray-50 flex items-center justify-center"
         onClick={onSidebarToggle}
       >
-        <span className="font-mono text-xs">
-          {sidebarCollapsed ? '▶' : '◀'}
-        </span>
+        {sidebarCollapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
       </Button>
 
       <div className="space-y-2">
