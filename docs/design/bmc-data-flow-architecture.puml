@@ -1,0 +1,186 @@
+@startuml BMC Data Flow Architecture
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+
+title **Business Model Canvas - Data Flow & Integration Architecture**
+
+package "Strategic Layer" {
+  [Value Propositions] as VP
+  [Customer Segments] as CS
+  [Revenue Streams] as RS
+}
+
+package "Operational Layer" {
+  [Channels] as CH
+  [Key Resources] as KR
+  [Key Activities] as KA
+  [Key Partnerships] as KP
+  [Cost Structure] as COST
+}
+
+package "Data Categories" {
+  [Strategic Context] as STRAT
+  [Operational Integration] as OPS
+  [Risk & Control] as RISK
+  [Performance Metrics] as PERF
+  [Compliance & Regulatory] as COMP
+}
+
+package "Core Infrastructure" {
+  [EnhancedItemDialog] as DIALOG
+  [Form Validation] as VALID
+  [Array Field Management] as ARRAY
+  [Database Schema] as DB
+  [Graph Relationships] as GRAPH
+}
+
+' Strategic Layer Connections
+VP --> STRAT : Strategic Context
+CS --> STRAT : Strategic Context
+RS --> STRAT : Strategic Context
+
+' Operational Layer Connections
+CH --> OPS : Operational Integration
+KR --> OPS : Operational Integration
+KA --> OPS : Operational Integration
+KP --> OPS : Operational Integration
+COST --> OPS : Operational Integration
+
+' Cross-layer Connections
+VP --> CS : Customer Alignment
+CS --> CH : Channel Selection
+CH --> RS : Revenue Generation
+RS --> COST : Cost Impact
+KR --> KA : Resource Requirements
+KA --> KP : Partnership Needs
+KP --> COST : Partnership Costs
+
+' Data Category Connections
+STRAT --> DIALOG : Field Configuration
+OPS --> DIALOG : Field Configuration
+RISK --> DIALOG : Field Configuration
+PERF --> DIALOG : Field Configuration
+COMP --> DIALOG : Field Configuration
+
+' Infrastructure Connections
+DIALOG --> VALID : Form Validation
+DIALOG --> ARRAY : Array Management
+DIALOG --> DB : Data Persistence
+DB --> GRAPH : Graph Integration
+
+' Section-specific data flows
+note right of VP
+  Strategic Context:
+  - Target Customer Segment
+  - Customer Pain Points
+  - Solution Benefits
+  - Unique Selling Point
+  
+  Operational Integration:
+  - Value Delivery Points
+  - Measurable Outcomes
+  - Success Criteria
+  - Process Dependencies
+end note
+
+note right of CS
+  Strategic Context:
+  - Geographic Region
+  - Industry Sector
+  - Company Size
+  - Customer Needs
+  
+  Operational Integration:
+  - Service Delivery Channels
+  - Support Processes
+  - Relationship Management
+  - Operational Delivery Points
+end note
+
+note right of CH
+  Strategic Context:
+  - Channel Type
+  - Reach
+  - Coverage
+  - Channel Strategy
+  
+  Operational Integration:
+  - Delivery Method
+  - Service Level
+  - Response Time
+  - Operational Delivery Points
+end note
+
+note right of RS
+  Strategic Context:
+  - Pricing Strategy
+  - Revenue Model
+  - Revenue Potential
+  - Competitive Advantage
+  
+  Operational Integration:
+  - Revenue Processes
+  - Billing Systems
+  - Collection Procedures
+  - Operational Delivery Points
+end note
+
+note right of KR
+  Strategic Context:
+  - Resource Category
+  - Criticality
+  - Uniqueness
+  - Strategic Objective
+  
+  Operational Integration:
+  - Capacity
+  - Utilization Rate
+  - Scalability
+  - Resource Requirements
+end note
+
+note right of KA
+  Strategic Context:
+  - Activity Type
+  - Complexity
+  - Process Steps
+  - Strategic Objective
+  
+  Operational Integration:
+  - Inputs
+  - Outputs
+  - Dependencies
+  - Process Dependencies
+end note
+
+note right of KP
+  Strategic Context:
+  - Partnership Model
+  - Exclusivity
+  - Contract Terms
+  - Strategic Objective
+  
+  Operational Integration:
+  - Service Level
+  - Communication
+  - Cost Structure
+  - Resource Requirements
+end note
+
+note right of COST
+  Strategic Context:
+  - Cost Type
+  - Cost Driver
+  - Allocation Method
+  - Strategic Objective
+  
+  Operational Integration:
+  - Budget
+  - Actual Cost
+  - Variance
+  - Resource Requirements
+end note
+
+@enduml 

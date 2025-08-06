@@ -64,11 +64,13 @@ import {
   Link,
   FileText
 } from 'lucide-react'
-import { BusinessModelCanvasProps, BusinessModel, CanvasItem } from './types'
+import { BusinessModelCanvasProps, BusinessModel, CanvasItem, EnhancedCanvasItem } from './types'
 import { canvasSections, getPriorityColor } from './utils'
 import { useBusinessCanvas, BusinessCanvas as DBBusinessCanvas } from '@/hooks/use-business-canvas'
 import { CanvasHierarchyView } from './CanvasHierarchyView'
 import { CanvasEditor } from './CanvasEditor'
+import { EnhancedItemCard } from './EnhancedItemCard'
+import { EnhancedItemDialog } from './EnhancedItemDialog'
 
 export function BusinessModelCanvas({ 
   businessModel, 
@@ -78,7 +80,7 @@ export function BusinessModelCanvas({
   onViewModeChange,
   onEditingChange
 }: BusinessModelCanvasProps) {
-  const [editingItem, setEditingItem] = useState<{ section: keyof BusinessModel; item: CanvasItem } | null>(null)
+  const [editingItem, setEditingItem] = useState<{ section: keyof BusinessModel; item: EnhancedCanvasItem } | null>(null)
   const [newItem, setNewItem] = useState<{ section: keyof BusinessModel } | null>(null)
   const [selectedCanvas, setSelectedCanvas] = useState<string>('')
   const selectedCanvasRef = useRef<string>('')
@@ -508,7 +510,7 @@ export function BusinessModelCanvas({
     },
   }
 
-  const addItem = async (section: keyof BusinessModel, item: Omit<CanvasItem, "id">) => {
+  const addItem = async (section: keyof BusinessModel, item: Omit<EnhancedCanvasItem, "id">) => {
     if (!selectedCanvas) {
       console.warn('No canvas selected, cannot add item')
       return
@@ -523,65 +525,186 @@ export function BusinessModelCanvas({
       switch (section) {
         case 'valuePropositions':
           newItem = await canvasContentService.createValueProposition(selectedCanvas, {
+            title: item.title || '',
             description: item.description || '',
-            priority: item.priority || 'MEDIUM'
+            priority: item.priority || 'MEDIUM',
+            // Enhanced fields
+            strategicObjective: item.strategicObjective,
+            competitiveAdvantage: item.competitiveAdvantage,
+            uniqueSellingPoint: item.uniqueSellingPoint,
+            operationalDeliveryPoints: item.operationalDeliveryPoints,
+            processDependencies: item.processDependencies,
+            resourceRequirements: item.resourceRequirements,
+            criticalControls: item.criticalControls,
+            riskMitigation: item.riskMitigation,
+            complianceRequirements: item.complianceRequirements,
+            effectiveness: item.effectiveness,
+            efficiency: item.efficiency,
+            satisfaction: item.satisfaction,
+            whsRequirements: item.whsRequirements,
+            isoStandards: item.isoStandards,
+            icmmGuidelines: item.icmmGuidelines
           })
           break
         case 'customerSegments':
           newItem = await canvasContentService.createCustomerSegment(selectedCanvas, {
-            name: item.name || '',
+            title: item.title || '',
             description: item.description || '',
-            size: item.size,
-            priority: item.priority || 'MEDIUM'
+            priority: item.priority || 'MEDIUM',
+            // Enhanced fields
+            strategicObjective: item.strategicObjective,
+            competitiveAdvantage: item.competitiveAdvantage,
+            uniqueSellingPoint: item.uniqueSellingPoint,
+            operationalDeliveryPoints: item.operationalDeliveryPoints,
+            processDependencies: item.processDependencies,
+            resourceRequirements: item.resourceRequirements,
+            criticalControls: item.criticalControls,
+            riskMitigation: item.riskMitigation,
+            complianceRequirements: item.complianceRequirements,
+            effectiveness: item.effectiveness,
+            efficiency: item.efficiency,
+            satisfaction: item.satisfaction,
+            whsRequirements: item.whsRequirements,
+            isoStandards: item.isoStandards,
+            icmmGuidelines: item.icmmGuidelines
           })
           break
         case 'revenueStreams':
           newItem = await canvasContentService.createRevenueStream(selectedCanvas, {
-            type: item.type || '',
-            description: item.description,
-            estimatedValue: item.estimatedValue,
-            frequency: item.frequency
+            title: item.title || '',
+            description: item.description || '',
+            priority: item.priority || 'MEDIUM',
+            // Enhanced fields
+            strategicObjective: item.strategicObjective,
+            competitiveAdvantage: item.competitiveAdvantage,
+            uniqueSellingPoint: item.uniqueSellingPoint,
+            operationalDeliveryPoints: item.operationalDeliveryPoints,
+            processDependencies: item.processDependencies,
+            resourceRequirements: item.resourceRequirements,
+            criticalControls: item.criticalControls,
+            riskMitigation: item.riskMitigation,
+            complianceRequirements: item.complianceRequirements,
+            effectiveness: item.effectiveness,
+            efficiency: item.efficiency,
+            satisfaction: item.satisfaction,
+            whsRequirements: item.whsRequirements,
+            isoStandards: item.isoStandards,
+            icmmGuidelines: item.icmmGuidelines
           })
           break
         case 'partnerships':
           newItem = await canvasContentService.createPartnership(selectedCanvas, {
-            name: item.name || '',
-            type: item.type,
-            description: item.description,
-            value: item.value
+            title: item.title || '',
+            description: item.description || '',
+            priority: item.priority || 'MEDIUM',
+            // Enhanced fields
+            strategicObjective: item.strategicObjective,
+            competitiveAdvantage: item.competitiveAdvantage,
+            uniqueSellingPoint: item.uniqueSellingPoint,
+            operationalDeliveryPoints: item.operationalDeliveryPoints,
+            processDependencies: item.processDependencies,
+            resourceRequirements: item.resourceRequirements,
+            criticalControls: item.criticalControls,
+            riskMitigation: item.riskMitigation,
+            complianceRequirements: item.complianceRequirements,
+            effectiveness: item.effectiveness,
+            efficiency: item.efficiency,
+            satisfaction: item.satisfaction,
+            whsRequirements: item.whsRequirements,
+            isoStandards: item.isoStandards,
+            icmmGuidelines: item.icmmGuidelines
           })
           break
         case 'resources':
           newItem = await canvasContentService.createResource(selectedCanvas, {
-            name: item.name || '',
-            type: item.type || 'PHYSICAL',
-            description: item.description,
-            availability: item.availability,
-            cost: item.cost
+            title: item.title || '',
+            description: item.description || '',
+            priority: item.priority || 'MEDIUM',
+            // Enhanced fields
+            strategicObjective: item.strategicObjective,
+            competitiveAdvantage: item.competitiveAdvantage,
+            uniqueSellingPoint: item.uniqueSellingPoint,
+            operationalDeliveryPoints: item.operationalDeliveryPoints,
+            processDependencies: item.processDependencies,
+            resourceRequirements: item.resourceRequirements,
+            criticalControls: item.criticalControls,
+            riskMitigation: item.riskMitigation,
+            complianceRequirements: item.complianceRequirements,
+            effectiveness: item.effectiveness,
+            efficiency: item.efficiency,
+            satisfaction: item.satisfaction,
+            whsRequirements: item.whsRequirements,
+            isoStandards: item.isoStandards,
+            icmmGuidelines: item.icmmGuidelines
           })
           break
         case 'activities':
           newItem = await canvasContentService.createActivity(selectedCanvas, {
-            name: item.name || '',
-            description: item.description,
+            title: item.title || '',
+            description: item.description || '',
             priority: item.priority || 'MEDIUM',
-            cost: item.cost
+            // Enhanced fields
+            strategicObjective: item.strategicObjective,
+            competitiveAdvantage: item.competitiveAdvantage,
+            uniqueSellingPoint: item.uniqueSellingPoint,
+            operationalDeliveryPoints: item.operationalDeliveryPoints,
+            processDependencies: item.processDependencies,
+            resourceRequirements: item.resourceRequirements,
+            criticalControls: item.criticalControls,
+            riskMitigation: item.riskMitigation,
+            complianceRequirements: item.complianceRequirements,
+            effectiveness: item.effectiveness,
+            efficiency: item.efficiency,
+            satisfaction: item.satisfaction,
+            whsRequirements: item.whsRequirements,
+            isoStandards: item.isoStandards,
+            icmmGuidelines: item.icmmGuidelines
           })
           break
         case 'costStructures':
           newItem = await canvasContentService.createCostStructure(selectedCanvas, {
+            title: item.title || '',
             description: item.description || '',
-            category: item.category,
-            amount: item.amount,
-            frequency: item.frequency
+            priority: item.priority || 'MEDIUM',
+            // Enhanced fields
+            strategicObjective: item.strategicObjective,
+            competitiveAdvantage: item.competitiveAdvantage,
+            uniqueSellingPoint: item.uniqueSellingPoint,
+            operationalDeliveryPoints: item.operationalDeliveryPoints,
+            processDependencies: item.processDependencies,
+            resourceRequirements: item.resourceRequirements,
+            criticalControls: item.criticalControls,
+            riskMitigation: item.riskMitigation,
+            complianceRequirements: item.complianceRequirements,
+            effectiveness: item.effectiveness,
+            efficiency: item.efficiency,
+            satisfaction: item.satisfaction,
+            whsRequirements: item.whsRequirements,
+            isoStandards: item.isoStandards,
+            icmmGuidelines: item.icmmGuidelines
           })
           break
         case 'channels':
           newItem = await canvasContentService.createChannel(selectedCanvas, {
-            type: item.type || '',
-            description: item.description,
+            title: item.title || '',
+            description: item.description || '',
+            priority: item.priority || 'MEDIUM',
+            // Enhanced fields
+            strategicObjective: item.strategicObjective,
+            competitiveAdvantage: item.competitiveAdvantage,
+            uniqueSellingPoint: item.uniqueSellingPoint,
+            operationalDeliveryPoints: item.operationalDeliveryPoints,
+            processDependencies: item.processDependencies,
+            resourceRequirements: item.resourceRequirements,
+            criticalControls: item.criticalControls,
+            riskMitigation: item.riskMitigation,
+            complianceRequirements: item.complianceRequirements,
             effectiveness: item.effectiveness,
-            cost: item.cost
+            efficiency: item.efficiency,
+            satisfaction: item.satisfaction,
+            whsRequirements: item.whsRequirements,
+            isoStandards: item.isoStandards,
+            icmmGuidelines: item.icmmGuidelines
           })
           break
         default:
@@ -607,7 +730,7 @@ export function BusinessModelCanvas({
     }
   }
 
-  const updateItem = async (section: keyof BusinessModel, itemId: string, updates: Partial<CanvasItem>) => {
+  const updateItem = async (section: keyof BusinessModel, itemId: string, updates: Partial<EnhancedCanvasItem>) => {
     if (!selectedCanvas) {
       console.warn('No canvas selected, cannot update item')
       return
@@ -1617,42 +1740,14 @@ export function BusinessModelCanvas({
         </CardHeader>
         <CardContent className="space-y-4 flex-1">
           {items.map((item) => (
-            <div 
-              key={item.id} 
-              className="bg-white p-4 rounded-lg border shadow-sm"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <h4 className="font-medium text-base leading-tight">{item.title}</h4>
-                <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
-                  <Badge variant="secondary" className={getPriorityColor(item.priority || 'medium')}>
-                    {item.priority || 'medium'}
-                  </Badge>
-                  {isEditing && (
-                    <div className="flex space-x-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                        onClick={() => setEditingItem({ section: sectionKey, item })}
-                        disabled={!hasData}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                        onClick={() => deleteItem(sectionKey, item.id)}
-                        disabled={!hasData}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 leading-relaxed">{item.description}</p>
-            </div>
+            <EnhancedItemCard
+              key={item.id}
+              item={item as EnhancedCanvasItem}
+              section={sectionKey}
+              isEditing={isEditing}
+              onEdit={(item) => setEditingItem({ section: sectionKey, item })}
+              onDelete={(itemId) => deleteItem(sectionKey, itemId)}
+            />
           ))}
 
           {isEditing && (
@@ -1998,136 +2093,31 @@ export function BusinessModelCanvas({
         </CardContent>
       </Card>
 
-      {/* Edit Item Dialog */}
-      <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Business Model Component</DialogTitle>
-            <DialogDescription>
-              Update the details for this business model component
-            </DialogDescription>
-          </DialogHeader>
-          {editingItem && (
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  value={editingItem.item.title}
-                  onChange={(e) =>
-                    setEditingItem({
-                      ...editingItem,
-                      item: { ...editingItem.item, title: e.target.value },
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={editingItem.item.description}
-                  onChange={(e) =>
-                    setEditingItem({
-                      ...editingItem,
-                      item: { ...editingItem.item, description: e.target.value },
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <Label htmlFor="priority">Priority</Label>
-                <select
-                  id="priority"
-                  className="w-full p-2 border rounded-md"
-                  value={editingItem.item.priority}
-                  onChange={(e) =>
-                    setEditingItem({
-                      ...editingItem,
-                      item: { ...editingItem.item, priority: e.target.value as "high" | "medium" | "low" },
-                    })
-                  }
-                >
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
-                </select>
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingItem(null)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                if (editingItem) {
-                  updateItem(editingItem.section, editingItem.item.id, editingItem.item)
-                  setEditingItem(null)
-                }
-              }}
-            >
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Enhanced Edit Item Dialog */}
+      <EnhancedItemDialog
+        isOpen={!!editingItem}
+        onClose={() => setEditingItem(null)}
+        section={editingItem?.section || 'valuePropositions'}
+        item={editingItem?.item || null}
+        isNew={false}
+        onSave={(section, item) => {
+          updateItem(section, item.id, item)
+          setEditingItem(null)
+        }}
+      />
 
-      {/* Add New Item Dialog */}
-      <Dialog open={!!newItem} onOpenChange={() => setNewItem(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Business Model Component</DialogTitle>
-            <DialogDescription>
-              Add a new component to your business model
-            </DialogDescription>
-          </DialogHeader>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              const formData = new FormData(e.currentTarget)
-              if (newItem) {
-                addItem(newItem.section, {
-                  title: formData.get("title") as string,
-                  description: formData.get("description") as string,
-                  priority: formData.get("priority") as "high" | "medium" | "low",
-                })
-                setNewItem(null)
-              }
-            }}
-          >
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="new-title">Title</Label>
-                <Input id="new-title" name="title" required />
-              </div>
-              <div>
-                <Label htmlFor="new-description">Description</Label>
-                <Textarea id="new-description" name="description" required />
-              </div>
-              <div>
-                <Label htmlFor="new-priority">Priority</Label>
-                <select
-                  id="new-priority"
-                  name="priority"
-                  className="w-full p-2 border rounded-md"
-                  defaultValue="medium"
-                >
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
-                </select>
-              </div>
-            </div>
-            <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => setNewItem(null)}>
-                Cancel
-              </Button>
-              <Button type="submit">Add Component</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {/* Enhanced Add New Item Dialog */}
+      <EnhancedItemDialog
+        isOpen={!!newItem}
+        onClose={() => setNewItem(null)}
+        section={newItem?.section || 'valuePropositions'}
+        item={null}
+        isNew={true}
+        onSave={(section, item) => {
+          addItem(section, item)
+          setNewItem(null)
+        }}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmation.isOpen} onOpenChange={cancelDeleteCanvas}>

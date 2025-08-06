@@ -714,8 +714,8 @@ export interface OperatingModelCanvasProps {
   operatingModel: OperatingModel
   onUpdate: (updatedModel: OperatingModel) => void
   isEditing?: boolean
-  viewMode?: 'canvas' | 'list'
-  onViewModeChange?: (mode: 'canvas' | 'list') => void
+  viewMode?: 'canvas' | 'list' | 'tree'
+  onViewModeChange?: (mode: 'canvas' | 'list' | 'tree') => void
   onEditingChange?: (editing: boolean) => void
 }
 

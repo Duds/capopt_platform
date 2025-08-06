@@ -1,6 +1,10 @@
 import { PrismaClient } from '@prisma/client'
 import { seedIndustries } from './industries'
 import { seedBusinessCanvases } from './business-canvases'
+import { seedOperational } from './operational'
+import { seedOKRSLAKPQ } from './okr-sla-kpq'
+import { seedHerculesLeveeBMC } from './hercules-levee-bmc'
+import { seedBMCTestData } from './bmc-test-data'
 import { PatternAnalysisService } from '@/lib/services/pattern-analysis'
 import { OperationalStreamStandardizer } from '@/lib/services/operational-stream-standardizer'
 
@@ -13,6 +17,18 @@ async function main() {
     // Seed core data using existing structure
     await seedIndustries()
     await seedBusinessCanvases(prisma)
+    
+    // Seed operational data (processes, playbooks, etc.)
+    await seedOperational(prisma)
+    
+    // Seed OKR/SLA/KPQ data
+    await seedOKRSLAKPQ()
+    
+    // Seed Hercules Levee BMC data
+    await seedHerculesLeveeBMC(prisma)
+    
+    // Seed comprehensive BMC test data
+    await seedBMCTestData(prisma)
 
     // Initialize pattern analysis
     console.log('🔍 Initializing pattern analysis...')
@@ -45,6 +61,9 @@ async function main() {
     console.log(`  - Compliance Frameworks: ${await prisma.complianceRequirement.count()}`)
     console.log(`  - Business Canvases: ${await prisma.businessCanvas.count()}`)
     console.log(`  - Assignment Patterns: ${await prisma.assignmentPattern.count()}`)
+    console.log(`  - OKRs: ${await prisma.oKR.count()}`)
+    console.log(`  - SLAs: ${await prisma.sLA.count()}`)
+    console.log(`  - KPQs: ${await prisma.kPQ.count()}`)
 
   } catch (error) {
     console.error('❌ Error during seeding:', error)

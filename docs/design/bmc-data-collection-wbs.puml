@@ -1,0 +1,221 @@
+@startwbs
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+skinparam maxMessageSize 150
+
+title **Business Model Canvas - Data Collection Requirements WBS**
+
+* Business Model Canvas
+** Value Propositions
+*** Strategic Context
+**** Target Customer Segment
+**** Customer Pain Points (Array)
+**** Solution Benefits (Array)
+**** Unique Selling Point
+*** Operational Integration
+**** Value Delivery Points (Array)
+**** Measurable Outcomes
+**** Success Criteria
+**** Process Dependencies (Array)
+*** Risk & Control
+**** Critical Controls (Array)
+**** Risk Mitigation
+**** Compliance Requirements (Array)
+*** Performance Metrics
+**** Value Effectiveness
+**** Customer Satisfaction
+**** Market Position
+*** Compliance & Regulatory
+**** WHS Requirements (Array)
+**** ISO Standards (Array)
+**** ICMM Guidelines (Array)
+
+** Customer Segments
+*** Strategic Context
+**** Geographic Region
+**** Industry Sector
+**** Company Size (Dropdown)
+**** Customer Needs
+*** Operational Integration
+**** Service Delivery Channels (Array)
+**** Support Processes (Array)
+**** Relationship Management
+**** Operational Delivery Points (Array)
+*** Risk & Control
+**** Customer Risk Profile
+**** Data Protection Needs (Array)
+**** Compliance Requirements (Array)
+*** Performance Metrics
+**** Revenue Potential
+**** Lifetime Value
+**** Retention Rate
+*** Compliance & Regulatory
+**** WHS Requirements (Array)
+**** ISO Standards (Array)
+**** ICMM Guidelines (Array)
+
+** Channels
+*** Strategic Context
+**** Channel Type (Dropdown)
+**** Reach
+**** Coverage
+**** Channel Strategy
+*** Operational Integration
+**** Delivery Method (Dropdown)
+**** Service Level (Dropdown)
+**** Response Time
+**** Operational Delivery Points (Array)
+*** Risk & Control
+**** Channel Risks (Array)
+**** Quality Controls (Array)
+**** Compliance Requirements (Array)
+*** Performance Metrics
+**** Channel Effectiveness
+**** Cost Efficiency
+**** Profitability
+*** Compliance & Regulatory
+**** WHS Requirements (Array)
+**** ISO Standards (Array)
+**** ICMM Guidelines (Array)
+
+** Revenue Streams
+*** Strategic Context
+**** Pricing Strategy (Dropdown)
+**** Revenue Model (Dropdown)
+**** Revenue Potential (Number)
+**** Competitive Advantage
+*** Operational Integration
+**** Revenue Processes (Array)
+**** Billing Systems (Array)
+**** Collection Procedures (Array)
+**** Operational Delivery Points (Array)
+*** Risk & Control
+**** Revenue Risks (Array)
+**** Financial Controls (Array)
+**** Compliance Requirements (Array)
+*** Performance Metrics
+**** Revenue Growth
+**** Profit Margin
+**** Cash Flow
+*** Compliance & Regulatory
+**** WHS Requirements (Array)
+**** ISO Standards (Array)
+**** ICMM Guidelines (Array)
+
+** Key Resources
+*** Strategic Context
+**** Resource Category (Dropdown)
+**** Criticality (Dropdown)
+**** Uniqueness (Dropdown)
+**** Strategic Objective
+*** Operational Integration
+**** Capacity
+**** Utilization Rate (%)
+**** Scalability (Dropdown)
+**** Resource Requirements (Array)
+*** Risk & Control
+**** Resource Risks (Array)
+**** Protection Measures (Array)
+**** Backup Plans (Array)
+*** Performance Metrics
+**** Reliability
+**** Efficiency
+**** Replacement Cost
+*** Compliance & Regulatory
+**** WHS Requirements (Array)
+**** ISO Standards (Array)
+**** ICMM Guidelines (Array)
+
+** Key Activities
+*** Strategic Context
+**** Activity Type (Dropdown)
+**** Complexity (Dropdown)
+**** Process Steps
+**** Strategic Objective
+*** Operational Integration
+**** Inputs
+**** Outputs
+**** Dependencies (Array)
+**** Process Dependencies (Array)
+*** Risk & Control
+**** Activity Risks (Array)
+**** Safety Controls (Array)
+**** Quality Assurance
+*** Performance Metrics
+**** Cycle Time
+**** Quality
+**** Efficiency
+*** Compliance & Regulatory
+**** WHS Requirements (Array)
+**** ISO Standards (Array)
+**** ICMM Guidelines (Array)
+
+** Key Partnerships
+*** Strategic Context
+**** Partnership Model (Dropdown)
+**** Exclusivity (Dropdown)
+**** Contract Terms
+**** Strategic Objective
+*** Operational Integration
+**** Service Level (Dropdown)
+**** Communication
+**** Cost Structure
+**** Resource Requirements (Array)
+*** Risk & Control
+**** Supplier Risks (Array)
+**** Compliance Requirements (Array)
+**** Contingency Plans (Array)
+*** Performance Metrics
+**** Supplier Performance
+**** Relationship Strength
+**** Value Delivery
+*** Compliance & Regulatory
+**** WHS Requirements (Array)
+**** ISO Standards (Array)
+**** ICMM Guidelines (Array)
+
+** Cost Structure
+*** Strategic Context
+**** Cost Type (Dropdown)
+**** Cost Driver
+**** Allocation Method (Dropdown)
+**** Strategic Objective
+*** Operational Integration
+**** Budget ($)
+**** Actual Cost ($)
+**** Variance ($)
+**** Resource Requirements (Array)
+*** Risk & Control
+**** Cost Risks (Array)
+**** Budget Controls (Array)
+**** Approval Procedures (Array)
+*** Performance Metrics
+**** Trend
+**** Forecast
+**** Efficiency
+*** Compliance & Regulatory
+**** WHS Requirements (Array)
+**** ISO Standards (Array)
+**** ICMM Guidelines (Array)
+
+** Core Infrastructure
+*** Basic Information
+**** Title
+**** Description
+**** Priority (Dropdown)
+*** Form Management
+**** Validation Rules
+**** Error Handling
+**** Array Field Management
+*** UI Components
+**** Tabbed Interface
+**** Dynamic Field Rendering
+**** Responsive Design
+*** Data Integration
+**** Database Schema Alignment
+**** API Endpoint Integration
+**** Graph Relationship Mapping
+
+@endwbs 

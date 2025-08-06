@@ -33,6 +33,8 @@ import {
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
+import { useBusinessCanvases } from '@/hooks/use-business-canvases'
+import { useBMCContext } from '@/hooks/use-bmc-context'
 import { 
   Plus,
   Edit,
@@ -212,6 +214,9 @@ export function OperatingModelCanvas({
   const { toast } = useToast()
   const router = useRouter()
   const searchParams = useSearchParams()
+  
+  // Fetch available business canvases for BMC selector
+  const { businessCanvases, loading: bmcLoading, error: bmcError } = useBusinessCanvases()
 
   // Build tree structure for navigation
   const treeStructure = useMemo(() => {
@@ -219,9 +224,7 @@ export function OperatingModelCanvas({
   }, [operatingModel])
 
   // Get BMC context for integration
-  const bmcContext = useMemo(() => {
-    return getBMCContext(operatingModel.businessCanvasId)
-  }, [operatingModel.businessCanvasId])
+  const { bmcContext, loading: bmcContextLoading, error: bmcContextError } = useBMCContext(operatingModel.businessCanvasId)
 
   // Calculate BMC integration score
   const bmcIntegrationScore = useMemo(() => {
@@ -322,6 +325,15 @@ export function OperatingModelCanvas({
         return
       }
       
+      if (bmcContextLoading) {
+        toast({
+          title: "Loading BMC Context",
+          description: "Please wait for BMC context to load before integrating.",
+          variant: "destructive",
+        })
+        return
+      }
+      
       const mappedItems = mapBMCToOMC(bmcContext, operatingModel)
       const updatedModel = {
         ...operatingModel,
@@ -409,7 +421,7 @@ export function OperatingModelCanvas({
 
   // Render BMC context strip
   const renderBMCContextStrip = () => {
-    if (!bmcContext || !operatingModel.businessCanvasId) return null
+    if (!operatingModel.businessCanvasId) return null
 
     return (
       <Card className="mb-6 border-blue-200 bg-blue-50/50">
@@ -420,16 +432,27 @@ export function OperatingModelCanvas({
               <CardTitle className="text-lg font-semibold text-blue-900">
                 Business Model Context
               </CardTitle>
-              <Badge variant="outline" className="bg-blue-100 text-blue-700">
-                {bmcIntegrationScore}% Integrated
-              </Badge>
+              {bmcContextLoading ? (
+                <Badge variant="outline" className="bg-blue-100 text-blue-700">
+                  Loading...
+                </Badge>
+              ) : bmcContextError ? (
+                <Badge variant="outline" className="bg-red-100 text-red-700">
+                  Error
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="bg-blue-100 text-blue-700">
+                  {bmcIntegrationScore}% Integrated
+                </Badge>
+              )}
             </div>
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleBMCIntegration}
-                className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                disabled={bmcContextLoading || !!bmcContextError || !bmcContext}
+                className="border-blue-300 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
               >
                 <ArrowRight className="h-4 w-4 mr-1" />
                 Integrate BMC
@@ -438,6 +461,7 @@ export function OperatingModelCanvas({
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowBMCContext(!showBMCContext)}
+                disabled={bmcContextLoading || !!bmcContextError || !bmcContext}
               >
                 {showBMCContext ? <ChevronDown className="h-4 w-4" /> : <ChevronDown className="h-4 w-4 rotate-180" />}
               </Button>
@@ -447,26 +471,43 @@ export function OperatingModelCanvas({
         
         {showBMCContext && (
           <CardContent className="pt-0">
-            <div className="grid grid-cols-3 gap-4 text-sm">
-              <div className="space-y-2">
-                <div className="font-medium text-blue-800">Value Proposition</div>
-                <div className="text-blue-700">
-                  {bmcContext.valuePropositions?.[0]?.description || 'Not defined'}
+            {bmcContextLoading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="text-blue-700 mt-2">Loading BMC context...</p>
+              </div>
+            ) : bmcContextError ? (
+              <div className="text-center py-4">
+                <AlertTriangle className="h-6 w-6 text-red-600 mx-auto mb-2" />
+                <p className="text-red-700">Failed to load BMC context</p>
+                <p className="text-red-600 text-sm">{bmcContextError}</p>
+              </div>
+            ) : bmcContext ? (
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="space-y-2">
+                  <div className="font-medium text-blue-800">Value Proposition</div>
+                  <div className="text-blue-700">
+                    {bmcContext.valuePropositions?.[0]?.description || 'Not defined'}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="font-medium text-blue-800">Customer Segments</div>
+                  <div className="text-blue-700">
+                    {bmcContext.customerSegments?.length || 0} segments defined
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="font-medium text-blue-800">Key Activities</div>
+                  <div className="text-blue-700">
+                    {bmcContext.keyActivities?.length || 0} activities defined
+                  </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="font-medium text-blue-800">Customer Segments</div>
-                <div className="text-blue-700">
-                  {bmcContext.customerSegments?.length || 0} segments defined
-                </div>
+            ) : (
+              <div className="text-center py-4 text-blue-700">
+                No BMC context available
               </div>
-              <div className="space-y-2">
-                <div className="font-medium text-blue-800">Key Activities</div>
-                <div className="text-blue-700">
-                  {bmcContext.keyActivities?.length || 0} activities defined
-                </div>
-              </div>
-            </div>
+            )}
           </CardContent>
         )}
       </Card>
@@ -550,7 +591,9 @@ export function OperatingModelCanvas({
                   key={item.id}
                   className="group relative p-3 bg-white/50 rounded-lg border border-white/20 hover:bg-white/70 transition-colors cursor-pointer"
                   onClick={() => {
-                    setSelectedTreeItem(`${sectionKey}-${item.id}`)
+                    if (viewMode === 'tree') {
+                      setSelectedTreeItem(`${sectionKey}-${item.id}`)
+                    }
                   }}
                 >
                   <div className="flex items-start justify-between">
@@ -827,23 +870,21 @@ export function OperatingModelCanvas({
   // Render list view
   const renderListView = () => {
     return (
-      <div className="space-y-6">
-        {Object.keys(operatingModelSections).map((sectionKey) => {
-          const section = operatingModelSections[sectionKey as keyof typeof operatingModelSections]
-          const items = operatingModel[sectionKey as keyof OperatingModel] as any[]
-          const Icon = section.icon
-
-          return (
-            <Card key={sectionKey}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Icon className="h-5 w-5" />
-                    <CardTitle>{section.title}</CardTitle>
-                    <Badge variant="secondary">{items.length}</Badge>
-                  </div>
-                  {isEditing && (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Operating Model Items</CardTitle>
+              <CardDescription>All items across all sections in a unified table view</CardDescription>
+            </div>
+            {isEditing && (
+              <div className="flex items-center space-x-2">
+                {Object.keys(operatingModelSections).map((sectionKey) => {
+                  const section = operatingModelSections[sectionKey as keyof typeof operatingModelSections]
+                  const Icon = section.icon
+                  return (
                     <Button
+                      key={sectionKey}
                       variant="outline"
                       size="sm"
                       onClick={() => setNewItem({ section: sectionKey as keyof OperatingModel })}
@@ -851,155 +892,212 @@ export function OperatingModelCanvas({
                       <Plus className="h-4 w-4 mr-1" />
                       Add {section.title.slice(0, -1)}
                     </Button>
-                  )}
-                </div>
-                <CardDescription>{section.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {items.length === 0 ? (
-                  <div className="text-center py-6 text-muted-foreground">
-                    <Icon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No {section.title.toLowerCase()} defined</p>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left p-2 font-medium">Name</th>
-                          <th className="text-left p-2 font-medium">Type</th>
-                          <th className="text-left p-2 font-medium">Description</th>
-                          <th className="text-left p-2 font-medium">Status</th>
-                          <th className="text-left p-2 font-medium">Created</th>
-                          <th className="text-left p-2 font-medium">Updated</th>
-                          {isEditing && <th className="text-left p-2 font-medium">Actions</th>}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {items.map((item: any) => (
-                          <tr key={item.id} className="border-b hover:bg-gray-50">
-                            <td className="p-2">
-                              {isEditing ? (
-                                <Input
-                                  defaultValue={item.name}
-                                  className="h-8 text-sm"
-                                  onBlur={(e) => {
-                                    if (e.target.value !== item.name) {
-                                      updateItem(sectionKey as keyof OperatingModel, item.id, { name: e.target.value })
-                                    }
-                                  }}
-                                />
-                              ) : (
-                                <span className="font-medium">{item.name}</span>
-                              )}
-                            </td>
-                            <td className="p-2">
-                              {isEditing ? (
-                                <Select
-                                  defaultValue={
-                                    'supplierType' in item ? item.supplierType :
-                                    'locationType' in item ? item.locationType :
-                                    'valueChainType' in item ? item.valueChainType :
-                                    'orgType' in item ? item.orgType :
-                                    'infoType' in item ? item.infoType :
-                                    'systemType' in item ? item.systemType : ''
-                                  }
-                                  onValueChange={(value) => {
-                                    const updateField = 
-                                      'supplierType' in item ? 'supplierType' :
-                                      'locationType' in item ? 'locationType' :
-                                      'valueChainType' in item ? 'valueChainType' :
-                                      'orgType' in item ? 'orgType' :
-                                      'infoType' in item ? 'infoType' :
-                                      'systemType' in item ? 'systemType' : null
-                                    
-                                    if (updateField) {
-                                      updateItem(sectionKey as keyof OperatingModel, item.id, { [updateField]: value })
-                                    }
-                                  }}
-                                >
-                                  <SelectTrigger className="h-8 text-sm">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {Object.values(SupplierType).map(type => (
-                                      <SelectItem key={type} value={type}>
-                                        {type.replace(/_/g, ' ')}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              ) : (
-                                <Badge variant="outline" className="text-xs">
-                                  {getItemTypeSafe(item)}
-                                </Badge>
-                              )}
-                            </td>
-                            <td className="p-2">
-                              {isEditing ? (
-                                <Textarea
-                                  defaultValue={item.description || ''}
-                                  className="h-8 text-sm resize-none"
-                                  rows={1}
-                                  onBlur={(e) => {
-                                    if (e.target.value !== item.description) {
-                                      updateItem(sectionKey as keyof OperatingModel, item.id, { description: e.target.value })
-                                    }
-                                  }}
-                                />
-                              ) : (
-                                <span className="text-sm text-muted-foreground">
-                                  {item.description || 'No description'}
-                                </span>
-                              )}
-                            </td>
-                            <td className="p-2">
-                              <Badge 
-                                variant="outline" 
-                                className={`text-xs ${getItemStatusColorSafe(item)}`}
-                              >
-                                {getItemStatusSafe(item)}
-                              </Badge>
-                            </td>
-                            <td className="p-2 text-xs text-muted-foreground">
-                              {formatDate(item.createdAt)}
-                            </td>
-                            <td className="p-2 text-xs text-muted-foreground">
-                              {formatDate(item.updatedAt)}
-                            </td>
-                            {isEditing && (
-                              <td className="p-2">
-                                <div className="flex items-center space-x-1">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setEditingItem({ section: sectionKey as keyof OperatingModel, item })}
-                                    className="h-6 w-6 p-0"
-                                  >
-                                    <Edit className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => deleteItem(sectionKey as keyof OperatingModel, item.id)}
-                                    className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
-                                  >
-                                    <Trash2 className="h-3 w-3" />
-                                  </Button>
-                                </div>
-                              </td>
-                            )}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b bg-gray-50">
+                  <th className="text-left p-3 font-semibold text-sm">Section</th>
+                  <th className="text-left p-3 font-semibold text-sm">Name</th>
+                  <th className="text-left p-3 font-semibold text-sm">Type</th>
+                  <th className="text-left p-3 font-semibold text-sm">Description</th>
+                  <th className="text-left p-3 font-semibold text-sm">Status</th>
+                  <th className="text-left p-3 font-semibold text-sm">Created</th>
+                  <th className="text-left p-3 font-semibold text-sm">Updated</th>
+                  {isEditing && <th className="text-left p-3 font-semibold text-sm">Actions</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {Object.keys(operatingModelSections).map((sectionKey) => {
+                  const section = operatingModelSections[sectionKey as keyof typeof operatingModelSections]
+                  const items = operatingModel[sectionKey as keyof OperatingModel] as any[]
+                  const Icon = section.icon
+
+                  if (items.length === 0) {
+                    return (
+                      <tr key={sectionKey} className="border-b">
+                        <td className="p-3 bg-gray-50">
+                          <div className="flex items-center space-x-2">
+                            <Icon className="h-4 w-4 text-gray-500" />
+                            <span className="font-medium text-gray-700">{section.title}</span>
+                            <Badge variant="secondary" className="text-xs">0</Badge>
+                          </div>
+                        </td>
+                        <td colSpan={isEditing ? 7 : 6} className="p-3 text-center text-gray-500">
+                          <div className="flex items-center justify-center space-x-2">
+                            <Icon className="h-5 w-5" />
+                            <span>No {section.title.toLowerCase()} defined</span>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  }
+
+                  return items.map((item: any, index: number) => (
+                    <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors">
+                      {index === 0 && (
+                        <td className="p-3 bg-gray-50 border-r" rowSpan={items.length}>
+                          <div className="flex items-center space-x-2">
+                            <Icon className="h-4 w-4 text-gray-600" />
+                            <span className="font-medium text-gray-700">{section.title}</span>
+                            <Badge variant="secondary" className="text-xs">{items.length}</Badge>
+                          </div>
+                        </td>
+                      )}
+                      <td className="p-3">
+                        {isEditing ? (
+                          <Input
+                            defaultValue={item.name}
+                            className="h-9 text-sm border-gray-300 focus:border-blue-500"
+                            placeholder="Enter name"
+                            onBlur={(e) => {
+                              if (e.target.value !== item.name && e.target.value.trim()) {
+                                updateItem(sectionKey as keyof OperatingModel, item.id, { name: e.target.value.trim() })
+                              }
+                            }}
+                          />
+                        ) : (
+                          <span className="font-medium text-gray-900">{item.name}</span>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        {isEditing ? (
+                          <Select
+                            defaultValue={
+                              'supplierType' in item ? item.supplierType :
+                              'locationType' in item ? item.locationType :
+                              'valueChainType' in item ? item.valueChainType :
+                              'orgType' in item ? item.orgType :
+                              'infoType' in item ? item.infoType :
+                              'systemType' in item ? item.systemType : ''
+                            }
+                            onValueChange={(value) => {
+                              const updateField = 
+                                'supplierType' in item ? 'supplierType' :
+                                'locationType' in item ? 'locationType' :
+                                'valueChainType' in item ? 'valueChainType' :
+                                'orgType' in item ? 'orgType' :
+                                'infoType' in item ? 'infoType' :
+                                'systemType' in item ? 'systemType' : null
+                              
+                              if (updateField) {
+                                updateItem(sectionKey as keyof OperatingModel, item.id, { [updateField]: value })
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="h-9 text-sm border-gray-300">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {sectionKey === 'suppliers' && Object.values(SupplierType).map(type => (
+                                <SelectItem key={type} value={type}>
+                                  {type.replace(/_/g, ' ')}
+                                </SelectItem>
+                              ))}
+                              {sectionKey === 'locations' && Object.values(LocationType).map(type => (
+                                <SelectItem key={type} value={type}>
+                                  {type.replace(/_/g, ' ')}
+                                </SelectItem>
+                              ))}
+                              {sectionKey === 'valueChains' && Object.values(ValueChainType).map(type => (
+                                <SelectItem key={type} value={type}>
+                                  {type.replace(/_/g, ' ')}
+                                </SelectItem>
+                              ))}
+                              {sectionKey === 'organisation' && Object.values(OrganisationType).map(type => (
+                                <SelectItem key={type} value={type}>
+                                  {type.replace(/_/g, ' ')}
+                                </SelectItem>
+                              ))}
+                              {sectionKey === 'information' && Object.values(InformationType).map(type => (
+                                <SelectItem key={type} value={type}>
+                                  {type.replace(/_/g, ' ')}
+                                </SelectItem>
+                              ))}
+                              {sectionKey === 'managementSystems' && Object.values(ManagementSystemType).map(type => (
+                                <SelectItem key={type} value={type}>
+                                  {type.replace(/_/g, ' ')}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Badge variant="outline" className="text-xs">
+                            {getItemTypeSafe(item)}
+                          </Badge>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        {isEditing ? (
+                          <Textarea
+                            defaultValue={item.description || ''}
+                            className="h-9 text-sm resize-none border-gray-300 focus:border-blue-500"
+                            placeholder="Enter description"
+                            rows={1}
+                            onBlur={(e) => {
+                              if (e.target.value !== item.description) {
+                                updateItem(sectionKey as keyof OperatingModel, item.id, { description: e.target.value })
+                              }
+                            }}
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-600">
+                            {item.description || 'No description'}
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs ${getItemStatusColorSafe(item)}`}
+                        >
+                          {getItemStatusSafe(item)}
+                        </Badge>
+                      </td>
+                      <td className="p-3 text-xs text-gray-500">
+                        {formatDate(item.createdAt)}
+                      </td>
+                      <td className="p-3 text-xs text-gray-500">
+                        {formatDate(item.updatedAt)}
+                      </td>
+                      {isEditing && (
+                        <td className="p-3">
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingItem({ section: sectionKey as keyof OperatingModel, item })}
+                              className="h-8 w-8 p-0 hover:bg-blue-50"
+                              title="Edit item"
+                            >
+                              <Edit className="h-4 w-4 text-blue-600" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deleteItem(sectionKey as keyof OperatingModel, item.id)}
+                              className="h-8 w-8 p-0 hover:bg-red-50"
+                              title="Delete item"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))
+                })}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     )
   }
 
@@ -1009,13 +1107,6 @@ export function OperatingModelCanvas({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Operating Model Tree</h3>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSelectedTreeItem(null)}
-          >
-            ← Back to Canvas
-          </Button>
         </div>
         
         <div className="border rounded-lg p-4">
@@ -1466,15 +1557,47 @@ export function OperatingModelCanvas({
         </div>
         <div className="flex items-center space-x-3">
           {/* BMC Selector */}
-          <Select defaultValue={operatingModel.businessCanvasId || 'none'}>
+          <Select 
+            value={operatingModel.businessCanvasId || 'none'} 
+            onValueChange={(value) => {
+              if (value === 'none') {
+                onUpdate({
+                  ...operatingModel,
+                  businessCanvasId: undefined
+                })
+              } else {
+                onUpdate({
+                  ...operatingModel,
+                  businessCanvasId: value
+                })
+              }
+            }}
+          >
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Select BMC" />
+              <SelectValue placeholder={bmcLoading ? "Loading..." : "Select BMC"} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">No BMC Selected</SelectItem>
-              <SelectItem value="bmc1">Copper Operations BMC</SelectItem>
-              <SelectItem value="bmc2">Gold Operations BMC</SelectItem>
-              <SelectItem value="bmc3">Iron Ore Operations BMC</SelectItem>
+              {bmcLoading ? (
+                <SelectItem value="loading" disabled>Loading business canvases...</SelectItem>
+              ) : bmcError ? (
+                <SelectItem value="error" disabled>Error loading BMCs</SelectItem>
+              ) : businessCanvases.length === 0 ? (
+                <SelectItem value="empty" disabled>No business canvases available</SelectItem>
+              ) : (
+                businessCanvases.map((canvas) => (
+                  <SelectItem key={canvas.id} value={canvas.id}>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{canvas.name}</span>
+                      {canvas.industry && (
+                        <span className="text-xs text-gray-500">
+                          {canvas.industry} {canvas.sector && `- ${canvas.sector}`}
+                        </span>
+                      )}
+                    </div>
+                  </SelectItem>
+                ))
+              )}
             </SelectContent>
           </Select>
           
@@ -1497,6 +1620,15 @@ export function OperatingModelCanvas({
             >
               <List className="h-4 w-4 mr-1" />
               List
+            </Button>
+            <Button
+              variant={viewMode === 'tree' ? "default" : "ghost"}
+              size="sm"
+              onClick={() => onViewModeChange?.('tree')}
+              className="px-3"
+            >
+              <Network className="h-4 w-4 mr-1" />
+              Tree
             </Button>
           </div>
           
@@ -1521,11 +1653,6 @@ export function OperatingModelCanvas({
               View
             </Button>
           </div>
-          
-          <Button variant="outline" className="px-6 bg-transparent" onClick={() => setSelectedTreeItem('tree')}>
-            <Network className="h-4 w-4 mr-2" />
-            Tree View
-          </Button>
           <Button variant="outline" className="px-6 bg-transparent" onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
             Export
@@ -1541,31 +1668,27 @@ export function OperatingModelCanvas({
       {renderBMCContextStrip()}
 
       {/* Main Content */}
-      {selectedTreeItem ? (
-        selectedTreeItem === 'tree' ? (
-          renderTreeView()
-        ) : (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedTreeItem(null)}
-              >
-                ← Back to Canvas
-              </Button>
-              <h2 className="text-xl font-bold">Item Details</h2>
-            </div>
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-muted-foreground">
-                  Detailed view for: {selectedTreeItem}
-                </p>
-                {/* TODO: Implement detailed item view */}
-              </CardContent>
-            </Card>
+      {selectedTreeItem && selectedTreeItem !== 'tree' ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedTreeItem(null)}
+            >
+              ← Back to {viewMode === 'canvas' ? 'Canvas' : viewMode === 'list' ? 'List' : 'Tree'}
+            </Button>
+            <h2 className="text-xl font-bold">Item Details</h2>
           </div>
-        )
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-muted-foreground">
+                Detailed view for: {selectedTreeItem}
+              </p>
+              {/* TODO: Implement detailed item view */}
+            </CardContent>
+          </Card>
+        </div>
       ) : (
         <>
           {/* Canvas Content - New Grid Layout */}
@@ -1598,10 +1721,14 @@ export function OperatingModelCanvas({
                     <div className="text-center py-4 text-sm text-muted-foreground">
                       <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
                       <p>Value proposition from BMC context</p>
-                      {bmcContext?.valuePropositions?.[0]?.description && (
+                      {bmcContextLoading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600 mx-auto mt-2"></div>
+                      ) : bmcContext?.valuePropositions?.[0]?.description ? (
                         <p className="mt-2 text-xs bg-white/50 p-2 rounded">
                           {bmcContext.valuePropositions[0].description}
                         </p>
+                      ) : (
+                        <p className="mt-2 text-xs text-gray-500">No value proposition defined</p>
                       )}
                     </div>
                   </CardContent>
@@ -1621,9 +1748,11 @@ export function OperatingModelCanvas({
                 {renderCanvasSection('managementSystems')}
               </div>
             </div>
-          ) : (
+          ) : viewMode === 'list' ? (
             renderListView()
-          )}
+          ) : viewMode === 'tree' ? (
+            renderTreeView()
+          ) : null}
 
           {/* Item Editing Dialog */}
           {renderItemDialog()}

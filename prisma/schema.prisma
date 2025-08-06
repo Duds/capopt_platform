@@ -17,7 +17,7 @@ datasource db {
 // Core graph structure for flexible relationship modeling
 model Node {
   id        String   @id @default(cuid())
-  type      String   // 'activity', 'canvas_card', 'control', 'process', 'asset', 'enterprise', 'facility', etc.
+  type      String   // 'activity', 'canvas_card', 'control', 'process', 'asset', 'enterprise', 'facility', 'okr', 'sla', 'kpq', etc.
   label     String
   metadata  Json     @default("{}")
   createdAt DateTime @default(now())
@@ -42,6 +42,11 @@ model Node {
   departments    Department[]
   businessCanvases BusinessCanvas[]
   processes      Process[]
+  
+  // OKR/SLA/KPQ relationships
+  okrs           OKR[]
+  slas           SLA[]
+  kpqs           KPQ[]
 
   @@map("nodes")
 }
@@ -49,7 +54,7 @@ model Node {
 model Edge {
   fromId       String
   toId         String
-  relationType String // 'delivers', 'mitigates', 'depends_on', 'controls', 'operates', 'contains', 'manages', etc.
+  relationType String // 'delivers', 'mitigates', 'depends_on', 'controls', 'operates', 'contains', 'manages', 'drives', 'expects_change_in', 'applies_to', 'questions', 'assesses', etc.
   metadata     Json   @default("{}")
   createdAt    DateTime @default(now())
 
@@ -496,6 +501,17 @@ model BusinessCanvas {
   riskProfile            RiskProfile?
   complianceRequirements String[]
   regulatoryFramework    String[]
+  
+  // Australian Business Context Fields
+  whsRequirements        String[]
+  isoStandards           String[]
+  icmmGuidelines         String[]
+  miningRegulations      String[]
+  environmentalCompliance String[]
+  safetyStandards        String[]
+  geographicRegions      String[]
+  australianIndustryType String? // MINING_COAL, MINING_METALS, MINING_MINERALS, OIL_GAS, PETROCHEMICALS, DEFENCE, CONSTRUCTION, MANUFACTURING
+  australianRegions      String[] // NSW, VIC, QLD, WA, SA, TAS, NT, ACT
 
   // Relationships
   enterprise    Enterprise?      @relation("EnterpriseBusinessCanvases", fields: [enterpriseId], references: [id])
@@ -531,6 +547,16 @@ model BusinessCanvas {
   // Enhanced relationships
   patternApplications PatternApplication[]
   operatingModels     OperatingModel[] @relation("BusinessCanvasOperatingModels")
+  
+  // BMC → OMC Integration relationships
+  bmcOmcIntegrations BMCOMCIntegration[]
+  bmcGraphRelationships BMCGraphRelationship[]
+  bmcCriticalControls BMCCriticalControl[]
+  
+  // OKR/SLA/KPQ relationships
+  okrs OKR[]
+  slas SLA[]
+  kpqs KPQ[]
 
   @@map("business_canvases")
 }
@@ -933,6 +959,38 @@ model ValueProposition {
   businessCanvasId String
   description      String
   priority         Priority @default(MEDIUM)
+  
+  // Enhanced Strategic Context Fields
+  strategicObjective    String?
+  competitiveAdvantage  String?
+  uniqueSellingPoint    String?
+  targetCustomerSegment String?
+  customerPainPoints    String[]
+  solutionBenefits      String[]
+  valueDeliveryPoints   String[]
+  measurableOutcomes    String?
+  successCriteria       String?
+  
+  // Enhanced Operational Integration Fields
+  operationalDeliveryPoints String[]
+  processDependencies       String[]
+  resourceRequirements      String[]
+  
+  // Enhanced Risk & Control Fields
+  criticalControls        String[]
+  riskMitigation          String?
+  complianceRequirements  String[]
+  
+  // Enhanced Performance Fields
+  valueEffectiveness      String?
+  customerSatisfaction    Decimal?
+  marketPosition          String?
+  
+  // Enhanced Compliance & Regulatory Fields
+  whsRequirements         String[]
+  isoStandards            String[]
+  icmmGuidelines          String[]
+  
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -949,6 +1007,34 @@ model CustomerSegment {
   description      String?
   size             Int?
   priority         Priority @default(MEDIUM)
+  
+  // Enhanced Strategic Context Fields
+  geographicRegion String?
+  industrySector   String?
+  companySize      String?
+  customerNeeds    String?
+  
+  // Enhanced Operational Integration Fields
+  serviceDeliveryChannels String[]
+  supportProcesses        String[]
+  relationshipManagement  String?
+  operationalDeliveryPoints String[]
+  
+  // Enhanced Risk & Control Fields
+  customerRiskProfile     String?
+  dataProtectionNeeds     String[]
+  complianceRequirements  String[]
+  
+  // Enhanced Performance Fields
+  revenuePotential String?
+  lifetimeValue    String?
+  retentionRate    Decimal?
+  
+  // Enhanced Compliance & Regulatory Fields
+  whsRequirements  String[]
+  isoStandards     String[]
+  icmmGuidelines   String[]
+  
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -965,6 +1051,34 @@ model RevenueStream {
   description      String?
   estimatedValue   Float?
   frequency        String?
+  
+  // Enhanced Strategic Context Fields
+  pricingStrategy  String?
+  revenueModel     String? // SUBSCRIPTION/TRANSACTION/LICENSING/ADVERTISING/MARKETPLACE
+  revenuePotential Decimal?
+  competitiveAdvantage String?
+  
+  // Enhanced Operational Integration Fields
+  revenueProcesses String[]
+  billingSystems   String[]
+  collectionProcedures String[]
+  operationalDeliveryPoints String[]
+  
+  // Enhanced Risk & Control Fields
+  revenueRisks     String[]
+  financialControls String[]
+  complianceRequirements String[]
+  
+  // Enhanced Performance Fields
+  revenueGrowth    String?
+  profitMargin     Decimal?
+  cashFlow         String?
+  
+  // Enhanced Compliance & Regulatory Fields
+  whsRequirements  String[]
+  isoStandards     String[]
+  icmmGuidelines   String[]
+  
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -981,6 +1095,34 @@ model Partnership {
   type             String?
   description      String?
   value            String?
+  
+  // Enhanced Strategic Context Fields
+  partnershipModel String? // STRATEGIC/OPERATIONAL/COMPETITIVE/JOINT_VENTURE
+  exclusivity      String? // NONE/PARTIAL/EXCLUSIVE
+  contractTerms    String?
+  strategicObjective String?
+  
+  // Enhanced Operational Integration Fields
+  serviceLevel     String? // BASIC/STANDARD/PREMIUM/ENTERPRISE
+  communication    String?
+  costStructure    String?
+  resourceRequirements String[]
+  
+  // Enhanced Risk & Control Fields
+  supplierRisks    String[]
+  complianceRequirements String[]
+  contingencyPlans String[]
+  
+  // Enhanced Performance Fields
+  supplierPerformance String?
+  relationshipStrength String?
+  valueDelivery    String?
+  
+  // Enhanced Compliance & Regulatory Fields
+  whsRequirements  String[]
+  isoStandards     String[]
+  icmmGuidelines   String[]
+  
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -1001,6 +1143,34 @@ model Resource {
   description      String?
   availability     String?
   cost             Float?
+  
+  // Enhanced Strategic Context Fields
+  resourceCategory String? // PHYSICAL/INTELLECTUAL/HUMAN/FINANCIAL
+  criticality      String? // LOW/MEDIUM/HIGH/CRITICAL
+  uniqueness       String? // COMMON/RARE/UNIQUE/PROPRIETARY
+  strategicObjective String?
+  
+  // Enhanced Operational Integration Fields
+  capacity         String?
+  utilization      Decimal?
+  scalability      String? // LOW/MEDIUM/HIGH/UNLIMITED
+  resourceRequirements String[]
+  
+  // Enhanced Risk & Control Fields
+  resourceRisks    String[]
+  protectionMeasures String[]
+  backupPlans      String[]
+  
+  // Enhanced Performance Fields
+  reliability      String?
+  efficiency       String?
+  replacementCost  String?
+  
+  // Enhanced Compliance & Regulatory Fields
+  whsRequirements  String[]
+  isoStandards     String[]
+  icmmGuidelines   String[]
+  
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 
@@ -1017,6 +1187,34 @@ model Activity {
   description      String?
   priority         Priority @default(MEDIUM)
   cost             Float?
+  
+  // Enhanced Strategic Context Fields
+  activityType     String? // PRODUCTION/PROBLEM_SOLVING/PLATFORM/NETWORK
+  complexity       String? // SIMPLE/MODERATE/COMPLEX/VERY_COMPLEX
+  processSteps     String?
+  strategicObjective String?
+  
+  // Enhanced Operational Integration Fields
+  inputs           String?
+  outputs          String?
+  dependencies     String[]
+  processDependencies String[]
+  
+  // Enhanced Risk & Control Fields
+  activityRisks    String[]
+  safetyControls   String[]
+  qualityAssurance String?
+  
+  // Enhanced Performance Fields
+  cycleTime        String?
+  quality          String?
+  efficiency       String?
+  
+  // Enhanced Compliance & Regulatory Fields
+  whsRequirements  String[]
+  isoStandards     String[]
+  icmmGuidelines   String[]
+  
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -1033,6 +1231,34 @@ model CostStructure {
   category         String?
   amount           Float?
   frequency        String?
+  
+  // Enhanced Strategic Context Fields
+  costType         String? // FIXED/VARIABLE/SEMI_VARIABLE
+  costDriver       String?
+  allocationMethod String? // DIRECT/ACTIVITY_BASED/VOLUME_BASED/TIME_BASED
+  strategicObjective String?
+  
+  // Enhanced Operational Integration Fields
+  budget           Decimal?
+  actual           Decimal?
+  variance         Decimal?
+  resourceRequirements String[]
+  
+  // Enhanced Risk & Control Fields
+  costRisks        String[]
+  budgetControls   String[]
+  approvalProcedures String[]
+  
+  // Enhanced Performance Fields
+  trend            String?
+  forecast         String?
+  efficiency       String?
+  
+  // Enhanced Compliance & Regulatory Fields
+  whsRequirements  String[]
+  isoStandards     String[]
+  icmmGuidelines   String[]
+  
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -1042,6 +1268,73 @@ model CostStructure {
   @@map("cost_structures")
 }
 
+// ============================================================================
+// BMC → OMC INTEGRATION TABLES
+// ============================================================================
+
+model BMCOMCIntegration {
+  id                String   @id @default(cuid())
+  businessCanvasId  String
+  operatingModelId  String
+  bmcSection        String   // value_propositions, customer_segments, etc.
+  bmcItemId         String
+  omcSection        String   // suppliers, locations, value_chains, etc.
+  omcItemId         String
+  integrationType   String   // DIRECT_MAPPING, DERIVED, INFLUENCES
+  integrationStrength Decimal @default(1.0)
+  integrationNotes  String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relationships
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  operatingModel OperatingModel @relation(fields: [operatingModelId], references: [id], onDelete: Cascade)
+
+  @@unique([businessCanvasId, bmcItemId, omcItemId])
+  @@map("bmc_omc_integrations")
+}
+
+model BMCGraphRelationship {
+  id                String   @id @default(cuid())
+  businessCanvasId  String
+  fromSection       String
+  fromItemId        String
+  toSection         String
+  toItemId          String
+  relationshipType  String   // DELIVERS_TO, SUPPORTS, DEPENDS_ON, COMPETES_WITH
+  relationshipStrength Decimal @default(1.0)
+  relationshipNotes String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relationships
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+
+  @@unique([businessCanvasId, fromSection, fromItemId, toSection, toItemId])
+  @@map("bmc_graph_relationships")
+}
+
+model BMCCriticalControl {
+  id                String   @id @default(cuid())
+  businessCanvasId  String
+  bmcSection        String
+  bmcItemId         String
+  criticalControlId String
+  controlEffectiveness Decimal @default(1.0)
+  verificationStatus String @default("PENDING") // PENDING, VERIFIED, FAILED, NOT_APPLICABLE
+  riskLevel         String @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  complianceRequirements String[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relationships
+  businessCanvas BusinessCanvas @relation(fields: [businessCanvasId], references: [id], onDelete: Cascade)
+  criticalControl CriticalControl @relation(fields: [criticalControlId], references: [id], onDelete: Cascade)
+
+  @@unique([businessCanvasId, bmcItemId, criticalControlId])
+  @@map("bmc_critical_controls")
+}
+
 model Channel {
   id               String   @id @default(cuid())
   businessCanvasId String
@@ -1049,6 +1342,34 @@ model Channel {
   description      String?
   effectiveness    String?
   cost             Float?
+  
+  // Enhanced Strategic Context Fields
+  channelType      String? // DIRECT/INDIRECT/PARTNER/ONLINE/RETAIL
+  reach            String?
+  coverage         String?
+  channelStrategy  String?
+  
+  // Enhanced Operational Integration Fields
+  deliveryMethod   String? // DIRECT/INDIRECT/DIGITAL/PHYSICAL
+  serviceLevel     String? // BASIC/STANDARD/PREMIUM/ENTERPRISE
+  responseTime     String?
+  operationalDeliveryPoints String[]
+  
+  // Enhanced Risk & Control Fields
+  channelRisks         String[]
+  qualityControls      String[]
+  complianceRequirements String[]
+  
+  // Enhanced Performance Fields
+  channelEffectiveness String?
+  costEfficiency       String?
+  profitability        String?
+  
+  // Enhanced Compliance & Regulatory Fields
+  whsRequirements      String[]
+  isoStandards         String[]
+  icmmGuidelines       String[]
+  
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -1113,6 +1434,14 @@ model OperatingModel {
   // Creator relationships
   createdBy       String
   creator         User @relation("OperatingModelCreator", fields: [createdBy], references: [id])
+  
+  // BMC → OMC Integration relationships
+  bmcOmcIntegrations BMCOMCIntegration[]
+  
+  // OKR/SLA/KPQ relationships
+  okrs OKR[]
+  slas SLA[]
+  kpqs KPQ[]
 
   @@map("operating_models")
 }
@@ -1800,6 +2129,14 @@ model CriticalControl {
   assets           AssetControl[]
   verificationLogs VerificationLog[]
   bowtieModels     BowtieModel[]
+  
+  // BMC → Critical Controls Integration relationships
+  bmcCriticalControls BMCCriticalControl[]
+  
+  // OKR/SLA/KPQ relationships
+  okrs OKR[]
+  slas SLA[]
+  kpqs KPQ[]
 
   @@map("critical_controls")
 }
@@ -2121,6 +2458,11 @@ model Process {
   playbooks      ProcessPlaybook[]
   maturityScores ProcessMaturityScore[]
   graphNode      Node?                 @relation(fields: [graphNodeId], references: [id])
+  
+  // OKR/SLA/KPQ relationships
+  okrs OKR[]
+  slas SLA[]
+  kpqs KPQ[]
 
   @@map("processes")
 }
@@ -2225,6 +2567,9 @@ model Playbook {
   bestPractices     BestPractice[]
   improvements      Improvement[]
   processes         ProcessPlaybook[]
+  
+  // OKR/SLA/KPQ relationships
+  kpqs KPQ[]
 
   @@map("playbooks")
 }
@@ -2989,4 +3334,282 @@ model OperatingModelTemplate {
   creator               User             @relation("OperatingModelTemplateCreator", fields: [createdBy], references: [id])
 
   @@map("operating_model_templates")
+}
+
+// ============================================================================
+// OKR/SLA/KPQ GRAPH-NATIVE INTEGRATION
+// ============================================================================
+
+// OKR (Objectives and Key Results) - Strategic direction and ambition
+model OKR {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  objective   String
+  keyResults  String[] // Array of key result statements
+  period      String   // e.g., 'Q3-2025', 'FY2025'
+  status      OKRStatus @default(ACTIVE)
+  priority    Priority @default(MEDIUM)
+  owner       String?  // User ID or role
+  targetDate  DateTime?
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Graph node relationship
+  graphNodeId String?  @unique
+  graphNode   Node?    @relation(fields: [graphNodeId], references: [id])
+
+  // Relationships to operational elements
+  businessCanvasId String?
+  businessCanvas   BusinessCanvas? @relation(fields: [businessCanvasId], references: [id], onDelete: SetNull)
+  
+  operatingModelId String?
+  operatingModel   OperatingModel? @relation(fields: [operatingModelId], references: [id], onDelete: SetNull)
+  
+  criticalControlId String?
+  criticalControl   CriticalControl? @relation(fields: [criticalControlId], references: [id], onDelete: SetNull)
+  
+  processId String?
+  process   Process? @relation(fields: [processId], references: [id], onDelete: SetNull)
+
+  // OKR relationships
+  okrSlas    OKRSLA[]
+  okrKpqs    OKRKPQ[]
+  okrMetrics OKRMetric[]
+
+  @@map("okrs")
+}
+
+// SLA (Service Level Agreement) - Performance thresholds and commitments
+model SLA {
+  id              String   @id @default(cuid())
+  title           String
+  description     String?
+  service         String   // Service or control being measured
+  target          String   // Target performance (e.g., 'Daily verification', '99.9% uptime')
+  acceptableLapse String?  // Acceptable deviation (e.g., '1 day', '0.1%')
+  measurementUnit String?  // Unit of measurement (e.g., 'days', 'percentage', 'hours')
+  status          SLAStatus @default(ACTIVE)
+  priority        Priority @default(MEDIUM)
+  owner           String?  // User ID or role
+  reviewPeriod    String?  // How often SLA is reviewed
+  metadata        Json     @default("{}")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Graph node relationship
+  graphNodeId String?  @unique
+  graphNode   Node?    @relation(fields: [graphNodeId], references: [id])
+
+  // Relationships to operational elements
+  businessCanvasId String?
+  businessCanvas   BusinessCanvas? @relation(fields: [businessCanvasId], references: [id], onDelete: SetNull)
+  
+  operatingModelId String?
+  operatingModel   OperatingModel? @relation(fields: [operatingModelId], references: [id], onDelete: SetNull)
+  
+  criticalControlId String?
+  criticalControl   CriticalControl? @relation(fields: [criticalControlId], references: [id], onDelete: SetNull)
+  
+  processId String?
+  process   Process? @relation(fields: [processId], references: [id], onDelete: SetNull)
+
+  // SLA relationships
+  okrSlas    OKRSLA[]
+  slaKpqs    SLAKPQ[]
+  slaMetrics SLAMetric[]
+
+  @@map("slas")
+}
+
+// KPQ (Key Performance Question) - Assurance and audit probes
+model KPQ {
+  id          String   @id @default(cuid())
+  question    String   // The actual question being asked
+  description String?
+  scope       String   // Scope of inquiry (e.g., 'Tailings Risk Response', 'Safety Culture')
+  category    KPQCategory @default(ASSURANCE)
+  status      KPQStatus @default(ACTIVE)
+  priority    Priority @default(MEDIUM)
+  owner       String?  // User ID or role
+  lastTested  DateTime?
+  nextTestDue DateTime?
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Graph node relationship
+  graphNodeId String?  @unique
+  graphNode   Node?    @relation(fields: [graphNodeId], references: [id])
+
+  // Relationships to operational elements
+  businessCanvasId String?
+  businessCanvas   BusinessCanvas? @relation(fields: [businessCanvasId], references: [id], onDelete: SetNull)
+  
+  operatingModelId String?
+  operatingModel   OperatingModel? @relation(fields: [operatingModelId], references: [id], onDelete: SetNull)
+  
+  criticalControlId String?
+  criticalControl   CriticalControl? @relation(fields: [criticalControlId], references: [id], onDelete: SetNull)
+  
+  processId String?
+  process   Process? @relation(fields: [processId], references: [id], onDelete: SetNull)
+  
+  playbookId String?
+  playbook   Playbook? @relation(fields: [playbookId], references: [id], onDelete: SetNull)
+
+  // KPQ relationships
+  okrKpqs    OKRKPQ[]
+  slaKpqs    SLAKPQ[]
+  kpqMetrics KPQMetric[]
+
+  @@map("kpqs")
+}
+
+// Junction tables for many-to-many relationships
+model OKRSLA {
+  id        String   @id @default(cuid())
+  okrId     String
+  slaId     String
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  // Relationships
+  okr OKR @relation(fields: [okrId], references: [id], onDelete: Cascade)
+  sla SLA @relation(fields: [slaId], references: [id], onDelete: Cascade)
+
+  @@unique([okrId, slaId])
+  @@map("okr_slas")
+}
+
+model OKRKPQ {
+  id        String   @id @default(cuid())
+  okrId     String
+  kpqId     String
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  // Relationships
+  okr OKR @relation(fields: [okrId], references: [id], onDelete: Cascade)
+  kpq KPQ @relation(fields: [kpqId], references: [id], onDelete: Cascade)
+
+  @@unique([okrId, kpqId])
+  @@map("okr_kpqs")
+}
+
+model SLAKPQ {
+  id        String   @id @default(cuid())
+  slaId     String
+  kpqId     String
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  // Relationships
+  sla SLA @relation(fields: [slaId], references: [id], onDelete: Cascade)
+  kpq KPQ @relation(fields: [kpqId], references: [id], onDelete: Cascade)
+
+  @@unique([slaId, kpqId])
+  @@map("sla_kpqs")
+}
+
+// Performance metrics for tracking OKR/SLA/KPQ effectiveness
+model OKRMetric {
+  id        String   @id @default(cuid())
+  okrId     String
+  metric    String   // Metric name
+  value     Float    // Current value
+  target    Float?   // Target value
+  unit      String?  // Unit of measurement
+  period    String   // Time period (e.g., 'Q3-2025')
+  status    MetricStatus @default(ON_TRACK)
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  okr OKR @relation(fields: [okrId], references: [id], onDelete: Cascade)
+
+  @@map("okr_metrics")
+}
+
+model SLAMetric {
+  id        String   @id @default(cuid())
+  slaId     String
+  metric    String   // Metric name
+  value     Float    // Current value
+  target    Float    // Target value
+  unit      String?  // Unit of measurement
+  period    String   // Time period
+  status    MetricStatus @default(ON_TRACK)
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  sla SLA @relation(fields: [slaId], references: [id], onDelete: Cascade)
+
+  @@map("sla_metrics")
+}
+
+model KPQMetric {
+  id        String   @id @default(cuid())
+  kpqId     String
+  metric    String   // Metric name
+  value     Float    // Current value
+  target    Float?   // Target value
+  unit      String?  // Unit of measurement
+  period    String   // Time period
+  status    MetricStatus @default(ON_TRACK)
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  kpq KPQ @relation(fields: [kpqId], references: [id], onDelete: Cascade)
+
+  @@map("kpq_metrics")
+}
+
+// Enums for OKR/SLA/KPQ status and categories
+enum OKRStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  ON_HOLD
+}
+
+enum SLAStatus {
+  DRAFT
+  ACTIVE
+  BREACHED
+  SUSPENDED
+  TERMINATED
+}
+
+enum KPQStatus {
+  DRAFT
+  ACTIVE
+  ANSWERED
+  UNANSWERED
+  OUTDATED
+}
+
+enum KPQCategory {
+  ASSURANCE
+  AUDIT
+  COMPLIANCE
+  SAFETY
+  QUALITY
+  OPERATIONAL
+  STRATEGIC
+}
+
+enum MetricStatus {
+  ON_TRACK
+  AT_RISK
+  OFF_TRACK
+  COMPLETED
+  OVERDUE
 }

@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { SeedOptions, SeedResult } from '../config/types'
 import { seedProcesses } from './processes'
+import { seedPlaybooks } from './playbooks'
 import { seedOperationalStreams } from './operational-streams'
 
 export async function seedOperational(prisma: PrismaClient, options?: SeedOptions): Promise<SeedResult> {
@@ -14,6 +15,11 @@ export async function seedOperational(prisma: PrismaClient, options?: SeedOption
     const processesResult = await seedProcesses(prisma, options)
     entitiesCreated += processesResult.entitiesCreated || 0
     entitiesUpdated += processesResult.entitiesUpdated || 0
+    
+    // Seed playbooks
+    const playbooksResult = await seedPlaybooks(prisma, options)
+    entitiesCreated += playbooksResult.entitiesCreated || 0
+    entitiesUpdated += playbooksResult.entitiesUpdated || 0
     
     // Seed operational streams
     const streamsResult = await seedOperationalStreams(prisma, options)
